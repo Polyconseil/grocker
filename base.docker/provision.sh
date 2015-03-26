@@ -11,6 +11,7 @@ SYS_DEPS="
     uwsgi-plugin-python
     uwsgi-plugin-python3
     virtualenv
+    sudo
 "
 
 BASE_DEPS="
