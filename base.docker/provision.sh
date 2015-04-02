@@ -40,6 +40,9 @@ export DEBIAN_FRONTEND=noninteractive
 alias apt="apt -o APT::Install-Recommends=false -o APT::Install-Suggests=false"
 
 apt install -qy ${SYS_DEPS} ${BASE_DEPS}
+apt-get clean
 
 # Create User
 adduser --shell /bin/bash --ingroup ${GROUP} --disabled-password --gecos ",,,," ${USER}
+
+
