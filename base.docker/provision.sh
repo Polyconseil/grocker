@@ -8,10 +8,11 @@ SYS_DEPS="
     nginx-full
     python
     python3
+    sudo
+    supervisor
     uwsgi-plugin-python
     uwsgi-plugin-python3
     virtualenv
-    sudo
 "
 
 BASE_DEPS="
