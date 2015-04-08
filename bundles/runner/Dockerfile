@@ -1,14 +1,12 @@
 FROM bluesolutions/bundle-base:0.1
 
-ADD provision.sh /tmp/provision.sh
+# Run the installer script for target package
+ADD 00_install_package.sh /tmp/00_install_package.sh
 COPY output/* /tmp/output/
+RUN /tmp/00_install_package.sh
 
-RUN /tmp/provision.sh
-
+# Prepare the image to run the entrypoint
 VOLUME [/media /scripts /config /dev/log]
 EXPOSE 8080 8081
-
 USER blue
-
-
 ENTRYPOINT ["/home/blue/app/bin/entrypoint"]

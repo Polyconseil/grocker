@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
     Docker Builder for Blue Applications
 
@@ -10,6 +12,7 @@
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import argparse
 import logging
 import logging.config
@@ -24,7 +27,7 @@ __version__ = '0.1'
 REQUIRED_IMAGE_NAMES = ('base', 'compiler')
 BLUE_HOME = '/home/blue'
 
-RUNNER_BUILD_DIR = './runner_template.docker/output'
+RUNNER_BUILD_DIR = './bundles/runner/output'  # the runner's Dockerfile needs access to this folder
 RUNNER_ENV_FILE = 'config.env'
 RUNNER_ENV_FILE_TPL = """
     PACKAGE_NAME={package}
@@ -37,15 +40,17 @@ def main():
 
     setup_logging(not args.no_colors)
 
+    # TODO: should be one of the targets of this script. make build_images with one of the "machines" as parameter.
     for name in REQUIRED_IMAGE_NAMES:
         build_docker_image(name)
 
+    # TODO: same, this is again a different target. should be separate.
     build_dir = args.build_dir or RUNNER_BUILD_DIR
     if not os.path.exists(build_dir):
         os.makedirs(build_dir, mode=0o0750)
-
     compile_packages(args.package, python_version=args.python_version, build_dir=build_dir)
 
+    # TODO: last but not least, go with the Makefile for this.
     if args.build_dir is None:
         build_runner(args.package, python_version=args.python_version, build_dir=build_dir)
 
@@ -80,11 +85,11 @@ def build_docker_image(name):
         'docker', 'build',
         '--force-rm=true', '--rm=true',
         '-t', 'bluesolutions/bundle-{name}:{version}'.format(name=name, version=__version__),
-        '{name}.docker/.'.format(name=name),
+        'bundles/{name}/.'.format(name=name),
     )
 
 
-def compile_packages(package, build_dir='./output', python_version=None):
+def compile_packages(package, build_dir, python_version=None):
     run(
         'docker', 'run',
         '--rm',
@@ -99,7 +104,7 @@ def compile_packages(package, build_dir='./output', python_version=None):
     )
 
 
-def build_runner(package, build_dir='./output', python_version=None):
+def build_runner(package, build_dir, python_version=None):
     # create env file
     env_file_path = os.path.join(build_dir, RUNNER_ENV_FILE)
     with open(env_file_path, 'w') as env_file:
@@ -114,7 +119,7 @@ def build_runner(package, build_dir='./output', python_version=None):
         'docker', 'build',
         '--force-rm=true', '--rm=true',
         '-t', 'bluesolutions/{0}'.format(package.replace('==', ':')),
-        'runner_template.docker/.'
+        'bundles/runner/.'
     )
 
 
