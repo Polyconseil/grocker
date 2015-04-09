@@ -5,7 +5,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update
 # Install system packages and compiler script in final destination
 ADD 00_install_python.sh /tmp/00_install_python.sh
 ADD 01_compile.py /tmp/01_compile.py
-RUN /tmp/00_provision.sh
+RUN /tmp/00_install_python.sh
 
 # Make the entrypoint run the compile script
 USER blue

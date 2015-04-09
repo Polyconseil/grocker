@@ -13,9 +13,7 @@ The following commands are available:
 
 - Bundle building:
 
-    base
-    compiler
-    runner
+    build PACKAGE=xxx VERSION=yyy
 
 - Other:
 
@@ -36,13 +34,13 @@ PYTHON_VERSION ?= 2.7
 help:
 	$(info $(helpmsg))
 
-all:
+build:
 	./builder.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
 clean:
 	rm -rf bundles/runner/output
 
 cleanall:
-	docker kill $(shell docker ps -a -q)
-	docker rm -f $(shell docker ps -a -q)
-	docker rmi -f $(shell docker images -a -q)
+	-docker kill $(shell docker ps -a -q)
+	-docker rm -f $(shell docker ps -a -q)
+	-docker rmi -f $(shell docker images -a -q)
