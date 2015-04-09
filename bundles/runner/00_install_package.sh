@@ -17,8 +17,8 @@ sudo -u blue $USER_HOME/app/bin/pip install pip setuptools --upgrade
 # Install the package and its dependencies using the provided wheels
 sudo -u blue $USER_HOME/app/bin/pip install --find-links=/tmp/output --no-index $PACKAGE_NAME
 
-# Install the entrypoint package
-sudo -u blue $USER_HOME/app/bin/pip install --find-links=/tmp/output --no-index entrypoint
+# Install the entrypoint script
+install --mode=0755 --owner=${USER} -D /tmp/01_entrypoint.py ${USER_HOME}/app/bin/entrypoint.py
 
 # Cleanup unnecessary files
 rm -Rf /tmp/output
