@@ -34,14 +34,13 @@ def templatize(filename, dest, context):
             fw.write(string.Template(fh.read()).safe_substitute(context))
 
 
-class Entrypoint:
-    """Entrypoint script main class"""
+class EntryPoint(object):
+    """EntryPoint script main class"""
 
-    def __init__(self, service, enable_colors, si_name):
+    def __init__(self, service, enable_colors):
         # our program logger
         self.logger = None
         self.user_home = os.path.expanduser('~')
-        self.si_name = si_name
         self.service = service[0]
         self.args = service[1:]
 
@@ -50,6 +49,7 @@ class Entrypoint:
 
         self.setup_logging(enable_colors)
         self.load_environment()
+        self.si_name = self.context['project_name']
 
     def gen_context(self, **kwargs):
         self.context['python_version'] = os.environ['PYTHON_VERSION']
@@ -158,16 +158,13 @@ def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
     parser.add_argument('service', nargs='+', help='the service to run')
     parser.add_argument('--disable-colors', help='disable colors')
-    #TODO: How do I know the SI name ?
-    parser.add_argument('--si-name', help='the SI name (autoslave, bluestock ...)')
 
     args = parser.parse_args()
-    entrypoint = Entrypoint(
+    entry_point = EntryPoint(
         service=args.service,
         enable_colors=not args.disable_colors,
-        si_name=args.si_name,
     )
-    entrypoint.run()
+    entry_point.run()
 
 if __name__ == '__main__':
     main()
