@@ -21,9 +21,10 @@ import string
 import subprocess
 
 DEFAULT_USER = 'blue'
+BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
 ENV_CONFIG = os.path.join('/tmp', 'config.env')
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates')
+TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
 
 
 def templatize(filename, dest, context):

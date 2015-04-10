@@ -6,7 +6,12 @@ source /opt/bundle/base_vars.sh
 
 # Get target package variables
 . /tmp/output/config.env
+
+# Make the environment script available to entrypoint.py
 mv /tmp/output/config.env /tmp
+
+# Copy the templates to home directory
+mv /tmp/templates/ $USER_HOME
 
 # Create virtualenv with the correct python version in $HOME/app
 sudo -u blue virtualenv $USER_HOME/app -p python$PYTHON_VERSION
