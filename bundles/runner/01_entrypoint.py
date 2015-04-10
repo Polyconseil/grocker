@@ -20,11 +20,14 @@ import re
 import string
 import subprocess
 
-DEFAULT_USER = 'blue'
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
+DEFAULT_USER = 'blue'
 ENV_CONFIG = os.path.join('/tmp', 'config.env')
 TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
+VENV = os.path.join(BLUE_HOME, 'app')
+VENV_BIN = os.path.join(VENV, 'bin')
+SCRIPT_DIR = '/scripts'
 
 
 def templatize(filename, dest, context):
@@ -49,8 +52,6 @@ class EntryPoint(object):
 
         self.setup_logging(enable_colors)
         self.load_environment()
-        self.gen_context(service=self.service)
-        self.si_name = self.context['project_name']
 
     def gen_context(self, **kwargs):
         self.context['python_version'] = os.environ['PYTHON_VERSION']
@@ -103,13 +104,52 @@ class EntryPoint(object):
             pass
 
     def run(self):
+        self.gen_context(service=self.service)
+        self.si_name = self.context['project_name']
+
+        # configure the django project
+        si_name_config_path = os.path.join(self.user_home, self.si_name)
+
+        os.makedirs(si_name_config_path)
+        templatize(
+            'settings.ini',
+            os.path.join(si_name_config_path, 'settings.ini'),
+            self.context,
+        )
+
         service_mapping = {
             'shell': self.run_shell,
             'ops': self.run_si,
+            'django-admin': self.django_admin,
         }
 
         fn = service_mapping.get(self.service, self.run_command)
         fn(self.service, *self.args)
+
+    def _setup_environ(self, **kwargs):
+        """In some case, we have to setup the environ"""
+        environ = os.environ.copy()
+        environ.update(kwargs)
+        return environ
+
+    def django_admin(self, service, *args):
+        """Run django-admin.py from the virtualenv"""
+        binary = os.path.join(VENV_BIN, 'django-admin.py')
+
+        # configure the environ
+        project_settings = os.path.join(BLUE_HOME, self.context['project_name'], 'settings.ini')
+        environ = {
+            'DJANGO_SETTINGS_MODULE': '{project_name}.settings'.format(**self.context),
+            '{project_name_upper}_CONFIG'.format(**self.context): project_settings,
+        }
+        environ = self._setup_environ(**environ)
+
+        # use run_command ?
+        cmd_line = [binary]
+        cmd_line.extend(args)
+        process = subprocess.Popen(cmd_line, env=environ, cwd=SCRIPT_DIR)
+        process.wait()
+
 
     def run_shell(self, service, *args):
         """simply start a shell"""
@@ -128,17 +168,6 @@ class EntryPoint(object):
         templatize(
             'nginx.conf',
             os.path.join(self.user_home, 'nginx.conf'),
-            self.context,
-        )
-        # configure the django project
-        # put configuration to /etc/<siname>/
-
-        si_name_config_path = os.path.join(self.user_home, self.si_name)
-
-        os.makedirs(si_name_config_path)
-        templatize(
-            'settings.ini',
-            os.path.join(si_name_config_path, 'settings.ini'),
             self.context,
         )
 
