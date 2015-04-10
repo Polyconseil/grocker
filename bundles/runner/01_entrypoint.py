@@ -49,6 +49,7 @@ class EntryPoint(object):
 
         self.setup_logging(enable_colors)
         self.load_environment()
+        self.gen_context(service=self.service)
         self.si_name = self.context['project_name']
 
     def gen_context(self, **kwargs):
@@ -102,7 +103,6 @@ class EntryPoint(object):
             pass
 
     def run(self):
-        self.gen_context(service=self.service)
         service_mapping = {
             'shell': self.run_shell,
             'ops': self.run_si,
