@@ -31,7 +31,7 @@ def templatize(filename, dest, context):
     filename = os.path.join(TEMPLATE_PATH, filename)
     with open(dest, 'w') as fw:
         with open(filename) as fh:
-            fw.write(string.Template(fh.read()).safe_substitute(context))
+            fw.write(string.Template(fh.read()).substitute(context))
 
 
 class EntryPoint(object):
