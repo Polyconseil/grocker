@@ -24,10 +24,10 @@ BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
 DEFAULT_USER = 'blue'
 ENV_CONFIG = os.path.join('/tmp', 'config.env')
+SCRIPT_DIR = '/scripts'
 TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
 VENV = os.path.join(BLUE_HOME, 'app')
 VENV_BIN = os.path.join(VENV, 'bin')
-SCRIPT_DIR = '/scripts'
 
 
 def templatize(filename, dest, context):
@@ -121,6 +121,7 @@ class EntryPoint(object):
             'shell': self.run_shell,
             'ops': self.run_si,
             'django-admin': self.django_admin,
+            'pyscript': self.run_pyscript,
         }
 
         fn = service_mapping.get(self.service, self.run_command)
@@ -132,24 +133,36 @@ class EntryPoint(object):
         environ.update(kwargs)
         return environ
 
-    def django_admin(self, service, *args):
-        """Run django-admin.py from the virtualenv"""
-        binary = os.path.join(VENV_BIN, 'django-admin.py')
-
+    def _run_custom_command(self, cmd_line):
+        """Run a script or the django-admin command"""
         # configure the environ
         project_settings = os.path.join(BLUE_HOME, self.context['project_name'], 'settings.ini')
         environ = {
             'DJANGO_SETTINGS_MODULE': '{project_name}.settings'.format(**self.context),
             '{project_name_upper}_CONFIG'.format(**self.context): project_settings,
         }
+        self.logger.info("running %s", " ".join(cmd_line))
         environ = self._setup_environ(**environ)
-
-        # use run_command ?
-        cmd_line = [binary]
-        cmd_line.extend(args)
         process = subprocess.Popen(cmd_line, env=environ, cwd=SCRIPT_DIR)
         process.wait()
 
+    def django_admin(self, service, *args):
+        """Run django-admin.py from the virtualenv"""
+        binary = os.path.join(VENV_BIN, 'django-admin.py')
+        cmd_line = [binary]
+        cmd_line.extend(args)
+        self._run_custom_command(cmd_line)
+
+    def run_pyscript(self, service, *args):
+        """Run a python script:
+            * ensure to use the python installed in the virtualenv
+        """
+        python_binary = os.path.join(VENV_BIN, 'python')
+        script_name = args[0]
+        script_path = os.path.join(SCRIPT_DIR, script_name)
+        cmd_line = [python_binary, script_path]
+        cmd_line.extend(args[1:])
+        self._run_custom_command(cmd_line)
 
     def run_shell(self, service, *args):
         """simply start a shell"""
