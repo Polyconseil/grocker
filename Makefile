@@ -8,8 +8,9 @@ The following commands are available:
 
 - Cleanup:
 
-    clean                Clean build artefacts, not docker images.
-    cleanall             Clean every container and image.
+    clean                Clean build artefacts.
+    kill_rm              Kill containers and delete them.
+    purge                All of the above and also delete blue solution's images.
 
 - Bundle building:
 
@@ -26,6 +27,12 @@ endef
 
 PYTHON_VERSION ?= 2.7
 
+BLUESOLUTIONS_CONTAINERS := $(shell docker ps |\grep 'bluesolutions' | awk '{print $$1}')
+BLUE_REGISTRY_CONTAINERS := $(shell docker ps |\grep 'docker\.polyconseil\.fr' | awk '{print $$1}')
+
+UNTAGGED_IMAGES := $(shell docker images | grep '^<none>' | awk '{print $$3}')
+BLUESOLUTIONS_IMAGES := $(shell docker images | grep '^bluesolutions' | awk '{print $$3}')
+BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polyconseil\.fr' | awk '{print $$3}')
 
 
 # Tasks
@@ -40,7 +47,10 @@ build:
 clean:
 	rm -rf bundles/runner/output
 
-cleanall:
-	-docker kill $(shell docker ps -a -q)
-	-docker rm -f $(shell docker ps -a -q)
-	-docker rmi -f $(shell docker images -a -q)
+kill_rm:
+	-docker kill $(BLUESOLUTIONS_CONTAINERS) $(BLUE_REGISTRY_CONTAINERS)
+	-docker rm $(BLUESOLUTIONS_CONTAINERS) $(BLUE_REGISTRY_CONTAINERS)
+
+purge: clean kill_rm
+	-docker rmi -f $(BLUESOLUTIONS_IMAGES) $(BLUE_REGISTRY_IMAGES)
+	-docker rmi $(UNTAGGED_IMAGES)

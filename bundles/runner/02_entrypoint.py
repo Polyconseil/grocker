@@ -22,6 +22,8 @@ import string
 import subprocess
 
 BLUE_HOME = '/home/blue'
+CRONTAB_RESOURCE_NAME = 'crontab'  # crontab with right permissions
+CRONTAB_TARGET_FILE = '/etc/cron.d/app'
 CONFIG_MOUNT_POINT = '/config'
 DEFAULT_USER = 'blue'
 DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
@@ -58,7 +60,7 @@ class EntryPoint(object):
     def gen_context(self, **kwargs):
         self.context['django_config_path'] = DJANGO_SETTINGS_PATH
         self.context['python_version'] = os.environ['PYTHON_VERSION']
-        self.context['project_name'] = os.environ['PACKAGE_NAME'].split('==')[0]
+        self.context['project_name'] = os.environ['PROJECT_NAME']
         self.context['project_name_upper'] = self.context['project_name'].upper()
         self.context.update(kwargs)
 
@@ -69,12 +71,14 @@ class EntryPoint(object):
         regex = re.compile("^([a-zA-Z_1-9]*)=(.*)$")
         with open(ENV_CONFIG) as fh:
             for line in fh.readlines():
+                if line.strip() == '':
+                    continue
                 r = regex.search(line)
                 if r:
                     key, value = r.groups()
                     os.environ[key] = value
                 else:
-                    print("line '%s' is not an envion" % line)
+                    self.logger.info("> line '%s' is not an environment variable" % line)
 
     def setup_logging(self, enable_colors):
         colors = {'begin': '\033[1;33m', 'end': '\033[0m'}
@@ -113,10 +117,12 @@ class EntryPoint(object):
         self._setup_si()
 
         service_mapping = {
+            'cron': self.run_cron,
             'django-admin': self.django_admin,
             'shell': self.run_shell,
             'si-service': self.run_si,
             'pyscript': self.run_pyscript,
+            'shell': self.run_shell,
         }
 
         fn = service_mapping.get(self.command, self.run_command)
@@ -142,7 +148,7 @@ class EntryPoint(object):
 
         si_mounted_config_dir = os.path.join(CONFIG_MOUNT_POINT, 'si_config')
         if not os.path.exists(si_mounted_config_dir):
-            logger.warning("No 'si_config' directory found")
+            self.logger.warning("No 'si_config' directory found")
             return
 
         for filename in os.listdir(si_mounted_config_dir):
@@ -150,7 +156,6 @@ class EntryPoint(object):
                 src=os.path.join(si_mounted_config_dir, filename),
                 dst=os.path.join(DJANGO_SETTINGS_PATH, filename),
             )
-
 
     def _run_custom_command(self, cmd_line):
         """Run a script or the django-admin command"""
@@ -216,6 +221,19 @@ class EntryPoint(object):
 
         # run supervisord
         self.run_command('supervisord', '-c', supervisord_config)
+
+    def run_cron(self, *args):
+        # configure cronwrapper
+        dest_cronwrapper = os.path.join(self.user_home, 'cronwrapper.sh')
+        templatize(
+            'cronwrapper.sh',
+            dest_cronwrapper,
+            self.context,
+        )
+        # make it executable
+        self.run_command('chmod', '+x', dest_cronwrapper)
+        # run cron daemon
+        self.run_command('sudo', 'cron', '-f')
 
 
 def main():

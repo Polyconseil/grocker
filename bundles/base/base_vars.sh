@@ -5,6 +5,7 @@ GROUP="www-data"
 USER_HOME=$( getent passwd "$USER" | cut -d: -f6 )
 
 SYS_DEPS="
+cron
 nginx-full
 python
 python3

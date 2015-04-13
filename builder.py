@@ -30,6 +30,8 @@ BLUE_HOME = '/home/blue'
 RUNNER_BUILD_DIR = './bundles/runner/output'  # the runner's Dockerfile needs access to this folder
 RUNNER_ENV_FILE = 'config.env'
 RUNNER_ENV_FILE_TPL = """
+    PROJECT_NAME={project}
+    PROJECT_VERSION={version}
     PACKAGE_NAME={package}
     PYTHON_VERSION={python_version}
 """
@@ -111,7 +113,12 @@ def build_runner(package, build_dir, python_version=None):
         env_file.write(
             textwrap
             .dedent(RUNNER_ENV_FILE_TPL)
-            .format(package=package, python_version=python_version)
+            .format(
+                package=package,
+                project=package.split('==')[0],
+                version=package.split('==')[1],
+                python_version=python_version
+            )
         )
 
     # create the future docker image
