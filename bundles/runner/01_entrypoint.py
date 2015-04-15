@@ -17,12 +17,14 @@ import logging
 import logging.config
 import os
 import re
+import shutil
 import string
 import subprocess
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
 DEFAULT_USER = 'blue'
+DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
 ENV_CONFIG = os.path.join('/tmp', 'config.env')
 SCRIPT_DIR = '/scripts'
 TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
@@ -54,6 +56,7 @@ class EntryPoint(object):
         self.load_environment()
 
     def gen_context(self, **kwargs):
+        self.context['django_config_path'] = DJANGO_SETTINGS_PATH
         self.context['python_version'] = os.environ['PYTHON_VERSION']
         self.context['project_name'] = os.environ['PACKAGE_NAME'].split('==')[0]
         self.context['project_name_upper'] = self.context['project_name'].upper()
@@ -107,15 +110,7 @@ class EntryPoint(object):
         self.gen_context(service=self.service)
         self.si_name = self.context['project_name']
 
-        # configure the django project
-        si_name_config_path = os.path.join(self.user_home, self.si_name)
-
-        os.makedirs(si_name_config_path)
-        templatize(
-            'settings.ini',
-            os.path.join(si_name_config_path, 'settings.ini'),
-            self.context,
-        )
+        self._setup_si()
 
         service_mapping = {
             'shell': self.run_shell,
@@ -132,6 +127,30 @@ class EntryPoint(object):
         environ = os.environ.copy()
         environ.update(kwargs)
         return environ
+
+    def _setup_si(self):
+        """Take care of django SI configuration:
+            * moves configuration from /config/SI/*ini to $HOME/django_settings/
+        """
+        # configure the django project
+        os.makedirs(DJANGO_SETTINGS_PATH)
+        templatize(
+            'settings.ini',
+            os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'),
+            self.context,
+        )
+
+        si_mounted_config_dir = os.path.join(CONFIG_MOUNT_POINT, 'si_config')
+        if not os.path.exists(si_mounted_config_dir):
+            logger.warning("No 'si_config' directory found")
+            return
+
+        for filename in os.listdir(si_mounted_config_dir):
+            shutil.copy(
+                src=os.path.join(si_mounted_config_dir, filename),
+                dst=os.path.join(DJANGO_SETTINGS_PATH, filename),
+            )
+
 
     def _run_custom_command(self, cmd_line):
         """Run a script or the django-admin command"""
