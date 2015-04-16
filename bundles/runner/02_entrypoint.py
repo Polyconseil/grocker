@@ -119,10 +119,9 @@ class EntryPoint(object):
         service_mapping = {
             'cron': self.run_cron,
             'django-admin': self.django_admin,
-            'shell': self.run_shell,
-            'si-service': self.run_si,
             'pyscript': self.run_pyscript,
             'shell': self.run_shell,
+            'si-service': self.run_si,
         }
 
         fn = service_mapping.get(self.command, self.run_command)
