@@ -42,12 +42,12 @@ def templatize(filename, dest, context):
 class EntryPoint(object):
     """EntryPoint script main class"""
 
-    def __init__(self, service, enable_colors):
+    def __init__(self, args, enable_colors):
         # our program logger
         self.logger = None
         self.user_home = os.path.expanduser('~')
-        self.service = service[0]
-        self.args = service[1:]
+        self.command = args[0]
+        self.args = args[1:]
 
         # our context, passed to our configuration template
         self.context = {}
@@ -107,20 +107,20 @@ class EntryPoint(object):
             pass
 
     def run(self):
-        self.gen_context(service=self.service)
+        self.gen_context()
         self.si_name = self.context['project_name']
 
         self._setup_si()
 
         service_mapping = {
-            'shell': self.run_shell,
-            'ops': self.run_si,
             'django-admin': self.django_admin,
+            'shell': self.run_shell,
+            'si-service': self.run_si,
             'pyscript': self.run_pyscript,
         }
 
-        fn = service_mapping.get(self.service, self.run_command)
-        fn(self.service, *self.args)
+        fn = service_mapping.get(self.command, self.run_command)
+        fn(self.command, *self.args)
 
     def _setup_environ(self, **kwargs):
         """In some case, we have to setup the environ"""
@@ -165,14 +165,14 @@ class EntryPoint(object):
         process = subprocess.Popen(cmd_line, env=environ, cwd=SCRIPT_DIR)
         process.wait()
 
-    def django_admin(self, service, *args):
+    def django_admin(self, command, *args):
         """Run django-admin.py from the virtualenv"""
         binary = os.path.join(VENV_BIN, 'django-admin.py')
         cmd_line = [binary]
         cmd_line.extend(args)
         self._run_custom_command(cmd_line)
 
-    def run_pyscript(self, service, *args):
+    def run_pyscript(self, command, *args):
         """Run a python script:
             * ensure to use the python installed in the virtualenv
         """
@@ -183,11 +183,14 @@ class EntryPoint(object):
         cmd_line.extend(args[1:])
         self._run_custom_command(cmd_line)
 
-    def run_shell(self, service, *args):
+    def run_shell(self, command, *args):
         """simply start a shell"""
         self.run_command('bash')
 
-    def run_si(self, si_service, *args):
+    def run_si(self, command, *args):
+        """Run the corresponding service with uwsgi & nginx"""
+        service = args[0]
+        self.context['service'] = service
         # configure uwsgi
         templatize(
             'uwsgi.ini',
@@ -217,12 +220,12 @@ class EntryPoint(object):
 
 def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
-    parser.add_argument('service', nargs='+', help='the service to run')
+    parser.add_argument('args', nargs='+', help='the command and its arguments')
     parser.add_argument('--disable-colors', help='disable colors')
 
     args = parser.parse_args()
     entry_point = EntryPoint(
-        service=args.service,
+        args=args.args,
         enable_colors=not args.disable_colors,
     )
     entry_point.run()
