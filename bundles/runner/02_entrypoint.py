@@ -22,10 +22,7 @@ import string
 import subprocess
 
 BLUE_HOME = '/home/blue'
-CRONTAB_RESOURCE_NAME = 'crontab'  # crontab with right permissions
-CRONTAB_TARGET_FILE = '/etc/cron.d/app'
 CONFIG_MOUNT_POINT = '/config'
-DEFAULT_USER = 'blue'
 DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
 ENV_CONFIG = os.path.join('/tmp', 'config.env')
 SCRIPT_DIR = '/scripts'
@@ -67,7 +64,7 @@ class EntryPoint(object):
         return self.context
 
     def load_environment(self):
-        """A provisioning script is installd in /tmp"""
+        """A provisioning script is installed in /tmp"""
         regex = re.compile("^([a-zA-Z_1-9]*)=(.*)$")
         with open(ENV_CONFIG) as fh:
             for line in fh.readlines():
@@ -112,8 +109,6 @@ class EntryPoint(object):
 
     def run(self):
         self.gen_context()
-        self.si_name = self.context['project_name']
-
         self._setup_si()
 
         service_mapping = {
@@ -237,8 +232,8 @@ class EntryPoint(object):
 
 def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
-    parser.add_argument('args', nargs='+', help='the command and its arguments')
     parser.add_argument('--disable-colors', help='disable colors')
+    parser.add_argument('args', nargs='+', help='the command and its arguments')
 
     args = parser.parse_args()
     entry_point = EntryPoint(

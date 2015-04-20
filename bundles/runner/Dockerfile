@@ -11,7 +11,7 @@ RUN /tmp/00_install_package.sh
 ADD 01_setup_cron.sh /tmp/01_setup_cron.sh
 RUN /tmp/01_setup_cron.sh
 
-# Prepare the image to run the entrypoint
+# Prepare the image to run the entry point
 VOLUME [/media /scripts /config /dev/log]
 EXPOSE 8080 8081
 USER blue

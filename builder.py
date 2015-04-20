@@ -42,17 +42,17 @@ def main():
 
     setup_logging(not args.no_colors)
 
-    # TODO: should be one of the targets of this script. make build_images with one of the "machines" as parameter.
+    # TODO: should be one of the targets of this script. make build_images with one of the "machines" as parameter.
     for name in REQUIRED_IMAGE_NAMES:
         build_docker_image(name)
 
-    # TODO: same, this is again a different target. should be separate.
+    # TODO: same, this is again a different target. should be separate.
     build_dir = args.build_dir or RUNNER_BUILD_DIR
     if not os.path.exists(build_dir):
         os.makedirs(build_dir, mode=0o0750)
     compile_packages(args.package, python_version=args.python_version, build_dir=build_dir)
 
-    # TODO: last but not least, go with the Makefile for this.
+    # TODO: last but not least, go with the Makefile for this.
     if args.build_dir is None:
         build_runner(args.package, python_version=args.python_version, build_dir=build_dir)
 
@@ -130,15 +130,16 @@ def build_runner(package, build_dir, python_version=None):
     )
 
 
-def setup_logging(colored):
+def setup_logging(enable_colors):
     colors = {'begin': '\033[1;33m', 'end': '\033[0m'}
-    no_colors = {'begin': '', 'end': ''}
+    if not enable_colors:
+        colors = {'begin': '', 'end': ''}
 
     logging.config.dictConfig({
         'version': 1,
         'formatters': {
             'simple': {
-                'format': '{colors[begin]}%(message)s{colors[end]}'.format(colors=colors if colored else no_colors)
+                'format': '{colors[begin]}%(message)s{colors[end]}'.format(colors=colors)
             },
         },
         'handlers': {

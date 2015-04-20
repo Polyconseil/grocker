@@ -40,10 +40,9 @@ def main(argv):
 
     # Build wheels
     try:
-        data = subprocess.check_call([pip, 'wheel', '--wheel-dir', output_dir, args.package])
+        subprocess.check_call([pip, 'wheel', '--wheel-dir', output_dir, args.package])
     except subprocess.CalledProcessError as exc:
         print(exc.output)
-
 
 
 if __name__ == '__main__':

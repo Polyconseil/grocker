@@ -5,10 +5,10 @@ set -xe
 source /opt/bundle/base.env
 
 # Get target package variables
-. /tmp/config.env
+source /tmp/config.env
 
 # Copy crontabs to root, ensure permissions
-CRONTAB_FILE=$($USER_HOME/app/bin/python -c "import pkg_resources; print pkg_resources.resource_filename('$PROJECT_NAME', 'crontab')")
+CRONTAB_FILE=$(${USER_HOME}/app/bin/python -c "import pkg_resources; print pkg_resources.resource_filename('${PROJECT_NAME}', 'crontab')")
 if [ -f "${CRONTAB_FILE}" ]; then
   cp ${CRONTAB_FILE} /etc/cron.d/app
   chown root:root /etc/cron.d/app
