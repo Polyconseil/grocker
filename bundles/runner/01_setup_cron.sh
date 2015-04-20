@@ -2,7 +2,7 @@
 set -xe
 
 # Retrieve base variables
-source /opt/bundle/base_vars.sh
+source /opt/bundle/base.env
 
 # Get target package variables
 . /tmp/config.env
