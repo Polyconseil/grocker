@@ -1,7 +1,5 @@
 FROM bluesolutions/bundle-base:0.1
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
-
 # Install system packages and compiler script in final destination
 ADD 00_install_python.sh /tmp/00_install_python.sh
 ADD 01_compile.py /tmp/01_compile.py
