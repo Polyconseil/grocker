@@ -129,7 +129,7 @@ class EntryPoint(object):
     def _run_custom_command(self, cmd_line):
         """Run a script or the django-admin command"""
         # configure the environ
-        project_settings = os.path.join(BLUE_HOME, self.context['project_name'], '*.ini')
+        project_settings = os.path.join(DJANGO_SETTINGS_PATH, '*.ini'),
         environ = {
             'DJANGO_SETTINGS_MODULE': '{project_name}.settings'.format(**self.context),
             '{project_name_upper}_CONFIG'.format(**self.context): project_settings,
