@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 # Purpose
 # =======
 
@@ -9,16 +8,13 @@
 # - Log (to syslog) the result of the cron in a dedicated facility
 # - If the command failed (non-zero exit, stderr output), send all (stdout+stderr) output to stdout / stderr in order to generate an email.
 
-export PROJECT=${project_name}
-export PYTHONPATH=/home/blue
-export DJANGO_SETTINGS_MODULE="${project_name}.settings"
-export ${project_name_upper}_CONFIG=${django_config_path}/*.ini
+eval $(cat /home/blue/etc/cron.env | sed 's/^/export /')
 
 # Settings
 # ========
 
 # Name of the project; used for logger name, loggging files, pid folder, etc.
-if [ -z "$$PROJECT" ]; then
+if [ -z "$PROJECT" ]; then
   logger -p cron.err "Cron Project not defined."
   echo "Cron Project not defined." >&2;
   exit 1;
@@ -26,7 +22,7 @@ fi
 
 # Path to the django-admin.py command
 # The #! line in django-admin.py has been fucked up by packaging, so we're using the stock system python.
-MANAGE_PY="$$PYTHONPATH/app/bin/django-admin.py"
+MANAGE_PY="$PYTHONPATH/app/bin/django-admin.py"
 
 # Where temporary log files should be created.
 LOG_FOLDER=/var/log/cronwrapper
@@ -41,13 +37,13 @@ usage() {
   # Print the usage string and exit.
   # Extra arg: retcode: the exit code to use (defaults to 0).
   local retcode;
-  retcode=$${1:-0};
+  retcode=${1:-0};
 
-  echo "Usage: $$0 --all|--help [--environment <environment>] [--fleet <fleet>] [--kill-previous] COMMAND [ARG1 ARG2 ...]
+  echo "Usage: $0 --all|--help [--environment <environment>] [--fleet <fleet>] [--kill-previous] COMMAND [ARG1 ARG2 ...]
 
 Run the COMMAND manage.py command within a wrapper which will capture stdout/stderr.
 
-The Django settings module is taken from the environment variable '\$$DJANGO_SETTINGS_MODULE', as usual for DJango apps.
+The Django settings module is taken from the environment variable '\$DJANGO_SETTINGS_MODULE', as usual for DJango apps.
 
 
 Options:
@@ -60,28 +56,28 @@ Options:
 Example:
 
   The command:
-    $$0 dumpdata auth
+    $0 dumpdata auth
   Would run the following line:
-    $${MANAGE_PY} dumpdata auth
+    ${MANAGE_PY} dumpdata auth
 ";
-  exit $${retcode};
+  exit ${retcode};
 }
 
 # Options
 # =======
 
 # Capture all command arguments into the FULL_ARGS variable.
-FULL_ARGS=$$*;
+FULL_ARGS=$*;
 
 # Check for at least two arguments (apart from --help / -h)
-if [[ $$# -lt 2 && $$1 != "--help" && $$1 != "-h" ]]; then
+if [[ $# -lt 2 && $1 != "--help" && $1 != "-h" ]]; then
   echo -e "Expecting at least one command name.\n"
   usage 1;
 fi
 
 # SWITCH will be one of --all, --help. Shift it.
-SWITCH=$$1;
-case $$SWITCH in
+SWITCH=$1;
+case $SWITCH in
   --master)
     # DEPRECATED: does nothing.
     shift 1;
@@ -102,30 +98,30 @@ case $$SWITCH in
 esac;
 
 # Check environment
-if [[ "$$1" == "--environment" ]]; then
-    FOR_ENVIRONMENT=$$2
+if [[ "$1" == "--environment" ]]; then
+    FOR_ENVIRONMENT=$2
     shift 2;
-    if [[ `cat $${${project_name_upper}_CONFIG}/environment` != $${FOR_ENVIRONMENT} ]]; then
-        logger -p cron.info "Cron $${FULL_ARGS} disabled: environment is not $${FOR_ENVIRONMENT}."
+    if [[ `cat ${${project_name_upper}_CONFIG}/environment` != ${FOR_ENVIRONMENT} ]]; then
+        logger -p cron.info "Cron ${FULL_ARGS} disabled: environment is not ${FOR_ENVIRONMENT}."
         exit 0;
     fi
 fi
 
 # Check fleet
-if [[ "$$1" == "--fleet" ]]; then
-  FOR_FLEET=$$2;
-  CURRENT_FLEET=`grep -A1 ^'\[fleet\]' $${${project_name_upper}_CONFIG}/settings.ini | tail -1 | awk '{print $$3}'`
+if [[ "$1" == "--fleet" ]]; then
+  FOR_FLEET=$2;
+  CURRENT_FLEET=`grep -A1 ^'\[fleet\]' ${${project_name_upper}_CONFIG}/settings.ini | tail -1 | awk '{print $3}'`
   shift 2;
-  if [[ $${FOR_FLEET} != $${CURRENT_FLEET} ]]; then
+  if [[ ${FOR_FLEET} != ${CURRENT_FLEET} ]]; then
     # Log to the 'cron' facility, level 'info'.
-    logger -p cron.info "Cron $${FULL_ARGS} disabled: fleet $${FOR_FLEET} is not the current fleet."
+    logger -p cron.info "Cron ${FULL_ARGS} disabled: fleet ${FOR_FLEET} is not the current fleet."
     exit 0;
   fi
 fi
 
 # Kill previous
 KILL_PREVIOUS=0;
-if [[ "$$1" == "--kill-previous" ]]; then
+if [[ "$1" == "--kill-previous" ]]; then
   KILL_PREVIOUS=1;
   shift 1;
 fi
@@ -135,39 +131,39 @@ fi
 # =====================
 
 # Store the command name and the args list in two separate vars.
-COMMAND=$$1
-# Remove the command name from $$*
+COMMAND=$1
+# Remove the command name from $*
 shift 1;
-ARGS=$$*
+ARGS=$*
 
 
-LOG_NAME=$${LOG_NAME:-$${COMMAND}}
+LOG_NAME=${LOG_NAME:-${COMMAND}}
 
 
 # PID check
 # =========
 
-PIDFILE="$${PID_FOLDER}/$${LOG_NAME}.pid"
+PIDFILE="${PID_FOLDER}/${LOG_NAME}.pid"
 
-if [[ -f "$${PIDFILE}" ]]; then
-  OLD_PID=$$(cat "$${PIDFILE}");
+if [[ -f "${PIDFILE}" ]]; then
+  OLD_PID=$(cat "${PIDFILE}");
 
-  if kill -0 "$${OLD_PID}" ; then  # Still running
+  if kill -0 "${OLD_PID}" ; then  # Still running
 
-    if [[ "$${KILL_PREVIOUS}" = "1" ]]; then
-      echo "Previous instance still running as $${OLD_PID}, killing it." >&2;
-      kill -9 $${OLD_PID};
+    if [[ "${KILL_PREVIOUS}" = "1" ]]; then
+      echo "Previous instance still running as ${OLD_PID}, killing it." >&2;
+      kill -9 ${OLD_PID};
       sleep 1;
     else
-      echo "Previous instance still running as $${OLD_PID}, aborting." >&2
+      echo "Previous instance still running as ${OLD_PID}, aborting." >&2
       exit 1;
     fi
   fi
 
-  rm -f "$${PIDFILE}";
+  rm -f "${PIDFILE}";
 fi
 
-echo -n $$$$ > "$${PIDFILE}"
+echo -n $$ > "${PIDFILE}"
 
 
 # Logging setup
@@ -177,19 +173,19 @@ DATE=`date +'%F_%H%M%S'`
 
 # Logs will be written to two temporary files in order to be able know whether
 # stderr was used.
-LOGFILE_STDOUT="$${LOG_FOLDER}/$${LOG_NAME}-$${DATE}.stdout"
-LOGFILE_STDERR="$${LOG_FOLDER}/$${LOG_NAME}-$${DATE}.stderr"
+LOGFILE_STDOUT="${LOG_FOLDER}/${LOG_NAME}-${DATE}.stdout"
+LOGFILE_STDERR="${LOG_FOLDER}/${LOG_NAME}-${DATE}.stderr"
 DEFAULT_FACILITY=level3
 
 syslog_line() {
   # Log one line to syslog.
   # Args: level, line.
   local line level;
-  facility=$$(cat $${${project_name_upper}_CONFIG}/syslog-facility);
-  facility=$${facility:-$${DEFAULT_FACILITY}}
-  level=$$1;
-  line=$$2;
-  logger -p $${facility}.$${level} -t $${PROJECT}.cron.$${LOG_NAME} -- $${line};
+  facility=$(cat ${${project_name_upper}_CONFIG}/syslog-facility);
+  facility=${facility:-${DEFAULT_FACILITY}}
+  level=$1;
+  line=$2;
+  logger -p ${facility}.${level} -t ${PROJECT}.cron.${LOG_NAME} -- ${line};
 }
 
 syslog_file() {
@@ -197,12 +193,12 @@ syslog_file() {
   # Args: level, file name.
   # The file will be logged as a single line, unless empty.
   local filename level content;
-  level=$$1;
-  filename=$$2;
+  level=$1;
+  filename=$2;
 
-  if [[ -s $${filename} ]]; then
-    content=`cat $${filename}`;
-    syslog_line $${level} "$${content}";
+  if [[ -s ${filename} ]]; then
+    content=`cat ${filename}`;
+    syslog_line ${level} "${content}";
   fi
 }
 
@@ -210,45 +206,45 @@ syslog_file() {
 # =================
 
 # Prepare the command
-CMD="$${MANAGE_PY} $${COMMAND} $${ARGS}"
+CMD="${MANAGE_PY} ${COMMAND} ${ARGS}"
 
 # Run it
-$${CMD} > $${LOGFILE_STDOUT} 2> $${LOGFILE_STDERR}
-RETCODE=$$?
+${CMD} > ${LOGFILE_STDOUT} 2> ${LOGFILE_STDERR}
+RETCODE=$?
 
 # Remove our PIDFILE.
-rm -f $${PIDFILE}
+rm -f ${PIDFILE}
 
 
 # Log handling
 # ============
 
-if [[ $${RETCODE} == 0 && -s $${LOGFILE_STDERR} ]]; then
+if [[ ${RETCODE} == 0 && -s ${LOGFILE_STDERR} ]]; then
   # STDERR was not empty
   RETCODE=-1;
 fi
 
-if [[ $${RETCODE} == 0 ]]; then  # Success
+if [[ ${RETCODE} == 0 ]]; then  # Success
   # Log success and output to syslog
-  syslog_line info "Cron $$0 $${FULL_ARGS}: OK";
-  syslog_file info $${LOGFILE_STDOUT};
+  syslog_line info "Cron $0 ${FULL_ARGS}: OK";
+  syslog_file info ${LOGFILE_STDOUT};
 
   # Cleanup
-  rm -f $${LOGFILE_STDOUT} $${LOGFILE_STDERR};
+  rm -f ${LOGFILE_STDOUT} ${LOGFILE_STDERR};
 
 else  # Some failure (retcode != 0 or stderr)
   # Log failure to syslog
-  syslog_line err "Cron $$0 $${FULL_ARGS}: NOK (code $${RETCODE}).";
+  syslog_line err "Cron $0 ${FULL_ARGS}: NOK (code ${RETCODE}).";
 
-  syslog_file info $${LOGFILE_STDOUT};
-  syslog_file err $${LOGFILE_STDERR};
+  syslog_file info ${LOGFILE_STDOUT};
+  syslog_file err ${LOGFILE_STDERR};
 
   # Output to stdout/stderr to generate email
-  echo "Project : $${PROJECT}" >&2;
-  echo "Cron $$0 $${FULL_ARGS} failed with status $${RETCODE}." >&2;
-  cat $${LOGFILE_STDOUT};
-  cat $${LOGFILE_STDERR} >&2;
+  echo "Project : ${PROJECT}" >&2;
+  echo "Cron $0 ${FULL_ARGS} failed with status ${RETCODE}." >&2;
+  cat ${LOGFILE_STDOUT};
+  cat ${LOGFILE_STDERR} >&2;
 
   # Propagate return code
-  exit $${RETCODE};
+  exit ${RETCODE};
 fi

@@ -8,21 +8,17 @@ source ${USER_HOME}/etc/config.env
 # Copy crontabs to root, ensure permissions
 CRONTAB_FILE=$(${USER_HOME}/app/bin/python -c "import pkg_resources; print pkg_resources.resource_filename('${PROJECT_NAME}', 'crontab')")
 if [ -f "${CRONTAB_FILE}" ]; then
-  cp ${CRONTAB_FILE} /etc/cron.d/app
-  chown root:root /etc/cron.d/app
-  chmod 600 /etc/cron.d/app
-  # Replace variables in the application's crontab
-  # FIXME: to be changed directly in the application's crontab
-  sed -i "s@ www-data @ ${USER} @" /etc/cron.d/app
-  sed -i "s@ \/usr\/share\/bluesys-cronwrapper\/bin\/cronwrapper\.sh @ ${USER_HOME}\/cronwrapper.sh @" /etc/cron.d/app
+    cat ${CRONTAB_FILE} | \
+    sed -e "s@ www-data @ @" | \
+    sed -e "s@ /usr/share/bluesys-cronwrapper/bin/cronwrapper.sh @ ${USER_HOME}/bin/cronwrapper.sh @" | \
+    crontab -u ${USER} -
 fi;
 
 # Ensure permissions on /var/log/cronwrapper and /var/run/cronwrapper
-mkdir /var/run/cronwrapper
-mkdir /var/log/cronwrapper
-chown ${USER}:${GROUP} /var/log/cronwrapper
-chown ${USER}:${GROUP} /var/run/cronwrapper
+install --mode=0755 --owner=${USER} --group=${GROUP} -d /var/run/cronwrapper
+install --mode=0755 --owner=${USER} --group=${GROUP} -d /var/log/cronwrapper
+install --mode=0755 --owner=${USER} -D /tmp/scripts/cronwrapper.sh ${USER_HOME}/bin/cronwrapper.sh
 
 # Cleanup unnecessary files
-rm -Rf /tmp/output
+rm -Rf /tmp/*
 rm -Rf /opt/bundle

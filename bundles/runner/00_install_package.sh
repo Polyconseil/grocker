@@ -13,7 +13,8 @@ sudo -u blue ${USER_HOME}/app/bin/pip install pip setuptools --upgrade
 sudo -u blue ${USER_HOME}/app/bin/pip install --find-links=/tmp/output --no-index ${PACKAGE_NAME}
 
 # Install the entrypoint script and it's dependancies
-install --mode=0644 --owner=${USER} -D /tmp/output/config.env ${USER_HOME}/etc/config.env
+install --mode=0755 --owner=${USER} -d ${USER_HOME}/etc
+install --mode=0644 --owner=${USER} /tmp/output/config.env ${USER_HOME}/etc/config.env
 for template in $(ls /tmp/templates/); do
     install --mode=0644 --owner=${USER} -D /tmp/templates/${template} ${USER_HOME}/templates/${template}
 done

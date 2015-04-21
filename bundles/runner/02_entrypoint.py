@@ -195,10 +195,7 @@ class EntryPoint(object):
         self.run_command('supervisord', '-c', supervisord_config)
 
     def run_cron(self, *args):
-        dest_cronwrapper = os.path.join(self.user_home, 'cronwrapper.sh')
-        templatize('cronwrapper.sh', dest_cronwrapper, self.context)
-
-        self.run_command('chmod', '+x', dest_cronwrapper)
+        templatize('cron.env', os.path.join(self.user_home, 'etc', 'cron.env'), self.context)
         self.run_command('sudo', 'cron', '-f')
 
 
