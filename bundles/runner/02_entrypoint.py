@@ -56,6 +56,7 @@ class EntryPoint(object):
         self.context['python_version'] = os.environ['PYTHON_VERSION']
         self.context['project_name'] = os.environ['PROJECT_NAME']
         self.context['project_name_upper'] = self.context['project_name'].upper()
+        self.context['venv'] = VENV
         self.context.update(kwargs)
 
         return self.context
@@ -128,7 +129,7 @@ class EntryPoint(object):
     def _run_custom_command(self, cmd_line):
         """Run a script or the django-admin command"""
         # configure the environ
-        project_settings = os.path.join(BLUE_HOME, self.context['project_name'], 'settings.ini')
+        project_settings = os.path.join(BLUE_HOME, self.context['project_name'], '*.ini')
         environ = {
             'DJANGO_SETTINGS_MODULE': '{project_name}.settings'.format(**self.context),
             '{project_name_upper}_CONFIG'.format(**self.context): project_settings,

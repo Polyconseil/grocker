@@ -10,25 +10,19 @@
 
 eval $(cat /home/blue/etc/cron.env | sed 's/^/export /')
 
+
 # Settings
 # ========
 
-# Name of the project; used for logger name, loggging files, pid folder, etc.
-if [ -z "$PROJECT" ]; then
-  logger -p cron.err "Cron Project not defined."
-  echo "Cron Project not defined." >&2;
-  exit 1;
-fi
+function get_django_setting () {
+    ${VENV}/bin/python -c "from django.conf import settings; print settings.$1"
+}
 
-# Path to the django-admin.py command
-# The #! line in django-admin.py has been fucked up by packaging, so we're using the stock system python.
-MANAGE_PY="$PYTHONPATH/app/bin/django-admin.py"
-
-# Where temporary log files should be created.
-LOG_FOLDER=/var/log/cronwrapper
-
-# Where PID files are kept
-PID_FOLDER=/var/run/cronwrapper
+PROJECT=$(get_django_setting PROJECT_NAME)
+PROJECT_NAME=$(echo ${PROJECT} | tr [a-z] [A-Z])
+MANAGE_PY="${VENV}/bin/django-admin.py"  # Path to the django-admin.py command
+LOG_FOLDER=/var/log/cronwrapper  # Where temporary log files should be created.
+PID_FOLDER=/var/run/cronwrapper  # Where PID files are kept
 
 # Usage
 # =====
@@ -101,7 +95,7 @@ esac;
 if [[ "$1" == "--environment" ]]; then
     FOR_ENVIRONMENT=$2
     shift 2;
-    if [[ `cat ${${project_name_upper}_CONFIG}/environment` != ${FOR_ENVIRONMENT} ]]; then
+    if [[ $(get_django_setting ENVIRONMENT) != ${FOR_ENVIRONMENT} ]]; then
         logger -p cron.info "Cron ${FULL_ARGS} disabled: environment is not ${FOR_ENVIRONMENT}."
         exit 0;
     fi
@@ -110,9 +104,8 @@ fi
 # Check fleet
 if [[ "$1" == "--fleet" ]]; then
   FOR_FLEET=$2;
-  CURRENT_FLEET=`grep -A1 ^'\[fleet\]' ${${project_name_upper}_CONFIG}/settings.ini | tail -1 | awk '{print $3}'`
   shift 2;
-  if [[ ${FOR_FLEET} != ${CURRENT_FLEET} ]]; then
+  if [[ $(get_django_setting FLEET_ID) != ${FOR_FLEET} ]]; then
     # Log to the 'cron' facility, level 'info'.
     logger -p cron.info "Cron ${FULL_ARGS} disabled: fleet ${FOR_FLEET} is not the current fleet."
     exit 0;
@@ -175,14 +168,12 @@ DATE=`date +'%F_%H%M%S'`
 # stderr was used.
 LOGFILE_STDOUT="${LOG_FOLDER}/${LOG_NAME}-${DATE}.stdout"
 LOGFILE_STDERR="${LOG_FOLDER}/${LOG_NAME}-${DATE}.stderr"
-DEFAULT_FACILITY=level3
 
 syslog_line() {
   # Log one line to syslog.
   # Args: level, line.
   local line level;
-  facility=$(cat ${${project_name_upper}_CONFIG}/syslog-facility);
-  facility=${facility:-${DEFAULT_FACILITY}}
+  facility=$(get_django_setting "LOGGING['handlers']['syslog']['facility']");
   level=$1;
   line=$2;
   logger -p ${facility}.${level} -t ${PROJECT}.cron.${LOG_NAME} -- ${line};
