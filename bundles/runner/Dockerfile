@@ -18,4 +18,4 @@ VOLUME ["/media", "/scripts", "/config"]
 
 EXPOSE 8080 8081
 USER blue
-ENTRYPOINT ["/home/blue/app/bin/entrypoint.py"]
+ENTRYPOINT ["/home/blue/bin/entrypoint.py"]

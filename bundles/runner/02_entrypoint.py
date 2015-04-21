@@ -41,17 +41,14 @@ def templatize(filename, dest, context):
 class EntryPoint(object):
     """EntryPoint script main class"""
 
-    def __init__(self, args, enable_colors):
-        # our program logger
-        self.logger = None
+    def __init__(self, args):
+        self.logger = logging.getLogger(__name__)
         self.user_home = os.path.expanduser('~')
         self.command = args[0]
         self.args = args[1:]
 
         # our context, passed to our configuration template
         self.context = {}
-
-        self.setup_logging(enable_colors)
         self.load_environment()
 
     def gen_context(self, **kwargs):
@@ -76,28 +73,6 @@ class EntryPoint(object):
                     os.environ[key] = value
                 else:
                     self.logger.info("> line '%s' is not an environment variable" % line)
-
-    def setup_logging(self, enable_colors):
-        colors = {'begin': '\033[1;33m', 'end': '\033[0m'}
-        if not enable_colors:
-            colors = {'begin': '', 'end': ''}
-
-        logging.config.dictConfig({
-            'version': 1,
-            'formatters': {
-                'simple': {
-                    'format': '{begin}%(message)s{end}'.format(**colors)
-                },
-            },
-            'handlers': {
-                'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
-            },
-            'loggers': {
-                __name__: {'handlers': ['console'], 'level': 'INFO'},
-            },
-        })
-
-        self.logger = logging.getLogger(__name__)
 
     def run_command(self, *args):
         """Run a command"""
@@ -133,7 +108,10 @@ class EntryPoint(object):
             * moves configuration from /config/SI/*ini to $HOME/django_settings/
         """
         # configure the django project
-        os.makedirs(DJANGO_SETTINGS_PATH)
+        if not os.path.exists(DJANGO_SETTINGS_PATH):
+            os.makedirs(DJANGO_SETTINGS_PATH)
+        else:
+            self.logger.info("%s already exists !", DJANGO_SETTINGS_PATH)
         templatize('settings.ini', os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'), self.context)
 
         si_mounted_config_dir = os.path.join(CONFIG_MOUNT_POINT, 'si_config')
@@ -199,13 +177,35 @@ class EntryPoint(object):
         self.run_command('sudo', 'cron', '-f')
 
 
+def setup_logging(enable_colors):
+    colors = {'begin': '\033[1;33m', 'end': '\033[0m'}
+    if not enable_colors:
+        colors = {'begin': '', 'end': ''}
+
+    logging.config.dictConfig({
+        'version': 1,
+        'formatters': {
+            'simple': {
+                'format': '{begin}%(message)s{end}'.format(**colors)
+            },
+        },
+        'handlers': {
+            'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
+        },
+        'loggers': {
+            __name__: {'handlers': ['console'], 'level': 'INFO'},
+        },
+    })
+
+
 def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
     parser.add_argument('--disable-colors', help='disable colors')
     parser.add_argument('args', nargs='+', help='the command and its arguments')
-
     args = parser.parse_args()
-    entry_point = EntryPoint(args=args.args, enable_colors=not args.disable_colors)
+
+    setup_logging(not args.disable_colors)
+    entry_point = EntryPoint(args=args.args)
     entry_point.run()
 
 if __name__ == '__main__':
