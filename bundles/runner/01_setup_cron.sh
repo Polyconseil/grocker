@@ -3,9 +3,7 @@ set -xe
 
 # Retrieve base variables
 source /opt/bundle/base.env
-
-# Get target package variables
-source /tmp/config.env
+source ${USER_HOME}/etc/config.env
 
 # Copy crontabs to root, ensure permissions
 CRONTAB_FILE=$(${USER_HOME}/app/bin/python -c "import pkg_resources; print pkg_resources.resource_filename('${PROJECT_NAME}', 'crontab')")

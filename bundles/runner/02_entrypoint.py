@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""This is our entrypoint script which is ran into our container
+"""This is our entry point script which is ran into our container
     on startup.
 
     It's meant to:
@@ -24,7 +24,7 @@ import subprocess
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
 DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
-ENV_CONFIG = os.path.join('/tmp', 'config.env')
+ENV_CONFIG = os.path.join(BLUE_HOME, 'etc', 'config.env')
 SCRIPT_DIR = '/scripts'
 TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
 VENV = os.path.join(BLUE_HOME, 'app')
@@ -134,11 +134,7 @@ class EntryPoint(object):
         """
         # configure the django project
         os.makedirs(DJANGO_SETTINGS_PATH)
-        templatize(
-            'settings.ini',
-            os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'),
-            self.context,
-        )
+        templatize('settings.ini', os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'), self.context)
 
         si_mounted_config_dir = os.path.join(CONFIG_MOUNT_POINT, 'si_config')
         if not os.path.exists(si_mounted_config_dir):
@@ -190,43 +186,19 @@ class EntryPoint(object):
         """Run the corresponding service with uwsgi & nginx"""
         service = args[0]
         self.context['service'] = service
-        # configure uwsgi
-        templatize(
-            'uwsgi.ini',
-            os.path.join(self.user_home, 'uwsgi.ini'),
-            self.context,
-        )
+        templatize('uwsgi.ini', os.path.join(self.user_home, 'etc', 'uwsgi.ini'), self.context)
+        templatize('nginx.conf', os.path.join(self.user_home, 'etc', 'nginx.conf'), self.context)
 
-        # configure nginx
-        os.makedirs(os.path.join(self.user_home, 'nginx'))
-        templatize(
-            'nginx.conf',
-            os.path.join(self.user_home, 'nginx.conf'),
-            self.context,
-        )
+        supervisord_config = os.path.join(self.user_home, 'etc', 'supervisord.conf')
+        templatize('supervisord.conf', supervisord_config, self.context)
 
-        # configure supervisord
-        supervisord_config = os.path.join(self.user_home, 'supervisord.conf')
-        templatize(
-            'supervisord.conf',
-            supervisord_config,
-            self.context,
-        )
-
-        # run supervisord
         self.run_command('supervisord', '-c', supervisord_config)
 
     def run_cron(self, *args):
-        # configure cronwrapper
         dest_cronwrapper = os.path.join(self.user_home, 'cronwrapper.sh')
-        templatize(
-            'cronwrapper.sh',
-            dest_cronwrapper,
-            self.context,
-        )
-        # make it executable
+        templatize('cronwrapper.sh', dest_cronwrapper, self.context)
+
         self.run_command('chmod', '+x', dest_cronwrapper)
-        # run cron daemon
         self.run_command('sudo', 'cron', '-f')
 
 
@@ -236,10 +208,7 @@ def main():
     parser.add_argument('args', nargs='+', help='the command and its arguments')
 
     args = parser.parse_args()
-    entry_point = EntryPoint(
-        args=args.args,
-        enable_colors=not args.disable_colors,
-    )
+    entry_point = EntryPoint(args=args.args, enable_colors=not args.disable_colors)
     entry_point.run()
 
 if __name__ == '__main__':
