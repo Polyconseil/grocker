@@ -25,6 +25,8 @@ BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
 DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
 ENV_CONFIG = os.path.join(BLUE_HOME, 'etc', 'config.env')
+LOG_DIR = os.path.join(BLUE_HOME, 'logs')
+RUN_DIR = os.path.join(BLUE_HOME, 'run')
 SCRIPT_DIR = '/scripts'
 TEMPLATE_PATH = os.path.join(BLUE_HOME, 'templates')
 VENV = os.path.join(BLUE_HOME, 'app')
@@ -104,15 +106,19 @@ class EntryPoint(object):
         environ.update(kwargs)
         return environ
 
+    def _setup_dir(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            self.logger.info("%s already exists !", path)
+
     def _setup_si(self):
         """Take care of django SI configuration:
             * moves configuration from /config/SI/*ini to $HOME/django_settings/
         """
-        # configure the django project
-        if not os.path.exists(DJANGO_SETTINGS_PATH):
-            os.makedirs(DJANGO_SETTINGS_PATH)
-        else:
-            self.logger.info("%s already exists !", DJANGO_SETTINGS_PATH)
+        for path in (DJANGO_SETTINGS_PATH, LOG_DIR, RUN_DIR, os.path.join(LOG_DIR, 'nginx')):
+            self._setup_dir(path)
+
         templatize('settings.ini', os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'), self.context)
 
         si_mounted_config_dir = os.path.join(CONFIG_MOUNT_POINT, 'si_config')
