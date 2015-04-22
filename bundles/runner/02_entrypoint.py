@@ -156,7 +156,8 @@ class EntryPoint(object):
         """Runs a script that HAS to begin with a shbang """
         script_name = args[0]
         script_path = os.path.join(SCRIPT_DIR, script_name)
-        cmd_line = [script_path] + args[1:]
+        cmd_line = [script_path]
+        cmd_line.extend(args[1:])
         self._run_custom_command(cmd_line)
 
     def run_shell(self, command, *args):
