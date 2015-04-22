@@ -90,7 +90,7 @@ class EntryPoint(object):
         service_mapping = {
             'cron': self.run_cron,
             'django-admin': self.django_admin,
-            'pyscript': self.run_pyscript,
+            'script': self.run_script,
             'shell': self.run_shell,
             'si-service': self.run_si,
         }
@@ -128,9 +128,9 @@ class EntryPoint(object):
 
     def _run_custom_command(self, cmd_line):
         """Run a script or the django-admin command"""
-        # configure the environ
         project_settings = os.path.join(DJANGO_SETTINGS_PATH, '*.ini')
         environ = {
+            'PATH': "%s%s%s" % (os.environ['PATH'], os.pathsep, VENV_BIN),
             'DJANGO_SETTINGS_MODULE': '{project_name}.settings'.format(**self.context),
             '{project_name_upper}_CONFIG'.format(**self.context): project_settings,
         }
@@ -146,15 +146,11 @@ class EntryPoint(object):
         cmd_line.extend(args)
         self._run_custom_command(cmd_line)
 
-    def run_pyscript(self, command, *args):
-        """Run a python script:
-            * ensure to use the python installed in the virtualenv
-        """
-        python_binary = os.path.join(VENV_BIN, 'python')
+    def run_script(self, command, *args):
+        """Runs a script that HAS to begin with a shbang """
         script_name = args[0]
         script_path = os.path.join(SCRIPT_DIR, script_name)
-        cmd_line = [python_binary, script_path]
-        cmd_line.extend(args[1:])
+        cmd_line = [script_path] + args[1:]
         self._run_custom_command(cmd_line)
 
     def run_shell(self, command, *args):
