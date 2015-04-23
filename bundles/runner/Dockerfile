@@ -1,4 +1,4 @@
-FROM bluesolutions/bundle-base:0.1
+FROM docker.polyconseil.fr/bundle-base:0.1
 
 # Run the installer script for target package
 ADD 00_install_package.sh /tmp/00_install_package.sh

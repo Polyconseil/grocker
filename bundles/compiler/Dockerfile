@@ -1,4 +1,4 @@
-FROM bluesolutions/bundle-base:0.1
+FROM docker.polyconseil.fr/bundle-base:0.1
 
 # Install system packages and compiler script in final destination
 ADD 00_install_python.sh /tmp/00_install_python.sh

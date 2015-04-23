@@ -86,7 +86,7 @@ def build_docker_image(name):
     run(
         'docker', 'build',
         '--force-rm=true', '--rm=true',
-        '-t', 'bluesolutions/bundle-{name}:{version}'.format(name=name, version=__version__),
+        '-t', 'docker.polyconseil.fr/bundle-{name}:{version}'.format(name=name, version=__version__),
         'bundles/{name}/.'.format(name=name),
     )
 
@@ -98,7 +98,7 @@ def compile_packages(package, build_dir, python_version=None):
         '--volume', '{home}/.pip/:{blue_home}/.pip.host'.format(home=os.path.expanduser("~"), blue_home=BLUE_HOME),
         '--volume', '{build_dir}:{blue_home}/output'.format(build_dir=os.path.abspath(build_dir), blue_home=BLUE_HOME),
 
-        'bluesolutions/bundle-compiler:{builder_version}'.format(builder_version=__version__),
+        'docker.polyconseil.fr/bundle-compiler:{builder_version}'.format(builder_version=__version__),
 
         '--output', '{blue_home}/output'.format(blue_home=BLUE_HOME),
         '--python', python_version,
@@ -125,7 +125,7 @@ def build_runner(package, build_dir, python_version=None):
     run(
         'docker', 'build',
         '--force-rm=true', '--rm=true',
-        '-t', 'bluesolutions/{0}'.format(package.replace('==', ':')),
+        '-t', 'docker.polyconseil.fr/{0}'.format(package.replace('==', ':')),
         'bundles/runner/.'
     )
 
