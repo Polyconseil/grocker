@@ -115,12 +115,16 @@ def setup_app():
 
 def setup_mail_relay():
     fqdn = socket.getfqdn()
+    get_mail_cmd = [  # FIXME
+        'python', '-c',
+        'from django.conf import settings; print settings.LOGGING["handlers"]["maildev"]["toaddrs"][0]'
+    ]
 
     context = {
         'smtp_server': get_host_ip(),
         'fqdn': fqdn,
         'domain': '.'.join(fqdn.split('.')[1:]),
-        'mailto': 'autolib-dev+prod@polyconseil.fr'  # TODO get it in si config ?
+        'mailto': subprocess.check_output(get_mail_cmd),
     }
 
     templatize('ssmtp.conf', os.path.join('~', 'etc', 'ssmtp.conf'), context)
