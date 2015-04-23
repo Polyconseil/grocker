@@ -5,6 +5,7 @@ set -xe
 source /opt/bundle/base.env
 
 # Install System Packages
+apt update
 apt install -qy ${SYS_DEPS} ${BASE_DEPS}
 apt-get clean
 

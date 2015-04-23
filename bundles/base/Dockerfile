@@ -6,9 +6,6 @@ ENV LANG C.UTF-8
 ADD 00_apt_config.sh /tmp/00_apt_config.sh
 RUN /tmp/00_apt_config.sh
 
-# Update the packages, once in the build.
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
-
 # Add a variables file that will be sourced by descendants
 ADD base.env /opt/bundle/base.env
 
