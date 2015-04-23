@@ -19,3 +19,7 @@ for template in $(ls /tmp/templates/); do
     install --mode=0644 --owner=${USER} -D /tmp/templates/${template} ${USER_HOME}/templates/${template}
 done
 install --mode=0755 --owner=${USER} -D /tmp/02_entrypoint.py ${USER_HOME}/bin/entrypoint.py
+
+# Allow to modified ssmtp config
+rm /etc/ssmtp/ssmtp.conf
+ln -s ${USER_HOME}/etc/ssmtp.conf /etc/ssmtp/ssmtp.conf

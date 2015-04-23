@@ -12,13 +12,13 @@
         * start cron jobs
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import logging
 import logging.config
 import os
 import re
 import shutil
+import socket
 import string
 import subprocess
 
@@ -38,6 +38,12 @@ def templatize(filename, destination_path, context):
     with open(os.path.expanduser(destination_path), 'w') as fw:
         with open(filename) as fh:
             fw.write(string.Template(fh.read()).substitute(context))
+
+
+def get_host_ip():
+    output = subprocess.check_output(['ip', 'route', 'show', '0.0.0.0/0'])
+    matched = re.search(r'via\s([0-9.]+)\s', output)
+    return matched.groups()[0]
 
 
 def create_directory(path):
@@ -105,6 +111,19 @@ def setup_app():
             src=os.path.join(si_mounted_config_dir, filename),
             dst=os.path.join(DJANGO_SETTINGS_PATH, filename),
         )
+
+
+def setup_mail_relay():
+    fqdn = socket.getfqdn()
+
+    context = {
+        'smtp_server': get_host_ip(),
+        'fqdn': fqdn,
+        'domain': '.'.join(fqdn.split('.')[1:]),
+        'mailto': 'autolib-dev+prod@polyconseil.fr'  # TODO get it in si config ?
+    }
+
+    templatize('ssmtp.conf', os.path.join('~', 'etc', 'ssmtp.conf'), context)
 
 
 def setup_logging(enable_colors):
@@ -177,6 +196,7 @@ def main():
 
     setup_logging(not args.disable_colors)
     setup_environment()
+    setup_mail_relay()
     setup_app()
 
     dispatch(args.args)
