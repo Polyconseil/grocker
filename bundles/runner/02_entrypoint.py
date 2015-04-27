@@ -96,7 +96,7 @@ def setup_app():
     """Take care of django SI configuration:
         * moves configuration from /config/SI/*ini to $HOME/django_settings/
     """
-    for path in (DJANGO_SETTINGS_PATH, LOG_DIR, RUN_DIR, os.path.join(LOG_DIR, 'nginx')):
+    for path in (DJANGO_SETTINGS_PATH, LOG_DIR, RUN_DIR):
         create_directory(path)
 
     templatize('settings.ini', os.path.join(DJANGO_SETTINGS_PATH, '50_base_settings.ini'), get_context())
