@@ -1,1 +1,5 @@
 output/
+build/
+dist/
+*.py[co]
+__pycache__/
