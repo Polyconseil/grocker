@@ -5,4 +5,7 @@
 
     self
     concepts
-    usage
+    internals
+    usage/build
+    usage/publish
+    usage/run
