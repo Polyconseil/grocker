@@ -38,7 +38,7 @@ Les bundle sont créés via un 'builder'.
 Il s'agit d'une build-chain qui s'occupe de péparer, compiler, et installer un SI
 ou autre projet (au sens projet hébergé sur Github) dans un container docker.
 
-Le fonctionnement de la création est detaillé dans :doc:`bundling` .
+Le fonctionnement de la création est detaillé dans la doc infra-agile.  .. FIXME
 
 
 Creation
