@@ -139,7 +139,7 @@ def setup_logging(enable_colors):
         'version': 1,
         'formatters': {
             'simple': {
-                'format': '{colors[begin]}%(message)s{colors[end]}'.format(colors=colors)
+                'format': '{begin}%(message)s{end}'.format(**colors)
             },
         },
         'handlers': {
