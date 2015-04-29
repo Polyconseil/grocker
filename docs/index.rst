@@ -6,6 +6,7 @@
     self
     concepts
     internals
+    security
     usage/build
     usage/publish
     usage/run
