@@ -14,16 +14,18 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
+import io
 import logging
 import logging.config
 import os
 import re
+import string
 import subprocess
 import sys
 import textwrap
 
 
-__version__ = '0.1'
+__version__ = '0.2.0'
 REQUIRED_IMAGE_NAMES = ('base', 'compiler')
 BLUE_HOME = '/home/blue'
 
@@ -83,12 +85,25 @@ def _versioned_package(value):
 
 
 def build_docker_image(name):
+    create_docker_file(name)
     run(
         'docker', 'build',
         '--force-rm=true', '--rm=true',
         '-t', 'docker.polyconseil.fr/bundle-{name}:{version}'.format(name=name, version=__version__),
         'bundles/{name}/.'.format(name=name),
     )
+
+
+def create_docker_file(name):
+    tpl_path = os.path.join('bundles', name, 'Dockerfile.tpl')
+    if os.path.exists(tpl_path):
+        templatize(tpl_path, os.path.join('bundles', name, 'Dockerfile'), {'grocker_version': __version__})
+
+
+def templatize(template, destination_path, context):
+    with io.open(destination_path, 'w', encoding='utf-8') as fw:
+        with io.open(template, encoding='utf-8') as fh:
+            fw.write(string.Template(fh.read()).substitute(context))
 
 
 def compile_packages(package, build_dir, python_version=None):
@@ -122,6 +137,7 @@ def build_runner(package, build_dir, python_version=None):
         )
 
     # create the future docker image
+    create_docker_file('runner')
     run(
         'docker', 'build',
         '--force-rm=true', '--rm=true',

@@ -3,3 +3,6 @@ build/
 dist/
 *.py[co]
 __pycache__/
+
+bundles/compiler/Dockerfile
+bundles/runner/Dockerfile
