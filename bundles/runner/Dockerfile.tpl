@@ -18,4 +18,5 @@ VOLUME ["/media", "/scripts", "/config"]
 
 EXPOSE 8080 8081
 USER blue
+RUN echo "${grocker_version}" > ~/.grocker_version
 ENTRYPOINT ["/home/blue/bin/entrypoint.py"]

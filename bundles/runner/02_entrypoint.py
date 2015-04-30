@@ -192,9 +192,15 @@ def dispatch(args):
     fn(*args)
 
 
+def get_version():
+    with open(os.path.expanduser('~/.grocker_version')) as f:
+        return f.read().strip()
+
+
 def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
     parser.add_argument('--disable-colors', help='disable colors')
+    parser.add_argument('--grocker-version', action='version', version=get_version())
     parser.add_argument('args', nargs='*', help='the command and its arguments')
     args = parser.parse_args()
 
