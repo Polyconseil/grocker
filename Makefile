@@ -14,8 +14,7 @@ The following commands are available:
 
 - Bundle building:
 
-    build PACKAGE=xxx [VERSION=yyy]
-    push  PACKAGE=xxx [VERSION=yyy]    Builds, then pushes package.
+    build PACKAGE=xxx VERSION=yyy
 
 - Other:
 
@@ -35,8 +34,6 @@ UNTAGGED_IMAGES := $(shell docker images | grep '^<none>' | awk '{print $$3}')
 BLUESOLUTIONS_IMAGES := $(shell docker images | grep '^bluesolutions' | awk '{print $$3}')
 BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polyconseil\.fr' | awk '{print $$3}')
 
-VERSION ?= $(shell pypi-version $(PACKAGE) 2>/dev/null |grep latest_dev | cut -d' ' -f 2)
-
 
 # Tasks
 #======
@@ -45,10 +42,7 @@ help:
 	$(info $(helpmsg))
 
 build:
-	./grocker.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
-
-push: build
-	docker push docker.polyconseil.fr/$(PACKAGE):$(VERSION)
+	./builder.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
 clean:
 	rm -rf bundles/runner/output

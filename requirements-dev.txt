@@ -1,1 +1,1 @@
-blease>=0.68.0
+blease
