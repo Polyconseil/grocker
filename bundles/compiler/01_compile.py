@@ -24,14 +24,14 @@ def main(argv):
     # Parse host pip.conf to generate guest pip.conf
     host_config = configparser.ConfigParser()
     host_config.read(host_pip_conf)
-    gest_config = configparser.ConfigParser()
-    gest_config.add_section('global')
-    gest_config.set('global', 'index-url', host_config.get('global', 'index-url'))
-    gest_config.set('global', 'wheel-dir', output_dir)
-    gest_config.set('global', 'find-links', output_dir)
+    guest_config = configparser.ConfigParser()
+    guest_config.add_section('global')
+    guest_config.set('global', 'index-url', host_config.get('global', 'index-url'))
+    guest_config.set('global', 'wheel-dir', output_dir)
+    guest_config.set('global', 'find-links', output_dir)
 
     with open(guest_pip_conf, 'w') as f:
-        gest_config.write(f)
+        guest_config.write(f)
 
     # Prepare to Build Wheels
     subprocess.check_call(['virtualenv', '-p', 'python{0}'.format(args.python), venv_dir])
