@@ -4,7 +4,7 @@ FROM docker.polyconseil.fr/bundle-base:${grocker_version}
 ADD 00_install_package.sh /tmp/00_install_package.sh
 ADD 02_entrypoint.py /tmp/02_entrypoint.py
 ADD templates/ /tmp/templates/
-ADD output/ /tmp/output/
+ADD output/${build_id} /tmp/output/
 ADD scripts/ /tmp/scripts/
 
 RUN /tmp/00_install_package.sh

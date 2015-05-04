@@ -41,6 +41,8 @@ RUNNER_ENV_FILE_TPL = """
 
 def main():
     args = builder_arg_parser(sys.argv[1:])
+    project, version = args.package.split('==')
+    build_id = '{0}-{1}'.format(project, version)
 
     setup_logging(not args.no_colors)
 
@@ -50,13 +52,32 @@ def main():
 
     # TODO: same, this is again a different target. should be separate.
     build_dir = args.build_dir or RUNNER_BUILD_DIR
+    build_dir = os.path.join(build_dir, build_id)
     if not os.path.exists(build_dir):
         os.makedirs(build_dir, mode=0o0750)
     compile_packages(args.package, python_version=args.python_version, build_dir=build_dir)
 
     # TODO: last but not least, go with the Makefile for this.
     if args.build_dir is None:
-        build_runner(args.package, python_version=args.python_version, build_dir=build_dir)
+        # create env file
+        env_file_path = os.path.join(build_dir, RUNNER_ENV_FILE)
+        with open(env_file_path, 'w') as env_file:
+            env_file.write(
+                textwrap.dedent(RUNNER_ENV_FILE_TPL).format(
+                    project=project,
+                    version=version,
+                    package=args.package,
+                    python_version=args.python_version,
+                ))
+
+        # create the future docker image
+        create_docker_file('runner', build_id=build_id)
+        run(
+            'docker', 'build',
+            '--force-rm=true', '--rm=true',
+            '-t', 'docker.polyconseil.fr/{0}:{1}'.format(project, version),
+            'bundles/runner/.'
+        )
 
 
 def builder_arg_parser(argv):
@@ -94,10 +115,12 @@ def build_docker_image(name):
     )
 
 
-def create_docker_file(name):
+def create_docker_file(name, **extra_args):
     tpl_path = os.path.join('bundles', name, 'Dockerfile.tpl')
+    tpl_args = {'grocker_version': __version__}
+    tpl_args.update(extra_args)
     if os.path.exists(tpl_path):
-        templatize(tpl_path, os.path.join('bundles', name, 'Dockerfile'), {'grocker_version': __version__})
+        templatize(tpl_path, os.path.join('bundles', name, 'Dockerfile'), tpl_args)
 
 
 def templatize(template, destination_path, context):
@@ -118,31 +141,6 @@ def compile_packages(package, build_dir, python_version=None):
         '--output', '{blue_home}/output'.format(blue_home=BLUE_HOME),
         '--python', python_version,
         package
-    )
-
-
-def build_runner(package, build_dir, python_version=None):
-    # create env file
-    env_file_path = os.path.join(build_dir, RUNNER_ENV_FILE)
-    with open(env_file_path, 'w') as env_file:
-        env_file.write(
-            textwrap
-            .dedent(RUNNER_ENV_FILE_TPL)
-            .format(
-                package=package,
-                project=package.split('==')[0],
-                version=package.split('==')[1],
-                python_version=python_version
-            )
-        )
-
-    # create the future docker image
-    create_docker_file('runner')
-    run(
-        'docker', 'build',
-        '--force-rm=true', '--rm=true',
-        '-t', 'docker.polyconseil.fr/{0}'.format(package.replace('==', ':')),
-        'bundles/runner/.'
     )
 
 
