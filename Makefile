@@ -14,7 +14,7 @@ The following commands are available:
 
 - Bundle building:
 
-    build PACKAGE=xxx VERSION=yyy
+    build PACKAGE=xxx [VERSION=yyy]
 
 - Other:
 
@@ -42,7 +42,7 @@ help:
 	$(info $(helpmsg))
 
 build:
-	./builder.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
+	./grocker.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
 clean:
 	rm -rf bundles/runner/output
