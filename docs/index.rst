@@ -3,7 +3,7 @@
 .. toctree::
     :maxdepth: 2
 
-    self
+    installation
     concepts
     internals
     security
