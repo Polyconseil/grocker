@@ -1,1 +1,1 @@
-blease
+Sphinx>=1.3

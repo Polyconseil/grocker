@@ -6,3 +6,4 @@ __pycache__/
 
 bundles/compiler/Dockerfile
 bundles/runner/Dockerfile
+/venv

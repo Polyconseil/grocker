@@ -44,7 +44,7 @@ help:
 build:
 	./grocker.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
-clean:
+clean: clean_docs
 	rm -rf bundles/runner/output
 
 kill_rm:
@@ -54,3 +54,22 @@ kill_rm:
 purge: clean kill_rm
 	-docker rmi -f $(BLUESOLUTIONS_IMAGES) $(BLUE_REGISTRY_IMAGES)
 	-docker rmi $(UNTAGGED_IMAGES)
+
+
+# Docs
+#=====
+
+SPHINX_BUILD_DIR ?= docs/build
+SPHINX_OPTS ?= -a
+ALLSPHINXOPTS ?= $(SPHINX_OPTS) docs $(SPHINX_BUILD_DIR)/html
+
+.PHONY: docs check_docs build_docs
+
+docs:
+	sphinx-build $(ALLSPHINXOPTS)
+
+check_docs:
+	sphinx-build -W $(ALLSPHINXOPTS)
+
+clean_docs:
+	rm -rf $(SPHINX_BUILD_DIR)
