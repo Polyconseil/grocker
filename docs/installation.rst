@@ -3,7 +3,10 @@ Installation
 
 Grocker nécessite `docker`_ pour pouvoir être utilisé.
 
-Sur un système Debian::
+.. _docker: https://www.docker.com/
+
+Debian
+------
 
   sudo apt-get update
   sudo apt-get install apt-transport-https ca-certificates
@@ -22,4 +25,18 @@ Sur un système Debian::
   `DOCKER_OPTS="--bip=10.1.1.1/24"` in file */etc/default/docker* then
   restart your computer (`sudo service docker restart` is not sufficient).
 
-.. _docker: https://www.docker.com/
+OSX
+---
+
+Installer `Boot2Docker`_ puis:
+
+  - Initialiser la VM (une seule fois après installation)::
+
+    boot2docker init
+
+  - Pour démarrer la VM et le démon Docker::
+
+    boot2docker start
+    eval "$(boot2docker shellinit)"
+
+.. _Boot2Docker: http://boot2docker.io
