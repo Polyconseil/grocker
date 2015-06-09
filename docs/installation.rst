@@ -8,6 +8,8 @@ Grocker nécessite `docker`_ pour pouvoir être utilisé.
 Debian
 ------
 
+.. code-block:: shell
+
   sudo apt-get update
   sudo apt-get install apt-transport-https ca-certificates
   sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
@@ -30,13 +32,17 @@ OSX
 
 Installer `Boot2Docker`_ puis:
 
-  - Initialiser la VM (une seule fois après installation)::
+  - Initialiser la VM (une seule fois après installation):
 
-    boot2docker init
+    .. code-block:: shell
 
-  - Pour démarrer la VM et le démon Docker::
+      boot2docker init
 
-    boot2docker start
-    eval "$(boot2docker shellinit)"
+  - Pour démarrer la VM et le démon Docker:
+
+    .. code-block:: shell
+
+      boot2docker start
+      eval "$(boot2docker shellinit)"
 
 .. _Boot2Docker: http://boot2docker.io
