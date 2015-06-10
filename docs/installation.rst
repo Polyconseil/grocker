@@ -29,18 +29,21 @@ Edit the docker's systemd file **/lib/systemd/system/docker.service** and these 
   ExecStart=/usr/bin/docker -d -H fd:// $DOCKER_OPTS
 
 Then reload the systemd configuration
+
 .. code-block:: shell
 
-  # systemctl daemon-reload
+  systemctl daemon-reload
 
 .. note::
 
-  Docker might take route `172.17.0.1/some_some` on installation which conflicts
+  Docker might take route ``172.17.0.1/some_some`` on installation which conflicts
   with ops.blue-city.co.uk (ip 172.17.57.12) preventing its access.
   You can tell Docker to install itself somewhere else by adding
-  `DOCKER_OPTS="--bip=10.1.1.1/24"` in file */etc/default/docker*.
+  ``DOCKER_OPTS="--bip=10.1.1.1/24"`` in file */etc/default/docker*.
   
-.. code-block::
+  **NB: The docker bridge IP must be a valid IP address in the CIDR notation, and not a network adress.**
+  
+.. code-block:: shell
 
   service docker stop
   ip link del docker0 && iptables -t nat -F
