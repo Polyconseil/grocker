@@ -55,21 +55,4 @@ purge: clean kill_rm
 	-docker rmi -f $(BLUESOLUTIONS_IMAGES) $(BLUE_REGISTRY_IMAGES)
 	-docker rmi $(UNTAGGED_IMAGES)
 
-
-# Docs
-#=====
-
-SPHINX_BUILD_DIR ?= docs/build
-SPHINX_OPTS ?= -a
-ALLSPHINXOPTS ?= $(SPHINX_OPTS) docs $(SPHINX_BUILD_DIR)/html
-
-.PHONY: docs check_docs build_docs
-
-docs:
-	sphinx-build $(ALLSPHINXOPTS)
-
-check_docs:
-	sphinx-build -W $(ALLSPHINXOPTS)
-
-clean_docs:
-	rm -rf $(SPHINX_BUILD_DIR)
+-include $(shell makefile_path docs.mk 2>/dev/null)
