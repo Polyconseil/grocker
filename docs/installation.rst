@@ -18,14 +18,36 @@ Debian
   sudo apt-get install lxc-docker
   sudo addgroup $USER docker
   sudo service docker restart
+  
+The lxc-docker package (v1.6) has a bug within its systemd init file which prevent to load docker options. 
+Edit the docker's systemd file **/lib/systemd/system/docker.service** and these line after the **[service]** section:
+
+.. code-block:: shell
+
+  [Service]
+  EnvironmentFile=/etc/default/docker
+  ExecStart=/usr/bin/docker -d -H fd:// $DOCKER_OPTS
+
+Then reload the systemd configuration
+
+.. code-block:: shell
+
+  systemctl daemon-reload
 
 .. note::
 
-  Docker might take route `172.17.0.1/some_some` on installation which conflicts
+  Docker might take route ``172.17.0.1/some_some`` on installation which conflicts
   with ops.blue-city.co.uk (ip 172.17.57.12) preventing its access.
   You can tell Docker to install itself somewhere else by adding
-  `DOCKER_OPTS="--bip=10.1.1.1/24"` in file */etc/default/docker* then
-  restart your computer (`sudo service docker restart` is not sufficient).
+  ``DOCKER_OPTS="--bip=10.1.1.1/24"`` in file */etc/default/docker*.
+  
+  **NB: The docker bridge IP must be a valid IP address in the CIDR notation, and not a network adress.**
+  
+.. code-block:: shell
+
+  service docker stop
+  ip link del docker0 && iptables -t nat -F
+  service docker start
 
 OSX
 ---
