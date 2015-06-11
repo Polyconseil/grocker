@@ -21,6 +21,7 @@ import shutil
 import socket
 import string
 import subprocess
+import textwrap
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
@@ -117,7 +118,11 @@ def setup_mail_relay():
     fqdn = socket.getfqdn()
     get_mail_cmd = [  # FIXME
         'python', '-c',
-        'from django.conf import settings; print settings.LOGGING["handlers"]["maildev"]["toaddrs"][0]'
+        ''.join(textwrap.dedent('''
+            from __future__ import print_function;
+            from django.conf import settings;
+            print(settings.LOGGING["handlers"]["maildev"]["toaddrs"][0])
+        ''').splitlines())
     ]
 
     context = {
