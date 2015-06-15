@@ -1,8 +1,8 @@
 Création d'une image
 ====================
 
-Comment Créer un image ?
-------------------------
+Comment créer une image ?
+-------------------------
 
 .. note:: **Prérequis**
 
