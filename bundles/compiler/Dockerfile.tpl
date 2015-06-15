@@ -1,4 +1,4 @@
-FROM docker.polyconseil.fr/bundle-base:${grocker_version}
+FROM ${grocker_registry_fqdn}/bundle-base:${grocker_version}
 
 # Install system packages and compiler script in final destination
 ADD 00_install_python.sh /tmp/00_install_python.sh

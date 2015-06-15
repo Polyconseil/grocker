@@ -26,6 +26,7 @@ import textwrap
 
 
 __version__ = '0.2.0'
+REGISTRY_FQDN = 'docker.polydev.blue'
 REQUIRED_IMAGE_NAMES = ('base', 'compiler')
 BLUE_HOME = '/home/blue'
 
@@ -75,7 +76,7 @@ def main():
         run(
             'docker', 'build',
             '--force-rm=true', '--rm=true',
-            '-t', 'docker.polyconseil.fr/{0}:{1}'.format(project, version),
+            '-t', '{0}/{1}:{2}'.format(REGISTRY_FQDN, project, version),
             'bundles/runner/.'
         )
 
@@ -110,14 +111,17 @@ def build_docker_image(name):
     run(
         'docker', 'build',
         '--force-rm=true', '--rm=true',
-        '-t', 'docker.polyconseil.fr/bundle-{name}:{version}'.format(name=name, version=__version__),
+        '-t', '{registry}/bundle-{name}:{version}'.format(registry=REGISTRY_FQDN, name=name, version=__version__),
         'bundles/{name}/.'.format(name=name),
     )
 
 
 def create_docker_file(name, **extra_args):
     tpl_path = os.path.join('bundles', name, 'Dockerfile.tpl')
-    tpl_args = {'grocker_version': __version__}
+    tpl_args = {
+        'grocker_registry_fqdn': REGISTRY_FQDN,
+        'grocker_version': __version__,
+    }
     tpl_args.update(extra_args)
     if os.path.exists(tpl_path):
         templatize(tpl_path, os.path.join('bundles', name, 'Dockerfile'), tpl_args)
@@ -136,7 +140,7 @@ def compile_packages(package, build_dir, python_version=None):
         '--volume', '{home}/.pip/:{blue_home}/.pip.host'.format(home=os.path.expanduser("~"), blue_home=BLUE_HOME),
         '--volume', '{build_dir}:{blue_home}/output'.format(build_dir=os.path.abspath(build_dir), blue_home=BLUE_HOME),
 
-        'docker.polyconseil.fr/bundle-compiler:{builder_version}'.format(builder_version=__version__),
+        '{registry}/bundle-compiler:{builder_version}'.format(registry=REGISTRY_FQDN, builder_version=__version__),
 
         '--output', '{blue_home}/output'.format(blue_home=BLUE_HOME),
         '--python', python_version,

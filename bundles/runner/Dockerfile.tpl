@@ -1,4 +1,4 @@
-FROM docker.polyconseil.fr/bundle-base:${grocker_version}
+FROM ${grocker_registry_fqdn}/bundle-base:${grocker_version}
 
 # Run the installer script for target package
 ADD 00_install_package.sh /tmp/00_install_package.sh

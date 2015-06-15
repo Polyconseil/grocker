@@ -47,7 +47,7 @@ build:
 	./grocker.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
 push: build
-	docker push docker.polyconseil.fr/$(PACKAGE):$(VERSION)
+	docker push docker.polydev.blue/$(PACKAGE):$(VERSION)
 
 clean: clean_docs
 	rm -rf bundles/runner/output
