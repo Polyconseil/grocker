@@ -1,6 +1,11 @@
 Publication des images
 ======================
 
+Docker registry
+---------------
+
+Polyconseil docker's registry is accessible at ``docker.polydev.blue``.
+
 Publication
 -----------
 
@@ -20,4 +25,4 @@ Récupération
 
 .. code-block:: bash
 
-  $ docker pull ${IMAGE}:${VERSION}
+  $ docker pull (registry_fqdn)/${IMAGE}:${VERSION}
