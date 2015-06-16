@@ -69,6 +69,13 @@ Installer `Boot2Docker`_ puis:
 
 .. _Boot2Docker: http://boot2docker.io
 
+Pour mettre à jour la version de docker
+
+.. code-block:: shell
+
+  boot2docker stop
+  boot2docker update
+  boot2docker start
 
 Archlinux
 ---------
