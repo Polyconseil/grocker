@@ -74,7 +74,7 @@ Pour mettre à jour la version de docker
 .. code-block:: shell
 
   boot2docker stop
-  boot2docker update
+  boot2docker upgrade
   boot2docker start
 
 Archlinux
