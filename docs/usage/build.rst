@@ -22,7 +22,7 @@ La création d'une image se fait via la commande ``grocker.py``
     $ # par exemple pour créer une image de dev de milborne :
     $ grocker.py --python 2.7 milborne==0.4.0.dev2015041600283
     $ # ou en utilisant le Makefile
-    $ make build PACKAGE=milborne VERSION=0.4.0.dev2015041600283
+    $ make build PACKAGE=milborne VERSION=0.4.0.dev2015041600283 PYTHON_VERSION=2.7
 
 Les paquets *Python* sont récupérés en utilisant la configuration *pip* de la machine hôte.
 
