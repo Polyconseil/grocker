@@ -76,7 +76,7 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         'python_version': os.environ['PYTHON_VERSION'],
         'project_name': os.environ['PROJECT_NAME'],
         'project_name_upper': os.environ['PROJECT_NAME'].upper(),
-        'uwsgi_plugin_name':, uwsgi_plugin_name,
+        'uwsgi_plugin_name': uwsgi_plugin_name,
         'venv': VENV,
     }
 
