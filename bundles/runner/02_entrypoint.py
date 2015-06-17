@@ -133,6 +133,8 @@ def setup_mail_relay():
     }
 
     templatize('ssmtp.conf', os.path.join('~', 'etc', 'ssmtp.conf'), context)
+    templatize('django_smtp_settings.ini', os.path.join(DJANGO_SETTINGS_PATH,
+        '40_smtp_settings.ini'), context)
 
 
 def setup_logging(enable_colors):
@@ -211,8 +213,8 @@ def main():
 
     setup_logging(not args.disable_colors)
     setup_environment()
-    setup_mail_relay()
     setup_app()
+    setup_mail_relay()
 
     dispatch(args.args)
 
