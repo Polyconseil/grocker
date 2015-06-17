@@ -64,11 +64,19 @@ def execute(*args):
 
 
 def get_context():  # TODO: replace by ad-hoc context in function ?
+    # uwsgi specific plugin name
+    python_version = os.environ['PYTHON_VERSION']
+    python_major = python_version.split('.')[0]
+    uwsgi_plugin_name = 'python'
+    if python_major == '3':
+        uwsgi_plugin_name = '{}{}'.format(uwsgi_plugin_name, python_major)
+
     return {
         'django_config_path': DJANGO_SETTINGS_PATH,
         'python_version': os.environ['PYTHON_VERSION'],
         'project_name': os.environ['PROJECT_NAME'],
         'project_name_upper': os.environ['PROJECT_NAME'].upper(),
+        'uwsgi_plugin_name':, uwsgi_plugin_name,
         'venv': VENV,
     }
 
