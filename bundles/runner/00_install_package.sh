@@ -18,7 +18,7 @@ install --mode=0644 --owner=${USER} /tmp/output/config.env ${USER_HOME}/etc/conf
 for template in $(ls /tmp/templates/); do
     install --mode=0644 --owner=${USER} -D /tmp/templates/${template} ${USER_HOME}/templates/${template}
 done
-install --mode=0755 --owner=${USER} -D /tmp/02_entrypoint.py ${USER_HOME}/bin/entrypoint.py
+install --mode=0755 --owner=${USER} -D /tmp/entrypoint.py ${USER_HOME}/bin/entrypoint.py
 
 # Allow to modified ssmtp config
 rm /etc/ssmtp/ssmtp.conf
