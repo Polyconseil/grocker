@@ -29,11 +29,11 @@ endef
 PYTHON_VERSION ?= 2.7
 
 BLUESOLUTIONS_CONTAINERS := $(shell docker ps |\grep 'bluesolutions' | awk '{print $$1}')
-BLUE_REGISTRY_CONTAINERS := $(shell docker ps |\grep 'docker\.polyconseil\.fr' | awk '{print $$1}')
+BLUE_REGISTRY_CONTAINERS := $(shell docker ps |\grep 'docker\.polydev\.blue' | awk '{print $$1}')
 
 UNTAGGED_IMAGES := $(shell docker images | grep '^<none>' | awk '{print $$3}')
 BLUESOLUTIONS_IMAGES := $(shell docker images | grep '^bluesolutions' | awk '{print $$3}')
-BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polyconseil\.fr' | awk '{print $$3}')
+BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polydev\.blue' | awk '{print $$3}')
 
 VERSION ?= $(shell pypi-version $(PACKAGE) 2>/dev/null |grep latest_dev | cut -d' ' -f 2)
 
