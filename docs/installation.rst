@@ -34,6 +34,8 @@ Then reload the systemd configuration
 
   systemctl daemon-reload
 
+**NB: With ubuntu 14.04, /lib/systemd/system/docker.service exists but you can not run systemctl command (14.04 is still with upstart rather than systemd).** 
+
 .. note::
 
   Docker might take route ``172.17.0.1/some_some`` on installation which conflicts
