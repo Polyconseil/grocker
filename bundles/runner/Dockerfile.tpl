@@ -2,7 +2,7 @@ FROM ${grocker_registry_fqdn}/bundle-base:${grocker_version}
 
 # Run the installer script for target package
 ADD 00_install_package.sh /tmp/00_install_package.sh
-ADD 02_entrypoint.py /tmp/02_entrypoint.py
+ADD entrypoint.py /tmp/entrypoint.py
 ADD templates/ /tmp/templates/
 ADD output/${build_id} /tmp/output/
 ADD scripts/ /tmp/scripts/

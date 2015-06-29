@@ -18,7 +18,7 @@ Arborescence de *Grocker*::
   │   └── runner ----------------------- runner, dans lequel on installe les wheels buildés.
   │       ├── 00_install_package.sh
   │       ├── 01_setup_cron.sh
-  │       ├── 02_entrypoint.py
+  │       ├── entrypoint.py
   │       ├── Dockerfile
   │       └── templates
   │           ├── cronwrapper.sh
