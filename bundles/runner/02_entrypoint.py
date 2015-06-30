@@ -78,6 +78,9 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         'project_name_upper': os.environ['PROJECT_NAME'].upper(),
         'uwsgi_plugin_name': uwsgi_plugin_name,
         'venv': VENV,
+        'http_proxy': os.environ.get('http_proxy', ''),
+        'https_proxy': os.environ.get('https_proxy', ''),
+        'no_proxy': os.environ.get('no_proxy', ''),
     }
 
 
