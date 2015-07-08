@@ -25,7 +25,7 @@ import textwrap
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
-DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'django_config')
+DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'app_config')
 ENV_CONFIG = os.path.join(BLUE_HOME, 'etc', 'config.env')
 LOG_DIR = os.path.join(BLUE_HOME, 'logs')
 RUN_DIR = os.path.join(BLUE_HOME, 'run')
@@ -225,7 +225,10 @@ def main():
     setup_logging(not args.disable_colors)
     setup_environment()
     setup_app()
-    setup_mail_relay()
+    try:
+        setup_mail_relay()
+    except Exception:
+        logging.getLogger(__name__).exception("Cannot setup mail relay")
 
     dispatch(args.args)
 

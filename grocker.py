@@ -43,6 +43,7 @@ RUNNER_ENV_FILE_TPL = """
 def main():
     args = builder_arg_parser(sys.argv[1:])
     project, version = args.package.split('==')
+    project = project.replace("[", "-").replace("]", "")
     build_id = '{0}-{1}'.format(project, version)
 
     setup_logging(not args.no_colors)
@@ -101,7 +102,7 @@ def builder_arg_parser(argv):
 
 
 def _versioned_package(value):
-    if not re.match(r'\w(\w|-)+==\d+.\d+.\d+', value):
+    if not re.match(r'\w(\w|-)+(\[\w*\])?==\d+.\d+.\d+', value):
         raise argparse.ArgumentTypeError("Do not match <name>==<x>.<y>.<z> pattern.")
     return value
 
