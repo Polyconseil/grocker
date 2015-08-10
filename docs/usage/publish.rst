@@ -49,3 +49,13 @@ La publier sur le registry:
 .. code:: shell
 
     $ docker push ${registry_fqdn}/${IMAGE}:${VERSION}
+
+
+SHA256 d'une Image
+------------------
+
+Vous pouvez à tout moment récupérer le SHA256 d'une image poussée sur notre registry avec::
+
+.. code:: shell
+
+    $ curl -X GET -I https://docker.polydev.blue/v2/<PROJECT>/manifests/<VERSION> | grep Docker-Content-Digest
