@@ -26,3 +26,26 @@ Récupération
 .. code-block:: bash
 
   $ docker pull (registry_fqdn)/${IMAGE}:${VERSION}
+
+
+Réplication
+-----------
+
+Pour créer une image mirroir d'une image officielle sur le registry
+Polyconseil, choisir l'image à répliquer à l'aide de:
+
+.. code:: shell
+
+    $ docker images
+
+Tagger l'image:
+
+.. code:: shell
+
+    $ docker tag ${IMAGE_ID} ${registry_fqdn}/${IMAGE}:${VERSION}
+
+La publier sur le registry:
+
+.. code:: shell
+
+    $ docker push ${registry_fqdn}/${IMAGE}:${VERSION}
