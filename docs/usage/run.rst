@@ -43,6 +43,7 @@ de configuration de base est fourni par l'image *Grocker*, celui-ci a une priori
 surcharger en utilisant des fichiers de priorité supérieure::
 
     config
+    ├── ssh-known-hosts
     └── app
         ├── 10_low_priority.ini
         ├── 50_default_settings.ini
@@ -101,11 +102,16 @@ Comment lancer un service ?
         -v ${MEDIA_DIR}:/media:rw \
         -v ${SCRIPT_DIR}:/scripts:rw \
         -v /dev/log:dev/log:rw \
-        -p ${PORT}:8080
-        -p ${SUPERVISION_PORT}:8081
+        -p ${PORT}:8080 \
+        -p ${SUPERVISION_PORT}:8081 \
         -ti \
         ${IMAGE} \
         start ${SERVICE}
+
+.. note::
+  
+  Le flag '-ti' ci-dessus n'est la plupart du temps pas nécessaire au lancement d'un service;
+  il permet surtout d'interagir (avec un flux stdin) avec la machine virtualisée.
 
 
 .. _run-scripts:
