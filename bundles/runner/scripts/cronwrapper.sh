@@ -33,7 +33,7 @@ usage() {
   local retcode;
   retcode=${1:-0};
 
-  echo "Usage: $0 --all|--help [--environment <environment>] [--fleet <fleet>] [--kill-previous] COMMAND [ARG1 ARG2 ...]
+  echo "Usage: $0 --all|--help [--environment <platform>] [--fleet <fleet>] [--kill-previous] COMMAND [ARG1 ARG2 ...]
 
 Run the COMMAND manage.py command within a wrapper which will capture stdout/stderr.
 
@@ -43,7 +43,7 @@ The Django settings module is taken from the environment variable '\$DJANGO_SETT
 Options:
 
   --help                        Show this help message
-  --environment <environment>   Excecute command only for specified environment
+  --environment <platform>      Execute command only for specified platform: 'production' or 'recette-fonctionnelle'
   --fleet <fleet>               Execute command only for specified fleet
   --kill-previous               Kill the previous instance
 
@@ -53,6 +53,7 @@ Example:
     $0 dumpdata auth
   Would run the following line:
     ${MANAGE_PY} dumpdata auth
+
 ";
   exit ${retcode};
 }
@@ -93,10 +94,10 @@ esac;
 
 # Check environment
 if [[ "$1" == "--environment" ]]; then
-    FOR_ENVIRONMENT=$2
+    FOR_PLATFORM=$2
     shift 2;
-    if [[ $(get_django_setting ENVIRONMENT) != ${FOR_ENVIRONMENT} ]]; then
-        logger -p cron.info "Cron ${FULL_ARGS} disabled: environment is not ${FOR_ENVIRONMENT}."
+    if [[ $(get_django_setting PLATFORM) != ${FOR_PLATFORM} ]]; then
+        logger -p cron.info "Cron ${FULL_ARGS} disabled: platform is not ${FOR_PLATFORM}."
         exit 0;
     fi
 fi
