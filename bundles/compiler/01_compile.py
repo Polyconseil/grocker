@@ -27,6 +27,7 @@ def main(argv):
     guest_config = configparser.ConfigParser()
     guest_config.add_section('global')
     guest_config.set('global', 'index-url', host_config.get('global', 'index-url'))
+    guest_config.set('global', 'extra-index-url', host_config.get('global', 'extra-index-url'))
     guest_config.set('global', 'wheel-dir', output_dir)
     guest_config.set('global', 'find-links', output_dir)
 
