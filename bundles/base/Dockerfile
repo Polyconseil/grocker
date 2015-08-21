@@ -4,6 +4,7 @@ ENV LANG C.UTF-8
 
 # Configure apt for a lighter & quieter use.
 ADD 00_apt_config.sh /tmp/00_apt_config.sh
+ADD nginx_signing.key /tmp/nginx_signing.key
 RUN /tmp/00_apt_config.sh
 
 # Add a variables file that will be sourced by descendants
