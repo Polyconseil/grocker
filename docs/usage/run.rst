@@ -9,7 +9,6 @@ Les images *Grocker* interagissent avec la machine hôte au travers des interfac
  - les volumes "montés" par *Docker* ;
  - les ports "attachés" par *Docker*.
 
-
 +-------------------------------------------------------------------------------------------------------------+
 | Liste des ports utilisés                                                                                    |
 +----------------+--------------------------------------------------------------------------------------------+
@@ -34,21 +33,24 @@ Les images *Grocker* interagissent avec la machine hôte au travers des interfac
 | ``/dev/log``     | *WO* | Permet l'utilisation du service *syslog* de la machine hôte.                        |
 +------------------+------+-------------------------------------------------------------------------------------+
 
-
 Configuration
 -------------
 
-La configuration de l'application doit être déposée dans le sous-dossier ``app`` du dossier de configuration. Un fichier
-de configuration de base est fourni par l'image *Grocker*, celui-ci a une priorité de 50, il est possible de le
-surcharger en utilisant des fichiers de priorité supérieure::
+La configuration de l'application doit être déposée dans le sous-dossier ``app`` du dossier de configuration. Un fichier de configuration de base est fourni par l'image *Grocker*, celui-ci a une priorité de 50, il est possible de le surcharger en utilisant des fichiers de priorité supérieure::
 
     config
-    ├── ssh-known-hosts
+    ├── ssh-dir
+    │   ├── known_hosts
+    │   ├── id_rsa
+    │   └── ...
     └── app
         ├── 10_low_priority.ini
         ├── 50_default_settings.ini
         └── 90_override.ini
 
+.. note::
+
+  Tous les fichiers contenus au premier niveau de ssh-dir sont copiés dans le dossier ``~/.ssh`` du container à l'installation de l'applicatif. Toute modification de la configuration SSH nécessite donc un redémarrage du docker pour pouvoir être prise en compte.
 
 Commandes
 ---------
@@ -99,6 +101,7 @@ Comment lancer un service ?
 
     $ docker run \
         -v ${CONFIG_DIR}:/config:ro \
+        -v ${SSH_DIR}:/config/ssh-dir:ro \
         -v ${MEDIA_DIR}:/media:rw \
         -v ${SCRIPT_DIR}:/scripts:rw \
         -v /dev/log:dev/log:rw \
@@ -109,7 +112,7 @@ Comment lancer un service ?
         start ${SERVICE}
 
 .. note::
-  
+
   Le flag '-ti' ci-dessus n'est la plupart du temps pas nécessaire au lancement d'un service;
   il permet surtout d'interagir (avec un flux stdin) avec la machine virtualisée.
 
