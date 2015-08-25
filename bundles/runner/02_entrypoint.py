@@ -136,7 +136,7 @@ def setup_app():
             src = os.path.join(src_ssh_dir, name)
             dst = os.path.join(dst_ssh_dir, name)
             if os.path.isfile(src):
-                shutil.copy(src=dst, dst=dst)
+                shutil.copy(src=src, dst=dst)
                 os.chmod(dst, 384)  # 0600 octal
 
 
