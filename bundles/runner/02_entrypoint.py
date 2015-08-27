@@ -13,6 +13,7 @@
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
+import ConfigParser as configparser
 import logging
 import logging.config
 import os
@@ -105,6 +106,37 @@ def setup_environment():
     })
 
 
+def setup_cron(grocker_config):
+    pkg_crontab = subprocess.check_output([
+        os.path.expanduser('~/app/bin/python'), '-c',
+        'import os;'
+        'from pkg_resources import resource_string, resource_exists;'
+        'resource_tuple = os.environ["PROJECT_NAME"], "crontab";'
+        'print(resource_string(*resource_tuple) if resource_exists(*resource_tuple) else "");'
+    ])
+
+    cron_wrapper_path = os.path.expanduser('~/bin/cronwrapper.sh')
+    prepared_crontab = (
+        pkg_crontab
+        .replace(' www-data ', ' ')
+        .replace(' /usr/share/bluesys-cronwrapper/bin/cronwrapper.sh ', ' {0} '.format(cron_wrapper_path))
+    )
+    mail_block_tpl = textwrap.dedent("""
+    MAILFROM={mailfrom}
+    MAILTO={mailto}
+    """)
+    crontab = (
+        mail_block_tpl.format(
+            mailfrom=grocker_config.get('cron', 'mailfrom'),
+            mailto=grocker_config.get('cron', 'mailto'),
+        ) +
+        prepared_crontab
+    )
+
+    process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE)
+    process.communicate(crontab)
+
+
 def setup_app():
     """Take care of django SI configuration:
         * moves configuration from /config/SI/*ini to $HOME/django_settings/
@@ -125,6 +157,8 @@ def setup_app():
             dst=os.path.join(DJANGO_SETTINGS_PATH, filename),
         )
 
+
+def setup_ssh():
     # Copy ssh-known-hosts
     dst_ssh_dir = os.path.join(BLUE_HOME, '.ssh')
     src_ssh_dir = os.path.join(CONFIG_MOUNT_POINT, SSH_CONFIG_DIR)
@@ -140,27 +174,16 @@ def setup_app():
                 os.chmod(dst, 0o600)
 
 
-def setup_mail_relay():
-    fqdn = socket.getfqdn()
-    get_mail_cmd = [  # FIXME
-        'python', '-c',
-        ''.join(textwrap.dedent('''
-            from __future__ import print_function;
-            from django.conf import settings;
-            print(settings.LOGGING["handlers"]["maildev"]["toaddrs"][0])
-        ''').splitlines())
-    ]
-
+def setup_mail_relay(grocker_config):
     context = {
-        'smtp_server': get_host_ip(),
-        'fqdn': fqdn,
-        'domain': '.'.join(fqdn.split('.')[1:]),
-        'mailto': subprocess.check_output(get_mail_cmd),
+        'smtp_server': grocker_config.get('smtp', 'server'),
+        'fqdn': grocker_config.get('instance', 'fqdn'),
+        'domain': '.'.join(grocker_config.get('instance', 'fqdn').split('.')[1:]),
+        'mailto': grocker_config.get('cron', 'mailto'),
     }
 
     templatize('ssmtp.conf', os.path.join('~', 'etc', 'ssmtp.conf'), context)
-    templatize('django_smtp_settings.ini', os.path.join(DJANGO_SETTINGS_PATH,
-        '40_smtp_settings.ini'), context)
+    templatize('django_smtp_settings.ini', os.path.join(DJANGO_SETTINGS_PATH, '40_smtp_settings.ini'), context)
 
 
 def setup_logging(enable_colors):
@@ -230,6 +253,23 @@ def get_version():
         return f.read().strip()
 
 
+def get_grocker_config():
+    config = configparser.ConfigParser()
+    config.add_section('instance')
+    config.set('instance', 'fqdn', socket.getfqdn())
+
+    config.add_section('smtp')
+    config.set('smtp', 'server', get_host_ip())
+
+    config.add_section('cron')
+    config.set('cron', 'mailfrom', 'cron@example.com')
+    config.set('cron', 'mailto', 'nobody@example.com')
+
+    config.read(os.path.join(CONFIG_MOUNT_POINT, 'grocker.ini'))
+
+    return config
+
+
 def main():
     parser = argparse.ArgumentParser(prog='entrypoint', description='Docker entry point')
     parser.add_argument('--disable-colors', help='disable colors')
@@ -237,13 +277,14 @@ def main():
     parser.add_argument('args', nargs='*', help='the command and its arguments')
     args = parser.parse_args()
 
+    grocker_config = get_grocker_config()
+
     setup_logging(not args.disable_colors)
     setup_environment()
+    setup_ssh()
     setup_app()
-    try:
-        setup_mail_relay()
-    except Exception:
-        logging.getLogger(__name__).exception("Cannot setup mail relay")
+    setup_mail_relay(grocker_config)
+    setup_cron(grocker_config)
 
     dispatch(args.args)
 

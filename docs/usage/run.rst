@@ -43,14 +43,25 @@ La configuration de l'application doit être déposée dans le sous-dossier ``ap
     │   ├── known_hosts
     │   ├── id_rsa
     │   └── ...
-    └── app
-        ├── 10_low_priority.ini
-        ├── 50_default_settings.ini
-        └── 90_override.ini
+    ├── app
+    │   ├── 10_low_priority.ini
+    │   ├── 50_default_settings.ini
+    │   └── 90_override.ini
+    └── grocker.ini
 
 .. note::
 
   Tous les fichiers contenus au premier niveau de ssh-dir sont copiés dans le dossier ``~/.ssh`` du container à l'installation de l'applicatif. Toute modification de la configuration SSH nécessite donc un redémarrage du docker pour pouvoir être prise en compte.
+
+.. note::
+
+    Le fichier ``grocker.ini`` permet de configurer le comportement des crons :
+
+    .. code-block:: ini
+
+        [cron]
+        mailto=dev@example.com
+        mailfrom=fleet+cron@example.com
 
 Commandes
 ---------

@@ -5,15 +5,6 @@ set -xe
 source /opt/bundle/base.env
 source ${USER_HOME}/etc/config.env
 
-# Copy crontabs to root, ensure permissions
-CRONTAB_FILE=$(${USER_HOME}/app/bin/python -c "import pkg_resources; print(pkg_resources.resource_filename('${PROJECT_NAME}', 'crontab'))" || true)
-if [ -f "${CRONTAB_FILE}" ]; then
-    cat ${CRONTAB_FILE} | \
-    sed -e "s@ www-data @ @" | \
-    sed -e "s@ /usr/share/bluesys-cronwrapper/bin/cronwrapper.sh @ ${USER_HOME}/bin/cronwrapper.sh @" | \
-    crontab -u ${USER} -
-fi;
-
 # Ensure permissions on /var/log/cronwrapper and /var/run/cronwrapper
 install --mode=0755 --owner=${USER} --group=${GROUP} -d /var/run/cronwrapper
 install --mode=0755 --owner=${USER} --group=${GROUP} -d /var/log/cronwrapper
