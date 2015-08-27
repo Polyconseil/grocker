@@ -130,7 +130,7 @@ def setup_app():
     src_ssh_dir = os.path.join(CONFIG_MOUNT_POINT, SSH_CONFIG_DIR)
 
     create_directory(dst_ssh_dir)
-    os.chmod(dst_ssh_dir, 448)  # 0700 octal
+    os.chmod(dst_ssh_dir, 0o700)
     if os.path.exists(src_ssh_dir):
         for name in os.listdir(src_ssh_dir):
             src = os.path.join(src_ssh_dir, name)
