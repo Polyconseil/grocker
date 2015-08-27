@@ -25,7 +25,7 @@ import textwrap
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
-SSH_DIR = 'ssh-dir'
+SSH_CONFIG_DIR = 'ssh-dir'
 DJANGO_SETTINGS_PATH = os.path.join(BLUE_HOME, 'app_config')
 ENV_CONFIG = os.path.join(BLUE_HOME, 'etc', 'config.env')
 LOG_DIR = os.path.join(BLUE_HOME, 'logs')
@@ -127,7 +127,7 @@ def setup_app():
 
     # Copy ssh-known-hosts
     dst_ssh_dir = os.path.join(BLUE_HOME, '.ssh')
-    src_ssh_dir = os.path.join(CONFIG_MOUNT_POINT, SSH_DIR)
+    src_ssh_dir = os.path.join(CONFIG_MOUNT_POINT, SSH_CONFIG_DIR)
 
     create_directory(dst_ssh_dir)
     os.chmod(dst_ssh_dir, 448)  # 0700 octal
@@ -137,7 +137,7 @@ def setup_app():
             dst = os.path.join(dst_ssh_dir, name)
             if os.path.isfile(src):
                 shutil.copy(src=src, dst=dst)
-                os.chmod(dst, 384)  # 0600 octal
+                os.chmod(dst, 0o600)
 
 
 def setup_mail_relay():
