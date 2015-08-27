@@ -25,7 +25,7 @@ import sys
 import textwrap
 
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 REGISTRY_FQDN = 'docker.polydev.blue'
 REQUIRED_IMAGE_NAMES = ('base', 'compiler')
 BLUE_HOME = '/home/blue'
