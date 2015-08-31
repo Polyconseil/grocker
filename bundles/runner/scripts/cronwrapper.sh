@@ -106,7 +106,7 @@ fi
 if [[ "$1" == "--fleet" ]]; then
   FOR_FLEET=$2;
   shift 2;
-  if [[ $(get_django_setting FLEET_ID) != ${FOR_FLEET} ]]; then
+  if [[ ! ( $(get_django_setting FLEET_ID) =~ ^(${FOR_FLEET})$$ ) ]]; then
     # Log to the 'cron' facility, level 'info'.
     logger -p cron.info "Cron ${FULL_ARGS} disabled: fleet ${FOR_FLEET} is not the current fleet."
     exit 0;
