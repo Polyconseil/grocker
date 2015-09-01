@@ -1,9 +1,7 @@
-output/
 build/
 dist/
 *.py[co]
 __pycache__/
 
-bundles/compiler/Dockerfile
-bundles/runner/Dockerfile
-/venv
+*.egg-info/
+reports/
