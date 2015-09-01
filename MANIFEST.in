@@ -1,0 +1,3 @@
+include Readme.rst requirements.txt
+graft grocker
+global-exclude *.py[cod] __pycache__ *.so

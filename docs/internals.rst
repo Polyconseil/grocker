@@ -4,30 +4,36 @@ Fonctionnement interne
 Arborescence de *Grocker*::
 
   .
-  ├── grocker.py  ---------------------- code pour compiler les bundles
-  ├── bundles
-  │   ├── base ------------------------- bundle de base, rootfs
-  │   │   ├── 00_apt_config.sh
-  │   │   ├── 01_provision.sh
-  │   │   ├── base.env
-  │   │   └── Dockerfile
-  │   ├── compiler --------------------- compiler, utilisé pour builder l'application
-  │   │   ├── 00_install_python.sh
-  │   │   ├── 01_compile.py
-  │   │   └── Dockerfile
-  │   └── runner ----------------------- runner, dans lequel on installe les wheels buildés.
-  │       ├── 00_install_package.sh
-  │       ├── 01_setup_cron.sh
-  │       ├── 02_entrypoint.py
-  │       ├── Dockerfile
-  │       └── templates
-  │           ├── cronwrapper.sh
-  │           ├── nginx.conf
-  │           ├── settings.ini
-  │           ├── supervisord.conf
-  │           └── uwsgi.ini
+  ├── grocker  ----------------------------------------- code pour compiler les bundles
+  │   ├── builders.py
+  │   ├── helpers.py
+  │   ├── __init__.py
+  │   ├── loggers.py
+  │   ├── __main__.py
+  │   ├── resources
+  │   │   └── docker
+  │   │       ├── compiler-image  ---------------------- compiler, utilisé pour builder l'application
+  │   │       │   ├── compile.py
+  │   │       │   ├── Dockerfile.j2
+  │   │       │   ├── provision.env -> ../provision.env
+  │   │       │   └── provision.sh
+  │   │       ├── provision.env
+  │   │       ├── root-image  -------------------------- bundle de base, rootfs
+  │   │       │   ├── apt-setup.sh
+  │   │       │   ├── Dockerfile
+  │   │       │   ├── provision.env -> ../provision.env
+  │   │       │   └── provision.sh
+  │   │       └── runner-image  ------------------------ runner, dans lequel on installe les wheels buildés.
+  │   │           ├── Dockerfile.j2
+  │   │           └── provision.sh
+  │   └── six.py
   ├── Makefile
-  └── README.rst
+  ├── MANIFEST.in
+  ├── Readme.rst
+  ├── requirements-dev.txt
+  ├── requirements.txt
+  ├── setup.cfg
+  └── setup.py
 
 
 Déboguage

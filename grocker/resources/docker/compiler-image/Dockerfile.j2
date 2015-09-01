@@ -1,0 +1,11 @@
+FROM {{root_image_tag}}
+LABEL grocker.step=build
+
+COPY . /tmp/grocker
+
+RUN /tmp/grocker/provision.sh
+
+# Make the entry point run the compile script
+USER grocker
+WORKDIR /home/grocker
+ENTRYPOINT ["/home/grocker/compile.py"]

@@ -39,7 +39,7 @@ Configuration
 La configuration de l'application doit être déposée dans le sous-dossier ``app`` du dossier de configuration. Un fichier de configuration de base est fourni par l'image *Grocker*, celui-ci a une priorité de 50, il est possible de le surcharger en utilisant des fichiers de priorité supérieure::
 
     config
-    ├── ssh-dir
+    ├── ssh-config-dir
     │   ├── known_hosts
     │   ├── id_rsa
     │   └── ...
@@ -51,7 +51,7 @@ La configuration de l'application doit être déposée dans le sous-dossier ``ap
 
 .. note::
 
-  Tous les fichiers contenus au premier niveau de ssh-dir sont copiés dans le dossier ``~/.ssh`` du container à l'installation de l'applicatif. Toute modification de la configuration SSH nécessite donc un redémarrage du docker pour pouvoir être prise en compte.
+  Tous les fichiers contenus au premier niveau de ``ssh-config-dir`` sont copiés dans le dossier ``~/.ssh`` du container à l'installation de l'applicatif. Toute modification de la configuration SSH nécessite donc un redémarrage du docker pour pouvoir être prise en compte.
 
 .. note::
 
@@ -61,7 +61,6 @@ La configuration de l'application doit être déposée dans le sous-dossier ``ap
 
         [cron]
         mailto=dev@example.com
-        mailfrom=fleet+cron@example.com
 
 Commandes
 ---------

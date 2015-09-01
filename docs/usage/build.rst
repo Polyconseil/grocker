@@ -14,15 +14,13 @@ Comment créer une image ?
       $ su $(whoami)  # pour recharger les groupes
 
 
-La création d'une image se fait via la commande ``grocker.py``
+La création d'une image se fait via la commande ``grocker``
 
 .. code-block:: bash
 
-    $ grocker.py --python {2.7,3.4} {project}=={version}
+    $ grocker --runtime {python, python3} --entry-point {grocker-pyapp, grocker-bluedjango} build-image {project}=={version}
     $ # par exemple pour créer une image de dev de milborne :
-    $ grocker.py --python 2.7 milborne==0.4.0.dev2015041600283
-    $ # ou en utilisant le Makefile
-    $ make build PACKAGE=milborne VERSION=0.4.0.dev2015041600283 PYTHON_VERSION=2.7
+    $ python -m grocker --runtime python --entry-point grocker-bluedjango build-image milborne==0.4.0.dev2015041600283
 
 Les paquets *Python* sont récupérés en utilisant la configuration *pip* de la machine hôte.
 
@@ -31,4 +29,4 @@ Autres commandes utiles
 -----------------------
 
 Il est possible de nettoyer l'environnement de construction en lançant la commande ``make clean`` et de supprimer les
-images déjà construites avec la commande ``make purge``.
+images déjà construites avec la commande ``grocker --purge all``.
