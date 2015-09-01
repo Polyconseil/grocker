@@ -1,0 +1,19 @@
+FROM {{ root_image_tag }}
+LABEL grocker.step=run
+
+# Provisionning
+COPY . /tmp/grocker
+RUN install --owner=grocker --mode=0444 /tmp/grocker/.grocker ~grocker/.grocker
+RUN /tmp/grocker/provision.sh
+
+# Prepare the image to run the entry point
+VOLUME ["/media", "/scripts", "/config"]
+RUN ln -s /config /scripts /media /home/grocker/
+
+# Exposed ports
+EXPOSE 8080 8081
+
+# Make the entry point run the compile script
+USER grocker
+WORKDIR /home/grocker
+ENTRYPOINT ["/home/grocker/ep.venv/bin/runner"]

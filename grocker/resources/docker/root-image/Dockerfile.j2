@@ -1,0 +1,14 @@
+FROM debian:jessie
+LABEL grocker.step=build
+LABEL grocker.version={{ version }}
+
+ENV LANG C.UTF-8
+
+# Copy all file to /tmp/grocker
+COPY . /tmp/grocker/
+
+# Configure apt for a lighter & quieter use.
+RUN /tmp/grocker/apt-setup.sh
+
+# Do provisioning
+RUN /tmp/grocker/provision.sh

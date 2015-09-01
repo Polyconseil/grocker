@@ -148,8 +148,7 @@ Grocker construit trois images *Docker*, dont les deux premières sont réutilis
  1. L'**image de base** contient les dépendances systèmes nécessaires aux deux autres images. Elle contient entre
     autres:
 
-    - Un *reverse proxy* (*Nginx*) ;
-    - *Python* (2 et 3) et les versions *Uwsgi* associées ;
+    - *Python* (2 et 3) ;
     - les bibliothèques d'accès aux bases de données (*libpq*) ;
     - les bibliothèques de manipulation d'images.
 
