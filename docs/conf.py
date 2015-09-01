@@ -3,40 +3,25 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from grocker import __version__
-from sphinx.builders.html import StandaloneHTMLBuilder
+from grocker import __version__, __copyright__
 
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.graphviz',
-]
-
-graphviz_output_format = "svg"
-extlinks = {'trac': ('http://tracker.autolib.polyconseil.fr/ticket/%s', '#')}
-source_suffix = '.rst'
-master_doc = 'index'
-copyright = "2015, Polyconseil"
+copyright = __copyright__
 project = "Grocker"
 version = __version__
 release = version
-pygments_style = 'sphinx'
+
+extensions = [
+    'sphinx.ext.graphviz',
+]
+
+master_doc = 'index'
+graphviz_output_format = "svg"
+
 html_theme = 'sphinx_rtd_theme'
-
-# Prefer png to svg for images
-image_types = list(StandaloneHTMLBuilder.supported_image_types)
-image_types.remove('image/png')
-StandaloneHTMLBuilder.supported_image_types = ['image/png'] + image_types
-
 html_context = {
-    'display_github' : True,
-    'github_user' : 'Polyconseil',
-    'github_repo' : 'stub',
+    'display_github': True,
+    'github_user': 'Polyconseil',
+    'github_repo': 'grocker',
     'github_version': 'master/',
-    'conf_py_path': 'docs/',
+    'conf_py_path': '',
 }
-
-intersphinx_mapping = {}
-html_context['github_repo'] = 'grocker'
-html_context['conf_py_path'] = ''
