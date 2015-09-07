@@ -14,6 +14,10 @@ APT::Install-Recommends=false;
 APT::Install-Suggests=false;
 EOF
 
+apt update
+apt install -qy apt-transport-https
+apt-get clean
+
 # Use NginX upstream versions
 apt-key add - <<EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -47,5 +51,26 @@ Va3l3WuB+rgKjsQ=
 EOF
 echo "deb http://nginx.org/packages/debian/ jessie nginx" >> /etc/apt/sources.list.d/nginx.list
 
-# TODO: Setup private Debian repo
-# https://github.com/Polyconseil/devtools/issues/103
+# Use our private debian repo
+apt-key add - <<EOF
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mQENBFXpXDgBCACo4Vatrhne4IrRO9/MqHNmvctb7wJJGdRu3fM+Ij909LO3bpF1
+cr/8GQhjiYAKNTwNIymDiwfqZRq0sQHj/tv+z8SkS/QlaRycA67HKCzb7Add4aTI
+YeNkna1TYnkBnPtVhCdlnfGCxKIldzydsUC1sVOu0rNg2TzHgVjtRpuzaxBddaKB
+vTG5FPb3a/v1ewuoT8cODl2wsYApsL2wZ7WSJbOg0LwQcSEq4jKpt8/HjkQwGlVF
+uh+nSWTRzNB7t6wQ0DclANzx1YZzI/T+BdFvw9BtWCflxrrozqN/ENmyIZZW3dg3
+dm/m1GoyDS/gS+GZ1MPfsBktPnLUjE4zojANABEBAAG0LFBvbHljb25zZWlsIERl
+diBUZWFtIDxkZXZvcHNAcG9seWNvbnNlaWwuZnI+iQE3BBMBCgAhBQJV6Vw4Ahsv
+BQsJCAcDBRUKCQgLBRYCAwEAAh4BAheAAAoJEEN79TgHYRMjbfMH/iqznoaVJDYU
+RSKOn7ln8kJt4ivMsUH6YzYbC8uCzt+ChJs0pstgR5KOTsf6k0j3xEYPuKN9yeCY
+hXEo+468wVxH0tkkX98cxBicJM+b/APnE/HyWV6V8xsIo06ozOgGBYdBZ39WY0Lg
+ggBkdDgmn7UTJisGQqcki6qLCwqVXOnk+auGfm7tlD1st2ZwKtFbUW54IQgEyru5
+7fkR4zxuCcfdUy6ThTo/XYyMyz/WS18zWHLFb+1iC23gcG4Pau4Z0TegK1hVJclb
+L1+yECVhPSlfVwac5jIyfzrfOL9JNuoH3MVk2qq6Sexzg8xaoEGYur4FXYocWIgT
+mxU9jhbqn08=
+=pw6K
+-----END PGP PUBLIC KEY BLOCK-----
+EOF
+echo "deb https://debian.polydev.blue/ grocker main" >> /etc/apt/sources.list.d/polydev.list
