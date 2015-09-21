@@ -177,9 +177,6 @@ def setup_ssh():
 def setup_mail_relay(grocker_config):
     context = {
         'smtp_server': grocker_config.get('smtp', 'server'),
-        'fqdn': grocker_config.get('instance', 'fqdn'),
-        'domain': '.'.join(grocker_config.get('instance', 'fqdn').split('.')[1:]),
-        'mailto': grocker_config.get('cron', 'mailto'),
     }
 
     templatize('ssmtp.conf', os.path.join('~', 'etc', 'ssmtp.conf'), context)
