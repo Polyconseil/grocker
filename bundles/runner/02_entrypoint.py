@@ -22,7 +22,10 @@ import shutil
 import socket
 import string
 import subprocess
+import sys
 import textwrap
+
+IS_PYTHON3 = sys.version_info[0] == 3
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
@@ -114,6 +117,9 @@ def setup_cron(grocker_config):
         'resource_tuple = os.environ["PROJECT_NAME"], "crontab";'
         'print(resource_string(*resource_tuple) if resource_exists(*resource_tuple) else "");'
     ])
+
+    if IS_PYTHON3:
+        pkg_crontab = pkg_crontab.decode()
 
     cron_wrapper_path = os.path.expanduser('~/bin/cronwrapper.sh')
     prepared_crontab = (
