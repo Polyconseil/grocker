@@ -54,7 +54,7 @@ La publier sur le registry:
 SHA256 d'une Image
 ------------------
 
-Vous pouvez à tout moment récupérer le SHA256 d'une image poussée sur notre registry avec::
+Vous pouvez à tout moment récupérer le SHA256 d'une image poussée sur notre registry avec:
 
 .. code:: shell
 
