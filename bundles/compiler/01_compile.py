@@ -37,7 +37,10 @@ def main(argv):
     # Prepare to Build Wheels
     subprocess.check_call(['virtualenv', '-p', 'python{0}'.format(args.python), venv_dir])
     pip = os.path.join(venv_dir, 'bin', 'pip')
-    subprocess.check_call([pip, 'install', '-U', 'pip', 'setuptools', 'wheel'])
+    # wheel 0.25.0 is broken with python3
+    # https://bitbucket.org/pypa/wheel/issues/148/unorderable-types-error-for-python-3
+    subprocess.check_call([pip, 'install', '-U', 'pip', 'setuptools',
+        'wheel==0.24.0'])
 
     # Build wheels
     try:
