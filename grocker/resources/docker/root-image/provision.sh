@@ -4,6 +4,9 @@ set -xe
 cd $(dirname $0)  # Go to Grocker build dir
 [ -e provision.env ] && source provision.env  # Retrieve config vars
 
+# Configure system
+echo "LANG=C.UTF-8" > /etc/default/locale
+
 # Install System Packages
 export DEBIAN_FRONTEND=noninteractive
 apt update
