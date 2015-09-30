@@ -84,6 +84,7 @@ def main():
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
     docker_client = builders.docker_get_client()
+    builders.check_docker_version(docker_client)
 
     if args.action in (ACTIONS.build_dep, ACTIONS.build_img):
         logger.info('Compiling dependencies...')

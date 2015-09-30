@@ -4,6 +4,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import functools
 import json
+import logging
 import os.path
 import shutil
 import sys
@@ -12,9 +13,16 @@ import uuid
 import docker
 import docker.utils
 
-from . import __version__
+from . import __version__, DOCKER_MIN_VERSION
 from . import six
 from . import helpers
+
+
+def check_docker_version(docker_client):
+    logger = logging.getLogger(__name__)
+    if docker_client.version().get('Version', '0').split('.') < DOCKER_MIN_VERSION.split('.'):
+        logger.critical('Grocker needs Docker >= %s', DOCKER_MIN_VERSION)
+        exit(1)
 
 
 def build_root_image(docker_client, tag=None):
