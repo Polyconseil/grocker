@@ -27,6 +27,9 @@ def arg_parser():
     def file_path_type(x):
         return os.path.abspath(os.path.expanduser(x))
 
+    def file_path_or_none_type(x):
+        return file_path_type(x) if x is not None else None
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--runtime', default='python', choices=('python', 'python3'),
@@ -41,8 +44,8 @@ def arg_parser():
         help="Store build dependencies in this directory.",
     )
     parser.add_argument(
-        '--pip-conf', type=file_path_type, default='~/.pip/pip.conf',
-        help="Pip configuration file used to download dependencies (only index-url is used).",
+        '--pip-conf', type=file_path_or_none_type, default=None,
+        help="Pip configuration file used to download dependencies (by default use pip config getter).",
     )
     parser.add_argument(
         '--docker-registry',
@@ -89,15 +92,16 @@ def main():
     if args.action in (ACTIONS.build_dep, ACTIONS.build_img):
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
-        builders.compile_wheels(
-            docker_client=docker_client,
-            compiler_tag=compiler_tag,
-            python=args.runtime,
-            release=args.release,
-            entrypoint=args.entrypoint,
-            package_dir=args.package_dir,
-            pip_conf=args.pip_conf,
-        )
+        with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
+            builders.compile_wheels(
+                docker_client=docker_client,
+                compiler_tag=compiler_tag,
+                python=args.runtime,
+                release=args.release,
+                entrypoint=args.entrypoint,
+                package_dir=args.package_dir,
+                pip_conf=pip_conf,
+            )
 
     if args.action in (ACTIONS.build_img, ACTIONS.only_build_img):
         logger.info('Building image...')

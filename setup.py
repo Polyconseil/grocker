@@ -30,6 +30,7 @@ setup(
         'docker-py',
         'Jinja2',
         'setuptools>=18.0.1',
+        'pip>=7.1.2',
     ],
     extras_require={
         ":python_version == '2.7'": [
