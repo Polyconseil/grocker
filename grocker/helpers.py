@@ -2,10 +2,14 @@
 # Copyright (c) 2011-2015 Polyconseil SAS. All rights reserved.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+import contextlib
 import io
+import os.path
 import shutil
+import tempfile
 
 import jinja2
+import pip.baseparser
 import pkg_resources
 
 from . import __version__
@@ -39,3 +43,24 @@ def default_image_name(docker_registry, release):
         str(req.specifier)[2:],
         __version__,
     )
+
+
+@contextlib.contextmanager
+def pip_conf(pip_conf_path=None):
+    """
+    Use or fake (when it does not exist) a pip config file
+
+    Args:
+        pip_conf_path: str, pip configuration file to use if it exists
+
+    Yield:
+        str, the path to the pip configuration file (or the faked one)
+    """
+    if pip_conf_path is None or not os.path.exists(pip_conf_path):
+        with tempfile.NamedTemporaryFile('w') as f:
+            config = pip.baseparser.ConfigOptionParser(name='global').config
+            config.write(f)
+            f.flush()
+            yield f.name
+    else:
+        yield pip_conf_path
