@@ -78,7 +78,7 @@ def main():
         run(
             'docker', 'build',
             '--force-rm=true', '--rm=true',
-            '-t', '{0}/{1}:{2}'.format(REGISTRY_FQDN, project, version),
+            '-t', '{0}/{1}:{2}-{3}'.format(REGISTRY_FQDN, project, version, __version__),
             'bundles/runner/.'
         )
 
