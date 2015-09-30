@@ -8,6 +8,8 @@ import shutil
 import jinja2
 import pkg_resources
 
+from . import __version__
+
 
 def copy_resource(resource, destination, package='grocker'):
     resource_path = pkg_resources.resource_filename(package, resource)
@@ -30,9 +32,10 @@ def render_template(template_path, output_path, context):
 def default_image_name(docker_registry, release):
     req = pkg_resources.Requirement.parse(release)
     assert str(req.specifier).startswith('=='), "Only fixed version can use default image name."
-    return "{}/{}{}:{}".format(
+    return "{}/{}{}:{}-{}".format(
         docker_registry,
         req.project_name,
         '-' + '-'.join(req.extras) if req.extras else '',
         str(req.specifier)[2:],
+        __version__,
     )
