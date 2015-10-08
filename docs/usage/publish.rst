@@ -15,6 +15,11 @@ Pour publier une image sur le registre docker, il suffit de lancer la commande s
 
     $ docker push ${IMAGE}:${VERSION}
 
+Par exemple, pour autoslave en version 2.94.0::
+
+    $ docker push docker.polydev.blue/autoslave:2.94.0
+    
+Vous pouvez vérifier le nom de votre image avec ``docker images``.
 
 La liste des versions des images publiées est récupérable sur l'url suivante :
 https://(registry_fqdn)/v2/(app)/tags/list
