@@ -114,7 +114,7 @@ def setup_cron(grocker_config):
         os.path.expanduser('~/app/bin/python'), '-c',
         'import os, sys;'
         'from pkg_resources import resource_string, resource_exists;'
-        'resource_tuple = os.environ["PROJECT_NAME"], "crontab";'
+        'resource_tuple = os.environ["PACKAGE_NAME"].split("[")[0], "crontab";'
         'py3 = sys.version_info[0] == 3;'
         'resource = resource_string(*resource_tuple) if resource_exists(*resource_tuple) else None;'
         'print(resource.decode() if py3 and resource else resource or "");'
