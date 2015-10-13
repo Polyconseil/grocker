@@ -25,7 +25,6 @@ import subprocess
 import sys
 import textwrap
 
-IS_PYTHON3 = sys.version_info[0] == 3
 
 BLUE_HOME = '/home/blue'
 CONFIG_MOUNT_POINT = '/config'
