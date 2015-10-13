@@ -15,12 +15,7 @@ eval $(cat /home/blue/etc/cron.env | sed 's/^/export /')
 # ========
 
 function get_django_setting () {
-if [ $PYTHON_VERSION == "3.4" ] ; then
-    ${VENV}/bin/python -c "from django.conf import settings; print(settings.$1)"
-else
-    ${VENV}/bin/python -c "from django.conf import settings; print settings.$1"
-fi
-
+    ${VENV}/bin/python -c "from __future__ import print_function; from django.conf import settings; print(settings.$1)"
 }
 
 PROJECT=$(get_django_setting PROJECT_NAME)
