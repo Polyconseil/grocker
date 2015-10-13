@@ -111,9 +111,10 @@ def setup_environment():
 def setup_cron(grocker_config):
     pkg_crontab = subprocess.check_output([
         os.path.expanduser('~/app/bin/python'), '-c',
-        'import os, sys;'
+        'import os, re, sys;'
         'from pkg_resources import resource_string, resource_exists;'
-        'resource_tuple = os.environ["PACKAGE_NAME"].split("[")[0], "crontab";'
+        'package_name = re.search("^([\w_]+)", os.environ["PACKAGE_NAME"]).group(0);'
+        'resource_tuple = package_name, "crontab";'
         'py3 = sys.version_info[0] == 3;'
         'resource = resource_string(*resource_tuple) if resource_exists(*resource_tuple) else None;'
         'print(resource.decode() if py3 and resource else resource or "");'
