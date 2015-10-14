@@ -72,6 +72,10 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
     python_version = os.environ['PYTHON_VERSION']
     python_major = python_version.split('.')[0]
     uwsgi_plugin_name = 'python'
+    try:
+        uwsgi_workers = int(os.environ.get('UWSGI_WORKERS', 10))
+    except ValueError:
+        uwsgi_workers = 10
     if python_major == '3':
         uwsgi_plugin_name = '{}{}'.format(uwsgi_plugin_name, python_major)
 
@@ -81,6 +85,7 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         'project_name': os.environ['PROJECT_NAME'],
         'project_name_upper': os.environ['PROJECT_NAME'].upper(),
         'uwsgi_plugin_name': uwsgi_plugin_name,
+        'uwsgi_workers': uwsgi_workers,
         'venv': VENV,
         'http_proxy': os.environ.get('http_proxy', ''),
         'https_proxy': os.environ.get('https_proxy', ''),
