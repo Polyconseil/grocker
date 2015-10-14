@@ -16,7 +16,7 @@ RUN /tmp/01_setup_cron.sh
 # Prepare the image to run the entry point
 VOLUME ["/media", "/scripts", "/config"]
 
-EXPOSE 8080 8081
+EXPOSE 8080 8081 8082
 USER blue
 RUN echo "${grocker_version}" > ~/.grocker_version
 ENTRYPOINT ["/home/blue/bin/entrypoint.py"]
