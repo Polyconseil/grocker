@@ -134,11 +134,13 @@ def setup_cron(grocker_config):
     mail_block_tpl = textwrap.dedent("""
     MAILFROM={mailfrom}
     MAILTO={mailto}
+    PATH={path}
     """)
     crontab = (
         mail_block_tpl.format(
             mailfrom=grocker_config.get('cron', 'mailfrom'),
             mailto=grocker_config.get('cron', 'mailto'),
+            path=os.environ['PATH'],
         ) +
         prepared_crontab
     )
