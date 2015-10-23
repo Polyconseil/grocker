@@ -36,6 +36,7 @@ BLUESOLUTIONS_IMAGES := $(shell docker images | grep '^bluesolutions' | awk '{pr
 BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polydev\.blue' | awk '{print $$3}')
 
 VERSION ?= $(shell pypi-version $(PACKAGE) 2>/dev/null |grep latest_dev | cut -d' ' -f 2)
+GROCKER_VERSION = $(shell ./grocker.py --version | rev | cut -d" " -f1 | rev)
 
 # Tasks
 #======
@@ -47,7 +48,7 @@ build:
 	./grocker.py --python $(PYTHON_VERSION) $(PACKAGE)==$(VERSION)
 
 push: build
-	docker push docker.polydev.blue/$(PACKAGE):$(VERSION)
+	docker push docker.polydev.blue/$(PACKAGE):$(VERSION)-$(GROCKER_VERSION)
 
 clean: clean_docs
 	rm -rf bundles/runner/output
