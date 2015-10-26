@@ -136,12 +136,18 @@ def setup_cron(grocker_config):
     MAILTO={mailto}
     PATH={path}
     """)
+
+    templatize('cron.env', os.path.join('~', 'etc', 'cron.env'), get_context())
+    with open('cron.env') as f:
+        cron_env = f.read()
+
     crontab = (
         mail_block_tpl.format(
             mailfrom=grocker_config.get('cron', 'mailfrom'),
             mailto=grocker_config.get('cron', 'mailto'),
             path=os.environ['PATH'],
         ) +
+        cron_env +
         prepared_crontab
     )
 
@@ -242,7 +248,6 @@ def start_service(command, *args):
 
 
 def run_cron(self, *args):
-    templatize('cron.env', os.path.join('~', 'etc', 'cron.env'), get_context())
     execute('sudo', 'cron', '-f')
 
 
