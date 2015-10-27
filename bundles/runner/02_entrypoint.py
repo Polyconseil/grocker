@@ -136,8 +136,9 @@ def setup_cron(grocker_config):
     PATH={path}
     """)
 
-    templatize('cron.env', os.path.join('~', 'etc', 'cron.env'), get_context())
-    with open(os.path.expanduser('~/cron.env')) as f:
+    cron_env_path = os.path.join('~', 'etc', 'cron.env')
+    templatize('cron.env', cron_env_path, get_context())
+    with open(cron_env_path) as f:
         cron_env = f.read()
 
     crontab = (
