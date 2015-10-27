@@ -22,7 +22,6 @@ import shutil
 import socket
 import string
 import subprocess
-import sys
 import textwrap
 
 
@@ -138,7 +137,7 @@ def setup_cron(grocker_config):
     """)
 
     templatize('cron.env', os.path.join('~', 'etc', 'cron.env'), get_context())
-    with open('cron.env') as f:
+    with open(os.path.expanduser('~/cron.env')) as f:
         cron_env = f.read()
 
     crontab = (
