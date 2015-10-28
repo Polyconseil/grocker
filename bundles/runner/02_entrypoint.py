@@ -75,6 +75,7 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         uwsgi_workers = int(os.environ.get('UWSGI_WORKERS', 10))
     except ValueError:
         uwsgi_workers = 10
+    rsyslog_host = os.environ.get('RSYSLOG_HOST', get_host_ip()) #TODO: user input validation. import ipaddress ?
     if python_major == '3':
         uwsgi_plugin_name = '{}{}'.format(uwsgi_plugin_name, python_major)
 
@@ -85,6 +86,7 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         'project_name_upper': os.environ['PROJECT_NAME'].upper(),
         'uwsgi_plugin_name': uwsgi_plugin_name,
         'uwsgi_workers': uwsgi_workers,
+        'rsyslog_host': rsyslog_host,
         'venv': VENV,
         'http_proxy': os.environ.get('http_proxy', ''),
         'https_proxy': os.environ.get('https_proxy', ''),
