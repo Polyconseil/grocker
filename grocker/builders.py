@@ -3,10 +3,12 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import functools
+import io
 import json
 import logging
 import os.path
-import shutil
+import re
+import subprocess
 import sys
 import uuid
 
@@ -51,8 +53,21 @@ def build_compiler_image(docker_client, root_image_tag, tag=None):
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
+def get_docker_host_ip():  # FIXME: Find a way to get virtual net ip when using boot2gecko
+    try:  # GNU/Linux only
+        output = subprocess.check_output(['ip', 'route', 'list', 'dev', 'docker0'])
+    except subprocess.CalledProcessError:
+        return None
+
+    matched = re.search(br'src\s([0-9.]+)\s', output)
+    return matched.groups()[0].decode()
+
+
 def build_runner_image(docker_client, root_image_tag, entrypoint, runtime, release, package_dir, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
+    docker_host_ip = get_docker_host_ip()
+    pypi_address = (docker_host_ip or '', 8403)
+
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
         helpers.copy_resource('resources/docker/runner-image', build_dir)
@@ -71,8 +86,12 @@ def build_runner_image(docker_client, root_image_tag, entrypoint, runtime, relea
                 'release': release,
             },
         )
-        shutil.copytree(package_dir, os.path.join(build_dir, 'packages'))
-        return docker_build_image(docker_client, build_dir, tag=tag)
+        with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
+            f.write(docker_host_ip)
+
+        six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
+        with helpers.SimpleHTTPServer(package_dir, pypi_address):
+            return docker_build_image(docker_client, build_dir, tag=tag)
 
 
 def get_root_image(docker_client, docker_registry):
