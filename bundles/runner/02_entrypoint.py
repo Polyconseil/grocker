@@ -155,6 +155,8 @@ def setup_cron(grocker_config):
 
     process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE)
     process.communicate(crontab)
+    if process.returncode:
+        logging.getLogger(__name__).error("-> crontab returned %d\n%s", process.returncode, crontab)
 
 
 def setup_app():
