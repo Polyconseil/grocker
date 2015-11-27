@@ -88,11 +88,12 @@ def build_wheels(venv, package, package_dir):
     pip = os.path.join(venv, 'bin', 'pip')
     try:
         subprocess.check_call([pip, 'wheel', '--wheel-dir', package_dir, package])
+        return True
     except subprocess.CalledProcessError as exc:
         info(str(exc))
         if exc.output:
             print(exc.output)
-        exit(1)
+        return False
 
 
 def main():
@@ -104,7 +105,8 @@ def main():
     setup_pip(venv, args.pip_conf, args.package_dir)
 
     for release in args.release:
-        build_wheels(venv, release, args.package_dir)
+        if not build_wheels(venv, release, args.package_dir):
+            exit(1)
 
 
 if __name__ == '__main__':
