@@ -16,11 +16,12 @@ from . import helpers
 from . import loggers
 
 
-ACTIONS = enum.Enum('GrockerActions', names={
-    'build_dep': 'build-dependencies',
-    'build_img': 'build-image',
-    'only_build_img': 'only-build-image',
-})
+class GrockerActions(enum.Enum):
+    build_dep = 'build-dependencies'  # -> dep
+    only_build_img = 'only-build'  # -> build
+    build_img = 'build'  # -> dep + build
+    build_and_push_img = 'build-and-push'  # -> dep + build + push
+    push_img = 'push'  # -> push
 
 
 def arg_parser():
@@ -54,8 +55,8 @@ def arg_parser():
     )
     parser.add_argument('--image-name', help="name used to tag the build image.")
     parser.add_argument(
-        'action', choices=ACTIONS, type=ACTIONS,
-        metavar='<action>', help='Should be on of {}.'.format(', '.join(x.value for x in ACTIONS))
+        'action', choices=GrockerActions, type=GrockerActions,
+        metavar='<action>', help='Should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
     )
     parser.add_argument('release', metavar='<release>', help="Application to build (you can use version specifier).")
 
@@ -98,6 +99,7 @@ def main():
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
     docker_client = builders.docker_get_client()
+    image_name = args.image_name or helpers.default_image_name(args.docker_registry, args.release)
 
     logger.info('Checking prerequisites...')
     if builders.is_docker_outdated(docker_client):
@@ -106,7 +108,7 @@ def main():
     if is_grocker_outdated(skip=args.no_check_version):
         exit(1)
 
-    if args.action in (ACTIONS.build_dep, ACTIONS.build_img):
+    if args.action in (GrockerActions.build_dep, GrockerActions.build_img, GrockerActions.build_and_push_img):
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
@@ -122,7 +124,7 @@ def main():
             if not compilation_success:
                 exit(1)
 
-    if args.action in (ACTIONS.build_img, ACTIONS.only_build_img):
+    if args.action in (GrockerActions.build_img, GrockerActions.build_and_push_img, GrockerActions.only_build_img):
         logger.info('Building image...')
         root_image_tag = builders.get_root_image(docker_client, args.docker_registry)
         builders.build_runner_image(
@@ -132,8 +134,13 @@ def main():
             runtime=args.runtime,
             release=args.release,
             package_dir=args.package_dir,
-            tag=args.image_name or helpers.default_image_name(args.docker_registry, args.release),
+            tag=image_name,
         )
+
+    if args.action in (GrockerActions.push_img, GrockerActions.build_and_push_img):
+        logger.info('Pushing image...')
+        builders.docker_push_image(docker_client, image_name)
+
 
 if __name__ == '__main__':
     main()
