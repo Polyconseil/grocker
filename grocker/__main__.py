@@ -88,13 +88,16 @@ def main():
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
     docker_client = builders.docker_get_client()
-    builders.check_docker_version(docker_client)
+
+    logger.info('Checking prerequisites...')
+    if builders.is_docker_outdated(docker_client):
+        exit(1)
 
     if args.action in (ACTIONS.build_dep, ACTIONS.build_img):
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
-            builders.compile_wheels(
+            compilation_success = builders.compile_wheels(
                 docker_client=docker_client,
                 compiler_tag=compiler_tag,
                 python=args.runtime,
@@ -103,6 +106,8 @@ def main():
                 package_dir=args.package_dir,
                 pip_conf=pip_conf,
             )
+            if not compilation_success:
+                exit(1)
 
     if args.action in (ACTIONS.build_img, ACTIONS.only_build_img):
         logger.info('Building image...')

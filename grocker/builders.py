@@ -20,7 +20,7 @@ from . import six
 from . import helpers
 
 
-def check_docker_version(docker_client):
+def is_docker_outdated(docker_client):
     def version2tuple(version):
         return [int(x) for x in version.split('.')]
 
@@ -29,7 +29,8 @@ def check_docker_version(docker_client):
     need_update = version2tuple(docker_version) < version2tuple(DOCKER_MIN_VERSION)
     if need_update:
         logger.critical('Grocker needs Docker >= %s', DOCKER_MIN_VERSION)
-        exit(1)
+
+    return need_update
 
 
 def build_root_image(docker_client, tag=None):
@@ -137,8 +138,9 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
 
     try:
         docker_run_container(docker_client, compiler_tag, command, binds=binds)
+        return True
     except RuntimeError:
-        exit(1)
+        return False
 
 
 def docker_get_client():
