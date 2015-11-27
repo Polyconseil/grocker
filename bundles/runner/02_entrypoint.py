@@ -57,11 +57,11 @@ def create_directory(path):
         logging.getLogger(__name__).info("%s already exists !", path)
 
 
-def execute(*args):
+def execute(*args, **kwargs):
     """Run a command"""
     logging.getLogger(__name__).info("-> running %s", ' '.join(args))
     try:
-        subprocess.check_call(args)
+        subprocess.check_call(args, **kwargs)
     except subprocess.CalledProcessError:
         pass
 
@@ -75,7 +75,7 @@ def get_context():  # TODO: replace by ad-hoc context in function ?
         uwsgi_workers = int(os.environ.get('UWSGI_WORKERS', 10))
     except ValueError:
         uwsgi_workers = 10
-    rsyslog_host = os.environ.get('RSYSLOG_HOST', get_host_ip()) #TODO: user input validation. import ipaddress ?
+    rsyslog_host = os.environ.get('RSYSLOG_HOST', get_host_ip())  # TODO: user input validation. import ipaddress ?
     if python_major == '3':
         uwsgi_plugin_name = '{}{}'.format(uwsgi_plugin_name, python_major)
 
@@ -252,7 +252,7 @@ def start_service(command, *args):
 
 
 def run_cron(self, *args):
-    execute('sudo', 'cron', '-f')
+    execute('sudo', 'cron', '-f', env={'TZ': os.environ.get('GROCKER_CRON_TZ', 'UTC')})
 
 
 def dispatch(args):
