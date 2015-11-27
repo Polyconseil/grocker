@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:8.2
 
 ENV LANG C.UTF-8
 
