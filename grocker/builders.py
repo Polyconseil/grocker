@@ -148,7 +148,7 @@ def docker_get_client():
 
 
 def docker_build_image(docker_client, path, tag=None):
-    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True)
+    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=True)
     docker_stream(stream)
     return tag
 
