@@ -8,6 +8,7 @@ import enum
 import logging
 import os
 import os.path
+import subprocess
 import sys
 
 from . import __version__
@@ -59,6 +60,7 @@ def arg_parser():
     )
     parser.add_argument('release', metavar='<release>', help="Application to build (you can use version specifier).")
 
+    parser.add_argument('--no-check-version', action='store_true', help='Do not check if Grocker is up to date.')
     parser.add_argument('--purge', action=PurgeAction, help="Purge docker images")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('--verbose', action='store_true', help='Verbose mode')
@@ -80,6 +82,14 @@ class PurgeAction(argparse.Action):
         parser.exit()
 
 
+def grocker_up_to_date(skip=False):
+    logger = logging.getLogger(__name__)
+    if not skip and 'grocker' in subprocess.check_output(['pip', 'list',  '--outdated']):
+        logger.critical('Grocker needs to be updated')
+        return False
+    return True
+
+
 def main():
     parser = arg_parser()
     args = parser.parse_args(sys.argv[1:])
@@ -88,6 +98,9 @@ def main():
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
     docker_client = builders.docker_get_client()
     if builders.is_docker_need_to_be_updated(docker_client):
+        exit(1)
+
+    if not grocker_up_to_date(skip=args.no_check_version):
         exit(1)
 
     if args.action in (ACTIONS.build_dep, ACTIONS.build_img):
