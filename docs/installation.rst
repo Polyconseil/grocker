@@ -117,25 +117,20 @@ like:
 .. code-block:: ini
 
     [Unit]
-    Description=Docker Application Container Engine for Polyconseil (DNS updated)
-    Documentation=http://docs.docker.com
-    After=network.target docker.socket
-    Requires=docker.socket
+    Description=Docker Application Container Engine for Polyconseil (bridge network changed)
 
     [Service]
     ExecStart=
     ExecStart=/usr/bin/docker -d -H fd:// --bip=10.1.1.1/24
-    MountFlags=slave
-    LimitNOFILE=1048576
-    LimitNPROC=1048576
-    LimitCORE=infinity
-
-    [Install]
-    WantedBy=multi-user.target
 
 .. note::
 
-    You have to put the blank ``ExecStart=`` line in to ensure that directive gets overridden.
+    You have to put the blank ``ExecStart=`` line in to ensure that directive
+    gets overridden.
+
+    For more information, ``man 5 systemd.service`` -> ExecStart=. "If the
+    empty string is assigned to this option, the list of commands to start is
+    reset, prior assignments of this option will have no effect."
 
 You should restart the docker daemon.
 
