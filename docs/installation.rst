@@ -91,15 +91,19 @@ First, install docker and add yourself to the docker group.
 
     You may have to logout/login or ``su - $USER`` in your shell so that the new group is added to your user.
 
+
 Unable to access `blue city <https://ops.blue-city.co.uk>`_
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------------------------------------
 
 Docker usually takes route ``172.17.0.1/some_some`` on installation, which conflicts with
 `https://ops.blue-city.co.uk/ <https://ops.blue-city.co.uk>`_ (ip ``172.17.57.12``), preventing access to this
 resource.
 
-A proper solution would be to override the default service file for docker to specify another network bridge. To do so,
-run the following commands as **root**:
+Linux
+"""""
+
+A proper solution is to override the default service file for docker to specify
+another network bridge. As **root**:
 
 .. code-block:: shell
 
