@@ -36,7 +36,9 @@ BLUESOLUTIONS_IMAGES := $(shell docker images | grep '^bluesolutions' | awk '{pr
 BLUE_REGISTRY_IMAGES := $(shell docker images | grep '^docker\.polydev\.blue' | awk '{print $$3}')
 
 VERSION ?= $(shell pypi-version $(PACKAGE) 2>/dev/null |grep latest_dev | cut -d' ' -f 2)
-GROCKER_VERSION = $(shell ./grocker.py --version | rev | cut -d" " -f1 | rev)
+# Redirect stderr to stdout: In Python < 3.4, argparse prints the
+# version on stderr. As of Python 3.4, it prints on stdout.
+GROCKER_VERSION = $(shell ./grocker.py --version 2>&1 | rev | cut -d" " -f1 | rev)
 
 # Tasks
 #======
