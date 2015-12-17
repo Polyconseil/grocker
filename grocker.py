@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Copyright (c) Polyconseil SAS. All rights reserved.
 
 """
     Docker Builder for Blue Applications

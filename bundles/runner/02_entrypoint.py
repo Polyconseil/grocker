@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Copyright (c) Polyconseil SAS. All rights reserved.
 
 """This is our entry point script which is ran into our container
     on startup.
