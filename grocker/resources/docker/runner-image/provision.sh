@@ -69,6 +69,11 @@ function system_provision() {
     # Allow ssmtp configuration
     rm /etc/ssmtp/ssmtp.conf
     ln -s ${sys_config_dir}/ssmtp.conf /etc/ssmtp/ssmtp.conf
+
+    # Security updates
+    apt update
+    apt upgrade -qy
+    apt-get clean
 }
 
 only_run_as_root system_provision
