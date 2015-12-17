@@ -49,33 +49,17 @@ Then reload the systemd configuration
   ip link del docker0 && iptables -t nat -F
   service docker start
 
-OSX
----
+Mac OS X
+--------
 
-Installer `Boot2Docker`_ puis:
+.. attention::
 
-  - Initialiser la VM (une seule fois après installation):
+    Si vous utilisez `boot2docker`, il est deprecated en faveur de Docker Toolbox.
 
-    .. code-block:: shell
+Docker Toolbox est l'installateur tout en un qui fait le café: https://www.docker.com/docker-toolbox
 
-      boot2docker init
+Il contient docker lui-même et des outils comme Machine ou Kitematic.
 
-  - Pour démarrer la VM et le démon Docker:
-
-    .. code-block:: shell
-
-      boot2docker start
-      eval "$(boot2docker shellinit)"
-
-.. _Boot2Docker: http://boot2docker.io
-
-Pour mettre à jour la version de docker
-
-.. code-block:: shell
-
-  boot2docker stop
-  boot2docker upgrade
-  boot2docker start
 
 Archlinux
 ---------
