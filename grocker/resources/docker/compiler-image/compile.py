@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) Polyconseil SAS. All rights reserved.
 from __future__ import absolute_import, print_function, unicode_literals
 import argparse
 import logging
