@@ -15,11 +15,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 import ConfigParser as configparser
+import ctypes
 import logging
 import logging.config
 import os
 import re
 import shutil
+import signal
 import socket
 import string
 import subprocess
@@ -43,6 +45,60 @@ def templatize(filename, destination_path, context):
     with open(os.path.expanduser(destination_path), 'w') as fw:
         with open(filename) as fh:
             fw.write(string.Template(fh.read()).substitute(context))
+
+
+class ChildSubReaper(object):
+    """
+    Wait for all children to terminate context manager
+    """
+    libc = ctypes.CDLL('libc.so.6')
+    PR_SET_CHILD_SUBREAPER = 36
+
+    def __enter__(self):
+        self.prctl_set_child_sub_reaper()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.wait_for_children()
+        self.prctl_set_child_sub_reaper(False)
+
+    def prctl_set_child_sub_reaper(self, activate=True):
+        self.libc.prctl(ctypes.c_int(self.PR_SET_CHILD_SUBREAPER), ctypes.c_ulong(1 if activate else 0))
+
+    @staticmethod
+    def wait_for_children():
+        logger = logging.getLogger(__name__)
+        while True:
+            try:
+                pid, status = os.wait()
+                logger.info('Process #%s terminated with status %s', pid, status)
+            except OSError:
+                logger.info('All children were terminated.')
+                break
+
+
+class GraceFulShutdown(object):
+    SIGTERM = 15
+
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+        self.process = None
+        self.old_handler = None
+
+    def graceful_shutdown_handler(self, signal_code, _frame):
+        if signal_code == self.SIGTERM:
+            self.process.terminate()
+
+    def __enter__(self):
+        self.old_handler = signal.getsignal(self.SIGTERM)
+        signal.signal(self.SIGTERM, self.graceful_shutdown_handler)
+
+        self.process = subprocess.Popen(*self.args, **self.kwargs)
+        return self.process
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        signal.signal(self.SIGTERM, self.old_handler)
 
 
 def get_host_ip():
@@ -252,8 +308,13 @@ def start_service(command, *args):
     execute('supervisord', '-c', supervisord_config)
 
 
-def run_cron(self, *args):
-    execute('sudo', 'cron', '-f', env={'TZ': os.environ.get('GROCKER_CRON_TZ', 'UTC')})
+def run_cron(command, *args):
+    cron_daemon_env = {'TZ': os.environ.get('GROCKER_CRON_TZ', 'UTC')}
+    cron_daemon_cmd = ['sudo', 'cron', '-f']
+    with ChildSubReaper():
+        logging.getLogger(__name__).info("-> running cron daemon...")
+        with GraceFulShutdown(cron_daemon_cmd, env=cron_daemon_env) as p:
+            p.wait()
 
 
 def dispatch(args):
