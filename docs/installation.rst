@@ -1,64 +1,33 @@
 Installation
 ============
 
-Grocker nécessite `docker`_ pour pouvoir être utilisé.
+*Grocker* requires `Docker <https://www.docker.com/>`_ to work.
 
-.. _docker: https://www.docker.com/
 
 Debian
 ------
 
 .. code-block:: shell
 
-  sudo apt-get update
-  sudo apt-get install apt-transport-https ca-certificates
+  sudo apt update
+  sudo apt install apt-transport-https ca-certificates
   sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
-  sudo sh -c "echo 'deb https://get.docker.com/ubuntu docker main' > /etc/apt/sources.list.d/docker.list"
-  sudo apt-get update
-  sudo apt-get install lxc-docker
+  sudo sh -c "echo 'deb https://apt.dockerproject.org/repo debian-jessie main' > /etc/apt/sources.list.d/docker.list"
+  sudo apt update
+  sudo apt install docker-engine
   sudo addgroup $USER docker
-  sudo service docker restart
 
-The lxc-docker package (v1.6) has a bug within its systemd init file which prevent to load docker options.
-Edit the docker's systemd file **/lib/systemd/system/docker.service** and these line after the **[service]** section:
-
-.. code-block:: shell
-
-  [Service]
-  EnvironmentFile=/etc/default/docker
-  ExecStart=/usr/bin/docker daemon -H fd:// $DOCKER_OPTS
-
-Then reload the systemd configuration
-
-.. code-block:: shell
-
-  systemctl daemon-reload
-
-.. note::
-
-  Docker might take route ``172.17.0.1/some_some`` on installation which conflicts
-  with ops.blue-city.co.uk (ip 172.17.57.12) preventing its access.
-  You can tell Docker to install itself somewhere else by adding
-  ``DOCKER_OPTS="--bip=10.1.1.1/24"`` in file */etc/default/docker*.
-
-  **NB: The docker bridge IP must be a valid IP address in the CIDR notation, and not a network adress.**
-
-.. code-block:: shell
-
-  service docker stop
-  ip link del docker0 && iptables -t nat -F
-  service docker start
 
 Mac OS X
 --------
 
-.. attention::
+.. warning::
 
-    Si vous utilisez `boot2docker`, il est deprecated en faveur de Docker Toolbox.
+    *boot2docker* is deprecated, use *Docker Toolbox* instead.
 
-Docker Toolbox est l'installateur tout en un qui fait le café: https://www.docker.com/docker-toolbox
+*Docker Toolbox* is an all-in-one installer which makes coffee: https://www.docker.com/docker-toolbox
 
-Il contient docker lui-même et des outils comme Machine ou Kitematic.
+It will install Docker and other tools such as *Docker Machine* or *Kitematic*.
 
 
 Archlinux
@@ -76,6 +45,8 @@ First, install docker and add yourself to the docker group.
     You may have to logout/login or ``su - $USER`` in your shell so that the new group is added to your user.
 
 
+.. _polyconseil_docker_bridge:
+
 Unable to access `blue city <https://ops.blue-city.co.uk>`_
 -----------------------------------------------------------
 
@@ -87,25 +58,21 @@ Linux
 """""
 
 A proper solution is to override the default service file for docker to specify
-another network bridge. As **root**:
+another network bridge then restarting the docker daemon. As **root**:
 
-.. code-block:: shell
+.. code-block:: bash
 
-    mkdir /etc/systemd/system/docker.service.d/
-    cp /usr/lib/systemd/system/docker.service /etc/systemd/system/docker.service.d/docker_poly.conf
-
-Edit the new configuration with your favorite text editor (``/etc/systemd/system/docker.service.d/docker_poly.conf``)
-to add ``--bip=10.1.1.1/24`` to the ExecStart parameter and perhaps modify the Description parameter. It should look
-like:
-
-.. code-block:: ini
-
+    $ mkdir /etc/systemd/system/docker.service.d/
+    $ cat <<EOF > /etc/systemd/system/docker.service.d/polyconseil_bridge.conf
     [Unit]
     Description=Docker Application Container Engine for Polyconseil (bridge network changed)
 
     [Service]
     ExecStart=
     ExecStart=/usr/bin/docker daemon -H fd:// --bip=10.1.1.1/24
+    EOF
+    $ systemctl daemon-reload
+    $ systemctl restart docker.service
 
 .. note::
 
@@ -115,9 +82,3 @@ like:
     For more information, ``man 5 systemd.service`` -> ExecStart=. "If the
     empty string is assigned to this option, the list of commands to start is
     reset, prior assignments of this option will have no effect."
-
-You should restart the docker daemon.
-
-.. code-block:: shell
-
-    systemctl restart docker.service

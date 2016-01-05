@@ -48,5 +48,5 @@ Il est possible de lancer un *shell* dans un conteneur déjà lancé
   $ docker ps  # trouvez le nom ou l'ID du container qui vous intéresse
   $ docker exec -ti <CONTAINER_NAME> /bin/bash
 
-Eh hop, vous voilà avec un *shell bash* dans ce conteneur. Vous serez sous l'utilisateur *blue*.
+Eh hop, vous voilà avec un *shell bash* dans ce conteneur. Vous serez sous l'utilisateur *grocker*.
 
