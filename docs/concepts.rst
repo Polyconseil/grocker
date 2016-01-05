@@ -5,94 +5,16 @@ Qu'est que Grocker ?
 créer une image *Docker* contenant l'ensemble des briques logicielles (hors services externes) nécessaires à l'exécution
 du code de cette application.
 
-.. graphviz::
-
-   strict digraph containerized_app {
-        node [shape="box"];
-
-        LB [label="Load Balancer"];
-
-        subgraph cluster_VM {
-            label="VM";
-            labeljust=l;
-
-            VM_RP [label="Nginx", margin="1,0.1"];
-
-            subgraph cluster_CNT {
-                label="Container";
-
-                CNT_RP [label="Nginx\n(only for service instances)", margin="1,0.1"];
-                CNT_UWSGI [label="Uwsgi\n(only for service instances)", margin="1,0.1"];
-                CNT_SMTPD [label="Simple SMTP Relay\n(not a daemon)", margin="1,0.1", shape=cds];
-
-                subgraph cluster_APP {
-                    label="Application";
-
-                    APP [label="App code"];
-                    APP_STATIC [label="Statics", shape=folder];
-                }
-
-                CNT_CRON [label="Con Daemon\n(only for cron instance)"];
-                CNT_MEDIA [label="Media", shape=folder, color=grey];
-                CNT_DEV_LOG [label="/dev/log", shape=note, color=grey];
-                CNT_CONFIG [label="/config", shape=folder, color=grey];
-                CNT_SCRIPTS [label="/scripts", shape=folder, color=grey];
-            }
-
-            VM_MEDIA [label="Media", shape=folder, color=grey];
-            VM_DEV_LOG [label="/dev/log", shape=note];
-            VM_CONFIG [label="/config", shape=folder];
-            VM_SCRIPTS [label="/scripts", shape=folder];
-            VM_SMTPD [label="SMTP Relay", margin="1,0.1", shape=cds];
-        }
-
-        subgraph external {
-            KBR [label="Kerberos", shape=septagon];
-            REDIS [label="Redis", shape=doubleoctagon];
-            DB [label="Postgres", shape=doubleoctagon];
-            NFS [Label="NFS Server", shape=folder];
-            EXT_WS [label="External WebServices", shape=egg];
-            SMTP [label="SMTP Server",  margin="1,0.1", shape=cds];
-
-            EXT_WS -> DB -> REDIS [style=invis];  # only to improve representation
-        }
-
-        LB -> VM_RP [dir="both"];
-
-        VM_RP -> KBR [dir="both"];
-        VM_RP -> CNT_RP [dir="both"];
-
-        CNT_RP -> CNT_UWSGI [dir="both"];
-        CNT_UWSGI -> APP [dir="both"];
-        CNT_RP -> APP_STATIC [dir="both", color=darkcyan];
-        CNT_RP -> CNT_MEDIA [dir="both", label="X-Accel-Redirect", color=darkcyan, fontcolor=darkcyan];
-
-        CNT_CRON -> APP [rank=same];
-        {CNT_CRON, APP} -> CNT_SMTPD -> VM_SMTPD -> SMTP;
-        APP -> REDIS [dir="both"];
-        APP -> DB [dir="both"];
-        APP -> EXT_WS [dir="both"];
-        APP -> CNT_MEDIA [dir="both"];
-
-        NFS -> VM_MEDIA -> CNT_MEDIA [arrowtail=inv, dir=both, color=grey];
-        VM_DEV_LOG -> CNT_DEV_LOG [arrowtail=inv, dir=both, color=grey];
-        VM_CONFIG -> CNT_CONFIG [arrowtail=inv, dir=both, color=grey];
-        VM_SCRIPTS -> CNT_SCRIPTS [arrowtail=inv, dir=both, color=grey];
-   }
-
-
 Comment est construite l'image ?
 ================================
 
 Grocker construit l'image en deux temps :
 
- - Dans une première phase, il compile l'application et ses dépendances (par exemple, il crée des *wheel* pour les
-   projets *Python*). Pour cela une image contenant les dépendances de construction est utilisée.
+ - Dans une première phase, il compile l'application, le point d'entrée et leurs dépendances (par exemple, il crée des
+   *wheel* pour les projets *Python*). Pour cela une image contenant les dépendances de construction est utilisée.
 
  - Dans la seconde phase, il installe les résultats de la compilation sur une image propre (i.e. sans les dépendances
-   de construction). Le point d'entrée de cette image permet de lancer soit le service *cron*, soit un service fourni
-   par l'application (``ops``, ``www``, ``ws``, *etc*), soit une commande (*shell*, script ou autre).
-
+   de construction). Le point d'entrée permet alors de faire simplifier le lancement de l'applicatif.
 
 .. graphviz::
 
