@@ -32,11 +32,11 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--runtime', default='python', choices=('python', 'python3'),
+        '-r', '--runtime', default='python', choices=('python', 'python3'),
         help="Runtime used to build and run this image.",
     )
     parser.add_argument(
-        '--entry-point', dest='entrypoint', default='grocker-pyapp',
+        '-e', '--entry-point', dest='entrypoint', default='grocker-pyapp',
         help="Entrypoint used to run this image.",
     )
     parser.add_argument(
@@ -52,7 +52,7 @@ def arg_parser():
         default='docker.polydev.blue',  # TODO(fbochu): Use config to define default registry
         help='Docker registry or account on Docker official registry to use.'
     )
-    parser.add_argument('--image-name', help="name used to tag the build image.")
+    parser.add_argument('-n', '--image-name', help="name used to tag the build image.")
     parser.add_argument(
         'action', choices=GrockerActions, type=GrockerActions, nargs='+',
         metavar='<action>', help='Should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
@@ -62,7 +62,7 @@ def arg_parser():
     parser.add_argument('--no-check-version', action='store_true', help='Do not check if Grocker is up to date.')
     parser.add_argument('--purge', action=PurgeAction, help="Purge docker images")
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('--verbose', action='store_true', help='Verbose mode')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
 
     return parser
 
