@@ -17,11 +17,10 @@ from . import loggers
 
 
 class GrockerActions(enum.Enum):
-    build_dep = 'build-dependencies'  # -> dep
-    only_build_img = 'only-build'  # -> build
-    build_img = 'build'  # -> dep + build
-    build_and_push_img = 'build-and-push'  # -> dep + build + push
+    build_dep = 'dep'  # -> dep
+    build_img = 'img'  # -> img
     push_img = 'push'  # -> push
+    all = 'build'  # -> dep + img + push
 
 
 def arg_parser():
@@ -55,7 +54,7 @@ def arg_parser():
     )
     parser.add_argument('--image-name', help="name used to tag the build image.")
     parser.add_argument(
-        'action', choices=GrockerActions, type=GrockerActions,
+        'action', choices=GrockerActions, type=GrockerActions, nargs='+',
         metavar='<action>', help='Should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
     )
     parser.add_argument('release', metavar='<release>', help="Application to build (you can use version specifier).")
@@ -95,6 +94,8 @@ def is_grocker_outdated(skip=False):
 def main():
     parser = arg_parser()
     args = parser.parse_args()
+    if GrockerActions.all in args.action:
+        args.action = set(GrockerActions) - set([GrockerActions.all])
 
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
@@ -108,7 +109,7 @@ def main():
     if is_grocker_outdated(skip=args.no_check_version):
         exit(1)
 
-    if args.action in (GrockerActions.build_dep, GrockerActions.build_img, GrockerActions.build_and_push_img):
+    if GrockerActions.build_dep in args.action:
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
@@ -124,7 +125,7 @@ def main():
             if not compilation_success:
                 exit(1)
 
-    if args.action in (GrockerActions.build_img, GrockerActions.build_and_push_img, GrockerActions.only_build_img):
+    if GrockerActions.build_img in args.action:
         logger.info('Building image...')
         root_image_tag = builders.get_root_image(docker_client, args.docker_registry)
         builders.build_runner_image(
@@ -137,7 +138,7 @@ def main():
             tag=image_name,
         )
 
-    if args.action in (GrockerActions.push_img, GrockerActions.build_and_push_img):
+    if GrockerActions.push_img in args.action:
         logger.info('Pushing image...')
         builders.docker_push_image(docker_client, image_name)
 

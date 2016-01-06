@@ -18,9 +18,9 @@ La création d'une image se fait via la commande ``grocker``
 
 .. code-block:: bash
 
-    $ grocker --runtime {python, python3} --entry-point {grocker-pyapp, grocker-bluedjango} build-image {project}=={version}
+    $ grocker --runtime {python, python3} --entry-point {grocker-pyapp, grocker-bluedjango} build {project}=={version}
     $ # par exemple pour créer une image de dev de milborne :
-    $ python -m grocker --runtime python --entry-point grocker-bluedjango build-image milborne==0.4.0.dev2015041600283
+    $ python -m grocker --runtime python --entry-point grocker-bluedjango build milborne==0.4.0.dev2015041600283
 
 Les paquets *Python* sont récupérés en utilisant la configuration *pip* de la machine hôte.
 
