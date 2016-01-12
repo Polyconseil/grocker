@@ -33,36 +33,36 @@ def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-r', '--runtime', default='python', choices=('python', 'python3'),
-        help="Runtime used to build and run this image.",
+        help="runtime used to build and run this image.",
     )
     parser.add_argument(
         '-e', '--entry-point', dest='entrypoint', default='grocker-pyapp',
-        help="Entrypoint used to run this image.",
+        help="entrypoint used to run this image.",
     )
     parser.add_argument(
         '--package-dir', type=file_path_type, default='./build/packages',
-        help="Store build dependencies in this directory.",
+        help="store build dependencies in this directory.",
     )
     parser.add_argument(
         '--pip-conf', type=file_path_or_none_type, default=None,
-        help="Pip configuration file used to download dependencies (by default use pip config getter).",
+        help="pip configuration file used to download dependencies (by default use pip config getter).",
     )
     parser.add_argument(
         '--docker-registry',
         default='docker.polydev.blue',  # TODO(fbochu): Use config to define default registry
-        help='Docker registry or account on Docker official registry to use.'
+        help='docker registry or account on Docker official registry to use.'
     )
     parser.add_argument('-n', '--image-name', help="name used to tag the build image.")
     parser.add_argument(
         'action', choices=GrockerActions, type=GrockerActions, nargs='+',
-        metavar='<action>', help='Should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
+        metavar='<action>', help='should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
     )
-    parser.add_argument('release', metavar='<release>', help="Application to build (you can use version specifier).")
+    parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier).")
 
-    parser.add_argument('--no-check-version', action='store_true', help='Do not check if Grocker is up to date.')
-    parser.add_argument('--purge', action=PurgeAction, help="Purge docker images")
+    parser.add_argument('--no-check-version', action='store_true', help='do not check if Grocker is up to date.')
+    parser.add_argument('--purge', action=PurgeAction, help="purge docker images")
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
 
     return parser
 
