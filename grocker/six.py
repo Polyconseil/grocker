@@ -20,6 +20,9 @@ except ImportError:
 
 
 def super6(cls, self, method, *args, **kwargs):
+    """
+    A kind of super() working on both old style and new style classes.
+    """
     classobj = getattr(types, 'ClassType', type(None))
     if isinstance(cls, classobj):
         getattr(cls.__bases__[-1], method)(self, *args, **kwargs)

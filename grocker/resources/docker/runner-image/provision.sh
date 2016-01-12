@@ -16,7 +16,7 @@ function get_gateway_ip() {
 function setup_venv() {  # venv runtime *dependencies
     local venv=$1
     local runtime=$2
-    shift; shift
+    shift 2
     local release="$*"
     local gateway_ip=$(get_gateway_ip)
     local wheelhouse=http://${gateway_ip}:8403/
