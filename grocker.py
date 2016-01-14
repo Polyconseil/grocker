@@ -26,7 +26,7 @@ import sys
 import textwrap
 
 
-__version__ = '0.11.0'
+__version__ = '0.12.0'
 __copyright__ = '2015, Polyconseil'
 REGISTRY_FQDN = 'docker.polydev.blue'
 REQUIRED_IMAGE_NAMES = ('base', 'compiler')
