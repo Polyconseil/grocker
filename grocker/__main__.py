@@ -36,23 +36,23 @@ def arg_parser():
         help="runtime used to build and run this image.",
     )
     parser.add_argument(
-        '-e', '--entry-point', dest='entrypoint', default='grocker-pyapp',
+        '-e', '--entry-point', metavar='<package>', dest='entrypoint', default='grocker-pyapp',
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
-        '--package-dir', type=file_path_type, default='./build/packages',
+        '--package-dir', metavar='<dir>', type=file_path_type, default='./build/packages',
         help="store build dependencies in this directory.",
     )
     parser.add_argument(
-        '--pip-conf', type=file_path_or_none_type, default=None,
+        '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
         help="pip configuration file used to download dependencies (by default use pip config getter).",
     )
     parser.add_argument(
-        '--docker-registry',
+        '--docker-registry', metavar='<url>',
         default='docker.polydev.blue',  # TODO(fbochu): Use config to define default registry
         help='docker registry or account on Docker official registry to use.'
     )
-    parser.add_argument('-n', '--image-name', help="name used to tag the build image.")
+    parser.add_argument('-n', '--image-name', metavar='<name>', help="name used to tag the build image.")
     parser.add_argument(
         'action', choices=GrockerActions, type=GrockerActions, nargs='+',
         metavar='<action>', help='should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
