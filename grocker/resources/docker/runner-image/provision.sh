@@ -31,7 +31,8 @@ function setup_venv() {  # venv runtime *dependencies
 function install_python_app() {
     local runtime=$(cat ~/.grocker | grep runtime | cut -f2- -d:)
     local release=$(cat ~/.grocker | grep release | cut -f2- -d:)
-    setup_venv ~/app.venv ${runtime} ${release}
+    local constraint=$([ -f ${WORKING_DIR}/constraints.txt ] && echo "--constraint ${WORKING_DIR}/constraints.txt")
+    setup_venv ~/app.venv ${runtime} ${constraint} ${release}
 }
 
 function install_grocker_entrypoint() {

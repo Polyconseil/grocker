@@ -48,6 +48,10 @@ def arg_parser():
         help="pip configuration file used to download dependencies (by default use pip config getter).",
     )
     parser.add_argument(
+        '--pip-constraint', metavar='<file>', type=file_path_or_none_type, default=None,
+        help="pip constraint file used to download dependencies.",
+    )
+    parser.add_argument(
         '--docker-registry', metavar='<url>',
         default='docker.polydev.blue',  # TODO(fbochu): Use config to define default registry
         help='docker registry or account on Docker official registry to use.'
@@ -121,6 +125,7 @@ def main():
                 entrypoint=args.entrypoint,
                 package_dir=args.package_dir,
                 pip_conf=pip_conf,
+                pip_constraint=args.pip_constraint,
             )
             if not compilation_success:
                 exit(1)
@@ -135,6 +140,7 @@ def main():
             runtime=args.runtime,
             release=args.release,
             package_dir=args.package_dir,
+            pip_constraint=args.pip_constraint,
             tag=image_name,
         )
 

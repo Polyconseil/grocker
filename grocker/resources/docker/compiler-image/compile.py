@@ -21,6 +21,7 @@ def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--python', default='python')
     parser.add_argument('--pip-conf', type=file_validator)
+    parser.add_argument('--pip-constraint', type=file_validator)
     parser.add_argument('--package-dir', type=file_validator, default='~/packages')
     parser.add_argument('--no-color', action='store_true')
     parser.add_argument('release', nargs='+')
@@ -84,11 +85,12 @@ def setup_venv(python):
     return venv
 
 
-def build_wheels(venv, package, package_dir):
+def build_wheels(venv, package, package_dir, constraint=None):
     info('Building wheels for %s...', package)
     pip = os.path.join(venv, 'bin', 'pip')
+    constraint_args = ['--constraint', constraint] if constraint else []
     try:
-        subprocess.check_call([pip, 'wheel', '--wheel-dir', package_dir, package])
+        subprocess.check_call([pip, 'wheel', '--wheel-dir', package_dir] + constraint_args + [package])
         return True
     except subprocess.CalledProcessError as exc:
         info(str(exc))
@@ -106,7 +108,7 @@ def main():
     setup_pip(venv, args.pip_conf, args.package_dir)
 
     for release in args.release:
-        if not build_wheels(venv, release, args.package_dir):
+        if not build_wheels(venv, release, args.package_dir, args.pip_constraint):
             exit(1)
 
 

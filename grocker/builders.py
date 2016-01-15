@@ -69,7 +69,9 @@ def get_docker_host_ip():  # FIXME: Find a way to get virtual net ip when using 
     return matched.groups()[0].decode()
 
 
-def build_runner_image(docker_client, root_image_tag, entrypoint, runtime, release, package_dir, tag=None):
+def build_runner_image(
+        docker_client, root_image_tag, entrypoint, runtime, release, package_dir, pip_constraint=None, tag=None
+):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     docker_host_ip = get_docker_host_ip()
     pypi_address = (docker_host_ip or '', 8403)
@@ -92,6 +94,11 @@ def build_runner_image(docker_client, root_image_tag, entrypoint, runtime, relea
                 'release': release,
             },
         )
+        if pip_constraint:
+            with io.open(pip_constraint, 'r') as fp:
+                with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
+                    f.write(fp.read())
+
         with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
             f.write(docker_host_ip)
 
@@ -115,7 +122,7 @@ def get_compiler_image(docker_client, docker_registry):
     )
 
 
-def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, package_dir, pip_conf):
+def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, package_dir, pip_conf, pip_constraint):
     binds = {
         package_dir: {
             'bind': '/home/grocker/packages',
@@ -124,14 +131,22 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
         pip_conf: {
             'bind': '/home/grocker/pip.conf',
             'mode': 'ro',
-        }
+        },
     }
+
     command = [
         '--pip-conf', '/home/grocker/pip.conf',
         '--package-dir', '/home/grocker/packages',
         '--python', python,
         release, entrypoint,
     ]
+
+    if pip_constraint:
+        binds[pip_constraint] = {
+            'bind': '/home/grocker/constraints.txt',
+            'mode': 'ro',
+        }
+        command = ['--pip-constraint', '/home/grocker/constraints.txt'] + command
 
     if not os.path.exists(package_dir):
         os.makedirs(package_dir)
