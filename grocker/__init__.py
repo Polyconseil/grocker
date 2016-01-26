@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-__version__ = '2.0a10'
+__version__ = '2.0.0'
 __copyright__ = '2015, Polyconseil'
 __description__ = 'Docker image builder'
 
