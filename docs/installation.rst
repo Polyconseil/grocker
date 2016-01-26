@@ -26,7 +26,7 @@ Edit the docker's systemd file **/lib/systemd/system/docker.service** and these 
 
   [Service]
   EnvironmentFile=/etc/default/docker
-  ExecStart=/usr/bin/docker -d -H fd:// $DOCKER_OPTS
+  ExecStart=/usr/bin/docker daemon -H fd:// $DOCKER_OPTS
 
 Then reload the systemd configuration
 
@@ -105,7 +105,7 @@ like:
 
     [Service]
     ExecStart=
-    ExecStart=/usr/bin/docker -d -H fd:// --bip=10.1.1.1/24
+    ExecStart=/usr/bin/docker daemon -H fd:// --bip=10.1.1.1/24
 
 .. note::
 
