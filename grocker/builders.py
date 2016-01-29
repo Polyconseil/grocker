@@ -230,7 +230,7 @@ def docker_run_container(docker_client, tag, command, binds=None):
         image=tag,
         command=command,
         volumes=[x['bind'] for x in binds.values()] if binds else [],
-        host_config=docker.utils.create_host_config(binds=binds),
+        host_config=docker_client.create_host_config(binds=binds),
     )
 
     container_id = container.get('Id')
