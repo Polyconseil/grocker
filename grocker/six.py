@@ -59,5 +59,8 @@ def sync():
     if hasattr(os, 'sync'):
         os.sync()
     else:
-        libc = ctypes.CDLL("libc.so.6")
-        libc.sync()
+        try:
+            libc = ctypes.CDLL("libc.so.6")
+            libc.sync()
+        except OSError:
+            pass
