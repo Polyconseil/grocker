@@ -171,7 +171,9 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
 
 
 def docker_get_client():
-    return docker.Client(**docker.utils.kwargs_from_env())
+    # XXX: hack around docker-machine certificate issue https://github.com/docker/docker-py/issues/731
+    extra_kwargs = {'assert_hostname': False} if 'DOCKER_MACHINE_NAME' in os.environ else {}
+    return docker.Client(**docker.utils.kwargs_from_env(**extra_kwargs))
 
 
 def docker_build_image(docker_client, path, tag=None):

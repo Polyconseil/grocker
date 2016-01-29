@@ -80,7 +80,7 @@ def pip_conf(pip_conf_path=None):
         str, the path to the pip configuration file (or the faked one)
     """
     if pip_conf_path is None or not os.path.exists(pip_conf_path):
-        with tempfile.NamedTemporaryFile('w') as f:
+        with tempfile.NamedTemporaryFile('w', dir=os.path.expanduser('~/.cache')) as f:
             config = pip.baseparser.ConfigOptionParser(name='global').config
             config.write(f)
             f.flush()
