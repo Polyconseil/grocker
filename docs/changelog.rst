@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.0.1
+-------------
 
 - Add docker-machine support
 
