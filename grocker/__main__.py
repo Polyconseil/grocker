@@ -14,6 +14,7 @@ from . import __version__
 from . import builders
 from . import helpers
 from . import loggers
+from . import six
 
 
 class GrockerActions(enum.Enum):
@@ -89,7 +90,7 @@ class PurgeAction(argparse.Action):
 
 def is_grocker_outdated(skip=False):
     logger = logging.getLogger(__name__)
-    if not skip and 'grocker' in subprocess.check_output(['pip', 'list',  '--outdated']):
+    if not skip and 'grocker' in six.smart_text(subprocess.check_output(['pip', 'list',  '--outdated'])):
         logger.critical('Grocker needs to be updated')
         return True
     return False

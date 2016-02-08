@@ -78,7 +78,7 @@ def get_docker_host_ip():
         docker_machine_ip = subprocess.check_output(['docker-machine', 'ip', os.environ['DOCKER_MACHINE_NAME']])
         interface = get_ip_interface(docker_machine_ip) or interface
 
-    return netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'].decode()
+    return six.smart_text(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
 
 
 def build_runner_image(
@@ -184,7 +184,7 @@ def docker_build_image(docker_client, path, tag=None):
 
 def docker_stream(stream):
     old_status = None
-    for line in (json.loads(x) for x in stream):
+    for line in (json.loads(six.smart_text(x)) for x in stream):
         if 'status' in line:
             status = line['status']
             if old_status != status:

@@ -64,3 +64,7 @@ def sync():
             libc.sync()
         except OSError:
             pass
+
+
+def smart_text(text, encoding='utf-8'):
+    return text.decode(encoding) if isinstance(text, bytes) else text
