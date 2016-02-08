@@ -100,7 +100,7 @@ def main():
     parser = arg_parser()
     args = parser.parse_args()
     if GrockerActions.all in args.action:
-        args.action = set(GrockerActions) - set([GrockerActions.all])
+        args.action = set(GrockerActions) - {GrockerActions.all}
 
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)

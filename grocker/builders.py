@@ -178,12 +178,15 @@ def docker_get_client():
 
 def docker_build_image(docker_client, path, tag=None):
     stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=True)
-    docker_stream(stream)
+    success = docker_stream(stream)
+    if not success:
+        raise RuntimeError('Image build failed')
     return tag
 
 
 def docker_stream(stream):
     old_status = None
+    success = True
     for line in (json.loads(six.smart_text(x)) for x in stream):
         if 'status' in line:
             status = line['status']
@@ -198,9 +201,11 @@ def docker_stream(stream):
             print(line['stream'], end='')
         elif 'error' in line:
             print(line['error'])
+            success = False
         else:
             print(line)
     print()
+    return success
 
 
 def docker_pull_image(docker_client, name):
