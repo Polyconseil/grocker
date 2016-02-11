@@ -1,7 +1,9 @@
 Next version (not yet released)
 -------------------------------
 
-
+- Add libyaml to run dependencies
+- Stop process on build error
+- Fix Python 3 support
 
 Grocker 2.0.1
 -------------
