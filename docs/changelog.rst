@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.1.0 (2016-02-11)
+--------------------------
 
 - Add libyaml to run dependencies
 - Stop process on build error
