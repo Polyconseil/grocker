@@ -41,7 +41,7 @@ def arg_parser():
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
-        '--package-dir', metavar='<dir>', type=file_path_type, default='./build/packages',
+        '--package-dir', metavar='<dir>', type=file_path_type, default='~/.cache/grocker/packages',
         help="store build dependencies in this directory.",
     )
     parser.add_argument(
