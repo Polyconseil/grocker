@@ -12,6 +12,7 @@ release = version
 
 extensions = [
     'sphinx.ext.graphviz',
+    'sphinx.ext.intersphinx',
 ]
 
 master_doc = 'index'
