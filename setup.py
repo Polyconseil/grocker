@@ -19,7 +19,7 @@ setup(
     version=__version__,
     description=__description__,
     long_description=read('Readme.rst'),
-    keywords=('docker', 'build', 'packaging'),
+    keywords='docker build packaging',
     url='http://github.com/polyconseil/grocker',
     author='Polyconseil',
     author_email='TBD on first public release',
