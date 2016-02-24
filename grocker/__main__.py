@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
+import collections
 import enum
 import logging
 import os
@@ -15,6 +16,9 @@ from . import builders
 from . import helpers
 from . import loggers
 from . import six
+
+
+Image = collections.namedtuple('Image', ['name', 'sha256'])
 
 
 class GrockerActions(enum.Enum):
@@ -96,9 +100,9 @@ def is_grocker_outdated(skip=False):
     return False
 
 
-def main():
+def main(args=None):
     parser = arg_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     if GrockerActions.all in args.action:
         args.action = set(GrockerActions) - {GrockerActions.all}
 
@@ -109,16 +113,16 @@ def main():
 
     logger.info('Checking prerequisites...')
     if builders.is_docker_outdated(docker_client):
-        exit(1)
+        raise RuntimeError('Docker is outdated')
 
     if is_grocker_outdated(skip=args.no_check_version):
-        exit(1)
+        raise RuntimeError('Grocker is outdated')
 
     if GrockerActions.build_dep in args.action:
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
-            compilation_success = builders.compile_wheels(
+            builders.compile_wheels(
                 docker_client=docker_client,
                 compiler_tag=compiler_tag,
                 python=args.runtime,
@@ -128,8 +132,6 @@ def main():
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
             )
-            if not compilation_success:
-                exit(1)
 
     if GrockerActions.build_img in args.action:
         logger.info('Building image...')
@@ -147,7 +149,8 @@ def main():
 
     if GrockerActions.push_img in args.action:
         logger.info('Pushing image...')
-        builders.docker_push_image(docker_client, image_name)
+        sha256 = builders.docker_push_image(docker_client, image_name)
+        return Image(image_name, sha256)
 
 
 if __name__ == '__main__':

@@ -2,11 +2,13 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import functools
 import io
 import json
 import logging
 import os.path
+import re
 import subprocess
 import sys
 import uuid
@@ -19,6 +21,9 @@ import netifaces
 from . import __version__, DOCKER_MIN_VERSION
 from . import six
 from . import helpers
+
+
+DIGEST_RE = re.compile(r'[\w\.-]+: digest: sha256:(\w+) size: \d+')
 
 
 def is_docker_outdated(docker_client):
@@ -163,11 +168,7 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
     if not os.path.exists(package_dir):
         os.makedirs(package_dir)
 
-    try:
-        docker_run_container(docker_client, compiler_tag, command, binds=binds)
-        return True
-    except RuntimeError:
-        return False
+    docker_run_container(docker_client, compiler_tag, command, binds=binds)
 
 
 def docker_get_client():
@@ -178,18 +179,22 @@ def docker_get_client():
 
 def docker_build_image(docker_client, path, tag=None):
     stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=True)
-    success = docker_stream(stream)
-    if not success:
+    data = inspect_stream(stream)
+    if not data['success']:
         raise RuntimeError('Image build failed')
     return tag
 
 
-def docker_stream(stream):
+def inspect_stream(stream):
+    """Return some data about the stream."""
     old_status = None
-    success = True
+    data = {'success': True}
     for line in (json.loads(six.smart_text(x)) for x in stream):
         if 'status' in line:
             status = line['status']
+            match = DIGEST_RE.match(status)
+            if match:
+                data['sha256'] = match.group(1)
             if old_status != status:
                 old_status = status
                 print()
@@ -201,23 +206,23 @@ def docker_stream(stream):
             print(line['stream'], end='')
         elif 'error' in line:
             print(line['error'])
-            success = False
+            data['success'] = False
         else:
             print(line)
     print()
-    return success
+    return data
 
 
 def docker_pull_image(docker_client, name):
     stream = docker_client.pull(name, stream=True)
-    docker_stream(stream)
-
+    inspect_stream(stream)
     return [image for image in docker_client.images() if name in image['RepoTags']]
 
 
 def docker_push_image(docker_client, name):
     stream = docker_client.push(name, stream=True)
-    docker_stream(stream)
+    data = inspect_stream(stream)
+    return data['sha256']
 
 
 def docker_get_or_build_image(docker_client, name, builder):
