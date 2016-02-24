@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.2.0 (2016-02-24)
+--------------------------
 
 - Allow grocker to be used as a library
 - Use common package cache dir for all grocker instances
