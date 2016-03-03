@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.3.1 (2016-03-03)
+--------------------------
 
 - Use Python 3 in entry point venv when runtime is `python3` (fix).
 
