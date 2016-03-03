@@ -37,7 +37,7 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-r', '--runtime', default='python', choices=('python', 'python3'),
+        '-r', '--runtime', default='python', choices=('python2', 'python3'),
         help="runtime used to build and run this image.",
     )
     parser.add_argument(
