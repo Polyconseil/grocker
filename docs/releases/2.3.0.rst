@@ -1,0 +1,15 @@
+2.3.0
+=====
+
+.. Voici le mail de livraison, merci de vérifier le contenu et de corriger les erreurs.
+
+**Objet : Livraison de grocker-2.3.0**
+
+Bonjour,
+
+La version 2.3.0 de grocker est gelée et disponible.
+
+**Les principaux changements sont :**
+  - Ask for a specific python version
+
+Je reste à votre disposition pour toute question,
