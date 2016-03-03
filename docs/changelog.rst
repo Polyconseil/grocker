@@ -1,3 +1,9 @@
+Next version (not yet released)
+-------------------------------
+
+- Use Python 3 in entry point venv (fix).
+
+
 Grocker 2.3.0 (2016-03-03)
 --------------------------
 

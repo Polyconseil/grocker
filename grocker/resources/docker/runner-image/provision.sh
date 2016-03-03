@@ -36,8 +36,9 @@ function install_python_app() {
 }
 
 function install_grocker_entrypoint() {
+    local runtime=$(cat ~/.grocker | grep runtime | cut -f2- -d:)
     local entrypoint=$(cat ~/.grocker | grep entrypoint | cut -f2- -d: | xargs echo)
-    setup_venv ~/ep.venv python ${entrypoint}
+    setup_venv ~/ep.venv ${runtime} ${entrypoint}
 }
 
 function run_as_user() {  # script_or_function
