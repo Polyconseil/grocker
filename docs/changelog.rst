@@ -1,7 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
-
+- Ask for a specific python version
 
 Grocker 2.2.0 (2016-02-24)
 --------------------------
