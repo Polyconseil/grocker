@@ -61,10 +61,10 @@ def setup_pip(venv, pip_conf, package_dir):
     guest_config.set('global', 'find-links', package_dir)
 
     # Specific config
-    if os.path.exists(pip_conf or '/nonexistent'):
+    if os.path.isfile(pip_conf or '/nonexistent'):
         info('-> Pip use specific configuration from %s.', pip_conf)
         specified_config = configparser.ConfigParser()
-        if specified_config.read(pip_conf):
+        if specified_config.read(pip_conf) and specified_config.has_section('global'):
             guest_config.set('global', 'index-url', specified_config.get('global', 'index-url'))
             guest_config.set('global', 'extra-index-url', specified_config.get('global', 'extra-index-url'))
         else:
