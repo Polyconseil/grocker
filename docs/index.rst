@@ -1,3 +1,5 @@
+.. _index:
+
 .. include:: ../Readme.rst
 
 .. toctree::
