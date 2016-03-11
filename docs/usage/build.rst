@@ -24,6 +24,13 @@ La création d'une image se fait via la commande ``grocker``
 
 Les paquets *Python* sont récupérés en utilisant la configuration *pip* de la machine hôte.
 
+.. note:: **Attention**
+
+   Si vous refaite une image docker d'une version releasée d'un SI, prenenez garde à utiliser l'option ``--pip-constraint``:
+   $ grocker --runtime python2 --entry-point grocker-bluedjango build milborne==0.4.0.dev2015041600283 --pip-constraint release.txt
+
+
+
 
 Autres commandes utiles
 -----------------------
