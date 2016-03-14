@@ -78,9 +78,12 @@ def get_ip_interface(ip):
 
 def get_docker_host_ip():
     interface = 'docker0'
-
     if 'DOCKER_MACHINE_NAME' in os.environ:
-        docker_machine_ip = subprocess.check_output(['docker-machine', 'ip', os.environ['DOCKER_MACHINE_NAME']])
+        docker_machine_ip = (
+            subprocess
+            .check_output(['docker-machine', 'ip', os.environ['DOCKER_MACHINE_NAME']])
+            .decode('ascii')
+            )
         interface = get_ip_interface(docker_machine_ip) or interface
 
     return six.smart_text(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
