@@ -1,2 +1,3 @@
 -e .
 blease>=0.69.0
+nose
