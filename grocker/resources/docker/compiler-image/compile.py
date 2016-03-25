@@ -68,7 +68,7 @@ def setup_pip(venv, pip_conf, package_dir):
             guest_config.set('global', 'index-url', specified_config.get('global', 'index-url'))
             guest_config.set('global', 'extra-index-url', specified_config.get('global', 'extra-index-url'))
         else:
-            info('-> Unable to read config.')
+            info('-> Unable to read config (%s).', pip_conf)
 
     # Write config
     venv_pip_conf = os.path.join(venv, 'pip.conf')
