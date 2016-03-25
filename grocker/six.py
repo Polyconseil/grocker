@@ -10,6 +10,7 @@ import shutil
 import tempfile
 import types
 
+# pylint: disable=unused-import,import-error
 try:
     from socketserver import ThreadingMixIn
     from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -19,6 +20,7 @@ except ImportError:
     from BaseHTTPServer import HTTPServer
     from SimpleHTTPServer import SimpleHTTPRequestHandler
     import ConfigParser as configparser
+# pylint: enable=unused-import,import-error
 
 
 def super6(cls, self, method, *args, **kwargs):

@@ -6,10 +6,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import collections
 import enum
+# pylint: disable=wrong-import-order
 import logging
 import os
 import os.path
 import subprocess
+# pylint: enable=wrong-import-order
 
 from . import __version__
 from . import builders
@@ -94,7 +96,7 @@ class PurgeAction(argparse.Action):
 
 def is_grocker_outdated(skip=False):
     logger = logging.getLogger(__name__)
-    if not skip and 'grocker' in six.smart_text(subprocess.check_output(['pip', 'list',  '--outdated'])):
+    if not skip and 'grocker' in six.smart_text(subprocess.check_output(['pip', 'list', '--outdated'])):
         logger.critical('Grocker needs to be updated')
         return True
     return False

@@ -145,7 +145,7 @@ def get_pip_env(pip_conf):
     def get(cfg, section, option, default=None):
         try:
             return cfg.get(section, option)
-        except (six.configparser.NoSectionError, six.configparser.NoOptionError) as e:
+        except (six.configparser.NoSectionError, six.configparser.NoOptionError):
             return default
 
     if not pip_conf:

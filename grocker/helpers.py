@@ -48,7 +48,7 @@ def default_image_name(docker_registry, release):
 
 
 class SimpleHTTPServer(six.ThreadingMixIn, six.HTTPServer):
-    def __init__(self, package_dir, server_address):
+    def __init__(self, package_dir, server_address): # pylint: disable=super-init-not-called
         six.super6(
             SimpleHTTPServer, self, '__init__',
             server_address, six.SimpleHTTPRequestHandler, bind_and_activate=False
