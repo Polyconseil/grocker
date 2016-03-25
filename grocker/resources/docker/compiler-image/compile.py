@@ -20,7 +20,6 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--python', default='python')
-    parser.add_argument('--pip-conf', type=file_validator)
     parser.add_argument('--pip-constraint', type=file_validator)
     parser.add_argument('--package-dir', type=file_validator, default='~/packages')
     parser.add_argument('--no-color', action='store_true')
@@ -50,8 +49,8 @@ def info(*msg):
     logging.getLogger(__name__).info(*msg)
 
 
-def setup_pip(venv, pip_conf, package_dir):
-    """Parse host pip.conf to generate venv pip.conf."""
+def setup_pip(venv, package_dir):
+    """Generate venv pip.conf."""
     info('Setup pip...')
 
     # Standard config
@@ -59,16 +58,6 @@ def setup_pip(venv, pip_conf, package_dir):
     guest_config.add_section('global')
     guest_config.set('global', 'wheel-dir', package_dir)
     guest_config.set('global', 'find-links', package_dir)
-
-    # Specific config
-    if os.path.isfile(pip_conf or '/nonexistent'):
-        info('-> Pip use specific configuration from %s.', pip_conf)
-        specified_config = configparser.ConfigParser()
-        if specified_config.read(pip_conf) and specified_config.has_section('global'):
-            guest_config.set('global', 'index-url', specified_config.get('global', 'index-url'))
-            guest_config.set('global', 'extra-index-url', specified_config.get('global', 'extra-index-url'))
-        else:
-            info('-> Unable to read config (%s).', pip_conf)
 
     # Write config
     venv_pip_conf = os.path.join(venv, 'pip.conf')
@@ -105,7 +94,7 @@ def main():
     setup_logging(not args.no_color)
 
     venv = setup_venv(args.python)
-    setup_pip(venv, args.pip_conf, args.package_dir)
+    setup_pip(venv, args.package_dir)
 
     for release in args.release:
         if not build_wheels(venv, release, args.package_dir, args.pip_constraint):

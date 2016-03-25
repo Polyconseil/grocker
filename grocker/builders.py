@@ -139,20 +139,40 @@ def get_compiler_image(docker_client, docker_registry):
     )
 
 
+def get_pip_env(pip_conf):
+    logger = logging.getLogger(__name__)
+
+    def get(cfg, section, option, default=None):
+        try:
+            return cfg.get(section, option)
+        except (six.configparser.NoSectionError, six.configparser.NoOptionError) as e:
+            return default
+
+    if not pip_conf:
+        return {}
+
+    logger.info('-> Pip use configuration from %s.', pip_conf)
+    config = six.configparser.ConfigParser()
+    config.read(pip_conf)
+
+    env = {
+        'PIP_INDEX_URL': get(config, 'global', 'index-url'),
+        'PIP_EXTRA_INDEX_URL': get(config, 'global', 'extra-index-url'),
+    }
+    env = {k: v for k, v in env.items() if v}
+    logger.debug('pip using env: %s', env)
+    return env
+
+
 def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, package_dir, pip_conf, pip_constraint):
     binds = {
         package_dir: {
             'bind': '/home/grocker/packages',
             'mode': 'rw',
         },
-        pip_conf: {
-            'bind': '/home/grocker/pip.conf',
-            'mode': 'ro',
-        },
     }
 
     command = [
-        '--pip-conf', '/home/grocker/pip.conf',
         '--package-dir', '/home/grocker/packages',
         '--python', python,
         release, entrypoint,
@@ -168,7 +188,7 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
     if not os.path.exists(package_dir):
         os.makedirs(package_dir)
 
-    docker_run_container(docker_client, compiler_tag, command, binds=binds)
+    docker_run_container(docker_client, compiler_tag, command, binds=binds, environment=get_pip_env(pip_conf))
 
 
 def docker_get_client():
@@ -235,10 +255,11 @@ def docker_get_or_build_image(docker_client, name, builder):
     return name
 
 
-def docker_run_container(docker_client, tag, command, binds=None):
+def docker_run_container(docker_client, tag, command, binds=None, environment=None):
     container = docker_client.create_container(
         image=tag,
         command=command,
+        environment=environment,
         volumes=[x['bind'] for x in binds.values()] if binds else [],
         host_config=docker_client.create_host_config(binds=binds),
     )

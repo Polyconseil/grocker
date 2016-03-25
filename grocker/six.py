@@ -13,10 +13,12 @@ import types
 try:
     from socketserver import ThreadingMixIn
     from http.server import HTTPServer, SimpleHTTPRequestHandler
+    import configparser
 except ImportError:
     from SocketServer import ThreadingMixIn
     from BaseHTTPServer import HTTPServer
     from SimpleHTTPServer import SimpleHTTPRequestHandler
+    import ConfigParser as configparser
 
 
 def super6(cls, self, method, *args, **kwargs):
