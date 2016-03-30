@@ -1,7 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
-- Add Oracle Instant Client to runtime dependencies.
+- Only install needed runtime in images.
 
 
 Grocker 2.3.1 (2016-03-03)
