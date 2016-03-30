@@ -5,6 +5,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import re
 import subprocess
+import sys
 import unittest
 import uuid
 
@@ -40,7 +41,7 @@ class BuildTestCase(unittest.TestCase):
 
     def test_dep_img_steps(self):  # but not push
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
-        runtime = 'python2'
+        runtime = 'python{}'.format(sys.version_info[0])
         msg = 'Grocker build this successfully !'
         try:
             subprocess.check_call(
