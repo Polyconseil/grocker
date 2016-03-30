@@ -69,7 +69,7 @@ def setup_venv(python):
     """Setup venv and return python interpreter."""
     info('Setup venv using %s...', python)
     venv = tempfile.mkdtemp(suffix='.venv')
-    subprocess.check_call(['virtualenv', '-p', python, venv])
+    subprocess.check_call([python, '-m', 'virtualenv', '-p', python, venv])
     subprocess.check_call([os.path.join(venv, 'bin', 'pip'), 'install', '-U', 'pip', 'setuptools', 'wheel'])
     return venv
 

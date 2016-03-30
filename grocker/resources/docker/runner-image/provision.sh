@@ -23,7 +23,7 @@ function setup_venv() {  # venv runtime *dependencies
 
     local pip=${venv}/bin/pip
 
-    virtualenv -p ${runtime} ${venv}
+    ${runtime} -m virtualenv -p ${runtime} ${venv}
     ${pip} install --upgrade pip setuptools
     ${pip} install --find-links=${wheelhouse} --trusted-host=${gateway_ip} --no-index ${release}
 }

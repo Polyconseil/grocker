@@ -1,0 +1,47 @@
+system:
+  image: debian:jessie  # FIXME use this value
+
+  base:
+    - cron
+    - less
+    - netcat-traditional
+    - ssmtp
+    - sudo
+    - vim
+
+  build:
+    - build-essential
+    - gettext
+    - nodejs-legacy
+
+  runtime:
+    python2:
+      - python: python-dev
+      - libpython2.7
+      - python-virtualenv
+    python3:
+      - python3: python3-dev
+      - libpython3.4
+      - python3-virtualenv
+
+dependencies:
+    - libpq5: libpq-dev
+    - libgdal1h
+    - libproj0: libproj-dev
+
+    - imagemagick
+    - poppler-utils
+    - libjpeg62-turbo: libjpeg62-turbo-dev
+    - libffi6: libffi-dev
+
+    - libzbar0: libzbar-dev
+
+    - libxml2: libxml2-dev
+    - libxslt1.1: libxslt1-dev
+    - libyaml-0-2: libyaml-dev
+
+    - libldap-2.4-2: libldap2-dev
+    - libsasl2-2: libsasl2-dev
+
+    - phantomjs
+    # TODO(fbo): - oracle-instantclient12.1-basic: oracle-instantclient12.1-devel

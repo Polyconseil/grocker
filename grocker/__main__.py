@@ -122,7 +122,7 @@ def main(args=None):
 
     if GrockerActions.build_dep in args.action:
         logger.info('Compiling dependencies...')
-        compiler_tag = builders.get_compiler_image(docker_client, args.docker_registry)
+        compiler_tag = builders.get_compiler_image(docker_client, args.runtime, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
             builders.compile_wheels(
                 docker_client=docker_client,
@@ -137,7 +137,7 @@ def main(args=None):
 
     if GrockerActions.build_img in args.action:
         logger.info('Building image...')
-        root_image_tag = builders.get_root_image(docker_client, args.docker_registry)
+        root_image_tag = builders.get_root_image(docker_client, args.runtime, args.docker_registry)
         builders.build_runner_image(
             docker_client=docker_client,
             root_image_tag=root_image_tag,

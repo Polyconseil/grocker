@@ -12,6 +12,7 @@ import threading
 import jinja2
 import pip.baseparser
 import pkg_resources
+import yaml
 
 from . import six
 from . import __version__
@@ -23,6 +24,12 @@ def copy_resource(resource, destination, package='grocker'):
         shutil.copytree(resource_path, destination)
     else:
         shutil.copy2(resource_path, destination)
+
+
+def load_yaml_resource(resource, package='grocker'):
+    resource_path = pkg_resources.resource_filename(package, resource)
+    with io.open(resource_path, encoding='utf-8') as fp:
+        return yaml.load(fp.read())
 
 
 def render_template(template_path, output_path, context):
@@ -48,7 +55,7 @@ def default_image_name(docker_registry, release):
 
 
 class SimpleHTTPServer(six.ThreadingMixIn, six.HTTPServer):
-    def __init__(self, package_dir, server_address): # pylint: disable=super-init-not-called
+    def __init__(self, package_dir, server_address):  # pylint: disable=super-init-not-called
         six.super6(
             SimpleHTTPServer, self, '__init__',
             server_address, six.SimpleHTTPRequestHandler, bind_and_activate=False

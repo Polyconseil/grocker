@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 import io
+import itertools
 import json
 import logging
 import os.path
@@ -39,7 +40,68 @@ def is_docker_outdated(docker_client):
     return need_update
 
 
-def build_root_image(docker_client, tag=None):
+def get_run_dependencies(dependency_list):
+    """
+    Parse list of dependencies to only get run dependencies.
+
+    Dependency list is a list of string or dict, which match the following
+    format:
+
+     [
+        'run_dependency_1',
+        {'run_dependency_2': 'build_dependency_2'},
+        {'run_dependency_3': ['build_dependency_3.1', 'build_dependency_3.2']},
+    ]
+    """
+    for dependency in dependency_list:
+        if isinstance(dependency, dict):
+            for key in dependency:
+                yield key
+        else:
+            yield dependency
+
+
+def get_build_dependencies(dependency_list):
+    """
+    Parse list of dependencies to only get build dependencies
+
+    see get_run_dependencies() for dependency list format
+    """
+    for dependency in dependency_list:
+        if isinstance(dependency, dict):
+            for value_or_list in dependency.values():
+                if isinstance(value_or_list, list):
+                    for value in value_or_list:
+                        yield value
+                else:
+                    yield value_or_list
+        else:
+            yield dependency
+
+
+def get_dependencies(runtime, with_build_dependencies=False):
+    config = helpers.load_yaml_resource('resources/grocker.yaml')
+    runtime_dependencies = config['system']['runtime'][runtime]
+
+    dependencies = itertools.chain(
+        config['system']['base'],
+        get_run_dependencies(runtime_dependencies),
+        get_run_dependencies(config['dependencies'])
+    )
+
+    if with_build_dependencies:
+        build_dependencies = itertools.chain(
+            config['system']['build'],
+            get_build_dependencies(runtime_dependencies),
+            get_build_dependencies(config['dependencies'])
+        )
+
+        dependencies = itertools.chain(dependencies, build_dependencies)
+
+    return list(dependencies)
+
+
+def build_root_image(docker_client, runtime, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
@@ -49,10 +111,14 @@ def build_root_image(docker_client, tag=None):
             os.path.join(build_dir, 'Dockerfile'),
             {'version': __version__},
         )
+
+        with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
+            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(get_dependencies(runtime))))
+
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def build_compiler_image(docker_client, root_image_tag, tag=None):
+def build_compiler_image(docker_client, root_image_tag, runtime, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
@@ -62,6 +128,11 @@ def build_compiler_image(docker_client, root_image_tag, tag=None):
             os.path.join(build_dir, 'Dockerfile'),
             {'root_image_tag': root_image_tag},
         )
+
+        dependencies = get_dependencies(runtime, with_build_dependencies=True)
+        with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
+            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
+
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
@@ -124,18 +195,22 @@ def build_runner_image(
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_root_image(docker_client, docker_registry):
-    tag = '{}/grocker-root:{}'.format(docker_registry, __version__)
-    return docker_get_or_build_image(docker_client, tag, build_root_image)
-
-
-def get_compiler_image(docker_client, docker_registry):
-    tag = '{}/grocker-compiler:{}'.format(docker_registry, __version__)
-    root_tag = get_root_image(docker_client, docker_registry)
+def get_root_image(docker_client, runtime, docker_registry):
+    tag = '{}/grocker-{}-root:{}'.format(docker_registry, runtime, __version__)
     return docker_get_or_build_image(
         docker_client,
         tag,
-        functools.partial(build_compiler_image, root_image_tag=root_tag),
+        functools.partial(build_root_image, runtime=runtime),
+    )
+
+
+def get_compiler_image(docker_client, runtime, docker_registry):
+    tag = '{}/grocker-{}-compiler:{}'.format(docker_registry, runtime, __version__)
+    root_tag = get_root_image(docker_client, runtime, docker_registry)
+    return docker_get_or_build_image(
+        docker_client,
+        tag,
+        functools.partial(build_compiler_image, runtime=runtime, root_image_tag=root_tag),
     )
 
 

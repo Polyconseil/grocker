@@ -33,6 +33,7 @@ setup(
         'pip>=7.1.2',
         'netifaces>=0.10.4',
         'netaddr>=0.7.18',
+        'pyyaml>=3.11',
     ],
     extras_require={
         ":python_version == '2.7'": [
