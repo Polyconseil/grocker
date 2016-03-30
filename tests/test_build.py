@@ -59,7 +59,7 @@ class BuildTestCase(unittest.TestCase):
             )
 
             self.assertEqual(return_code, 0)
-            matches = re.findall(msg, logs)
+            matches = re.findall(msg, logs.decode('utf-8'))
             self.assertEqual(len(matches), 2)
         finally:
             docker_rmi(image_name)
