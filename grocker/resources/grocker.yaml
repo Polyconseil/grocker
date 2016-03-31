@@ -1,7 +1,14 @@
-system:
-  image: debian:jessie  # FIXME use this value
+# This file describe grocker default configuration
+#
+# Dependency list have the following format:
+# - runtime_dependency
+# - runtime_dependency: build_dependency
+# - runtime_dependency: [build_dependency_1, build_dependency_2]
 
-  base:
+system:  # grocker internal configuration
+  image: debian:jessie  # base image to use to build root image, FIXME use this value
+
+  base:  # dependencies installed on root image
     - cron
     - less
     - netcat-traditional
@@ -9,12 +16,12 @@ system:
     - sudo
     - vim
 
-  build:
+  build:  # dependencies installed on build image
     - build-essential
     - gettext
     - nodejs-legacy
 
-  runtime:
+  runtime:  # dependencies needed for specified runtime
     python2:
       - python: python-dev
       - libpython2.7
@@ -24,6 +31,10 @@ system:
       - libpython3.4
       - python3-virtualenv
 
+# There begin the project configuration (so all values below are use as default)
+
+runtime: python2
+entrypoint: grocker-pyapp
 dependencies:
     - libpq5: libpq-dev
     - libgdal1h

@@ -31,6 +31,12 @@ class GrockerActions(enum.Enum):
 
 
 def arg_parser():
+    """
+    Create an CLI args parser
+
+    Some default value (marked as #precedence) are set to None due to precedence
+    order (see parse_config() doc string for more information).
+    """
     def file_path_type(x):
         return os.path.abspath(os.path.expanduser(x))
 
@@ -39,11 +45,15 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-r', '--runtime', default='python', choices=('python2', 'python3'),
+        '-c', '--config', type=file_path_or_none_type, default='./.grocker.yml',
+        help='Grocker config file',
+    )
+    parser.add_argument(  # precedence
+        '-r', '--runtime', default=None, choices=('python2', 'python3'),
         help="runtime used to build and run this image.",
     )
-    parser.add_argument(
-        '-e', '--entry-point', metavar='<package>', dest='entrypoint', default='grocker-pyapp',
+    parser.add_argument(  # precedence
+        '-e', '--entry-point', metavar='<package>', dest='entrypoint', default=None,
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
@@ -102,9 +112,30 @@ def is_grocker_outdated(skip=False):
     return False
 
 
-def main(args=None):
+def parse_config(config_path, **kwargs):
+    """
+    Generate config regarding precedence order
+
+    Precedence order is defined as :
+
+    1. Command line arguments
+    2. project ``.grocker.yml`` file (or the one specified on the command line)
+    3. the grocker ``resources/grocker.yaml`` file
+    """
+    config = helpers.load_yaml_resource('resources/grocker.yaml')
+    project_config = helpers.load_yaml(config_path) or {}
+
+    config.update(project_config)
+    config.update({k: v for k, v in kwargs.items() if v})
+
+    return config
+
+
+def main():
     parser = arg_parser()
-    args = parser.parse_args(args)
+    args = parser.parse_args()
+    config = parse_config(args.config, runtime=args.runtime, entrypoint=args.entrypoint)
+
     if GrockerActions.all in args.action:
         args.action = set(GrockerActions) - {GrockerActions.all}
 
@@ -122,14 +153,13 @@ def main(args=None):
 
     if GrockerActions.build_dep in args.action:
         logger.info('Compiling dependencies...')
-        compiler_tag = builders.get_compiler_image(docker_client, args.runtime, args.docker_registry)
+        compiler_tag = builders.get_compiler_image(docker_client, config, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
             builders.compile_wheels(
                 docker_client=docker_client,
                 compiler_tag=compiler_tag,
-                python=args.runtime,
+                config=config,
                 release=args.release,
-                entrypoint=args.entrypoint,
                 package_dir=args.package_dir,
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
@@ -137,12 +167,11 @@ def main(args=None):
 
     if GrockerActions.build_img in args.action:
         logger.info('Building image...')
-        root_image_tag = builders.get_root_image(docker_client, args.runtime, args.docker_registry)
+        root_image_tag = builders.get_root_image(docker_client, config, args.docker_registry)
         builders.build_runner_image(
             docker_client=docker_client,
             root_image_tag=root_image_tag,
-            entrypoint=args.entrypoint,
-            runtime=args.runtime,
+            config=config,
             release=args.release,
             package_dir=args.package_dir,
             pip_constraint=args.pip_constraint,

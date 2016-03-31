@@ -30,3 +30,20 @@ Autres commandes utiles
 
 Il est possible de nettoyer l'environnement de construction en lançant la commande ``make clean`` et de supprimer les
 images déjà construites avec la commande ``grocker --purge all``.
+
+
+Fichier de configuration "projet"
+---------------------------------
+
+Il est possible d'ajouter un fichier ``.grocker.yml`` à la racine de l'environnement de construction pour configurer le projet à construire.
+Ce fichier suit la syntax YAML et contient trois entrées :
+
+    :runtime: le runtime à utiliser
+    :entrypoint: le point d'entrée à utiliser
+    :dependencies: la liste des dépendances.
+
+Chaque entrée de la liste de dépendances peut-être selon le cas :
+
+   - ``my-dependency``,  pour les dépendances d'exécution sans dépendance de construction,
+   - ``my-dependency: my-dependency-dev``, pour les dépendances ayant une dépendance de construction,
+   - ``my-dependency: [my-dependency-dev, my-dependency-dev2]``, pour les dépendances ayant plusieurs dépendances de construction.

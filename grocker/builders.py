@@ -79,9 +79,8 @@ def get_build_dependencies(dependency_list):
             yield dependency
 
 
-def get_dependencies(runtime, with_build_dependencies=False):
-    config = helpers.load_yaml_resource('resources/grocker.yaml')
-    runtime_dependencies = config['system']['runtime'][runtime]
+def get_dependencies(config, with_build_dependencies=False):
+    runtime_dependencies = config['system']['runtime'][config['runtime']]
 
     dependencies = itertools.chain(
         config['system']['base'],
@@ -101,7 +100,7 @@ def get_dependencies(runtime, with_build_dependencies=False):
     return list(dependencies)
 
 
-def build_root_image(docker_client, runtime, tag=None):
+def build_root_image(docker_client, config, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
@@ -112,13 +111,14 @@ def build_root_image(docker_client, runtime, tag=None):
             {'version': __version__},
         )
 
+        dependencies = get_dependencies(config)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
-            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(get_dependencies(runtime))))
+            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def build_compiler_image(docker_client, root_image_tag, runtime, tag=None):
+def build_compiler_image(docker_client, root_image_tag, config, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
@@ -129,7 +129,7 @@ def build_compiler_image(docker_client, root_image_tag, runtime, tag=None):
             {'root_image_tag': root_image_tag},
         )
 
-        dependencies = get_dependencies(runtime, with_build_dependencies=True)
+        dependencies = get_dependencies(config, with_build_dependencies=True)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
@@ -158,11 +158,12 @@ def get_docker_host_ip():
 
 
 def build_runner_image(
-        docker_client, root_image_tag, entrypoint, runtime, release, package_dir, pip_constraint=None, tag=None
+        docker_client, root_image_tag, config, release, package_dir, pip_constraint=None, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     docker_host_ip = get_docker_host_ip()
     pypi_address = (docker_host_ip or '', 8403)
+    package_dir = get_package_dir(package_dir, config)
 
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
@@ -177,8 +178,8 @@ def build_runner_image(
             os.path.join(build_dir, '.grocker'),
             {
                 'grocker_version': __version__,
-                'runtime': runtime,
-                'entrypoint': entrypoint,
+                'runtime': config['runtime'],
+                'entrypoint': config['entrypoint'],
                 'release': release,
             },
         )
@@ -195,22 +196,32 @@ def build_runner_image(
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_root_image(docker_client, runtime, docker_registry):
-    tag = '{}/grocker-{}-root:{}'.format(docker_registry, runtime, __version__)
+def get_root_image(docker_client, config, docker_registry):
+    tag = '{registry}/grocker-{runtime}-root:{version}-{hash}'.format(
+        registry=docker_registry,
+        runtime=config['runtime'],
+        version=__version__,
+        hash=helpers.hash_list(get_dependencies(config)),
+    )
     return docker_get_or_build_image(
         docker_client,
         tag,
-        functools.partial(build_root_image, runtime=runtime),
+        functools.partial(build_root_image, config=config),
     )
 
 
-def get_compiler_image(docker_client, runtime, docker_registry):
-    tag = '{}/grocker-{}-compiler:{}'.format(docker_registry, runtime, __version__)
-    root_tag = get_root_image(docker_client, runtime, docker_registry)
+def get_compiler_image(docker_client, config, docker_registry):
+    tag = '{registry}/grocker-{runtime}-compiler:{version}-{hash}'.format(
+        registry=docker_registry,
+        runtime=config['runtime'],
+        version=__version__,
+        hash=helpers.hash_list(get_dependencies(config)),
+    )
+    root_tag = get_root_image(docker_client, config, docker_registry)
     return docker_get_or_build_image(
         docker_client,
         tag,
-        functools.partial(build_compiler_image, runtime=runtime, root_image_tag=root_tag),
+        functools.partial(build_compiler_image, config=config, root_image_tag=root_tag),
     )
 
 
@@ -239,7 +250,19 @@ def get_pip_env(pip_conf):
     return env
 
 
-def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, package_dir, pip_conf, pip_constraint):
+def get_package_dir(package_dir, config):
+    return os.path.join(
+        package_dir,
+        '__version__',
+        '{}-{}'.format(
+            config['runtime'],
+            helpers.hash_list(get_dependencies(config))
+        )
+    )
+
+
+def compile_wheels(docker_client, compiler_tag, config, release, package_dir, pip_conf, pip_constraint):
+    package_dir = get_package_dir(package_dir, config)
     binds = {
         package_dir: {
             'bind': '/home/grocker/packages',
@@ -249,8 +272,8 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
 
     command = [
         '--package-dir', '/home/grocker/packages',
-        '--python', python,
-        release, entrypoint,
+        '--python', config['runtime'],
+        release, config['entrypoint'],
     ]
 
     if pip_constraint:

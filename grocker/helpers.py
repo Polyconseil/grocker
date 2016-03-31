@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import contextlib
+import hashlib
 import io
 import os.path
 import shutil
@@ -17,6 +18,8 @@ import yaml
 from . import six
 from . import __version__
 
+UNIT_SEPARATOR = b'\x1F'
+
 
 def copy_resource(resource, destination, package='grocker'):
     resource_path = pkg_resources.resource_filename(package, resource)
@@ -26,10 +29,21 @@ def copy_resource(resource, destination, package='grocker'):
         shutil.copy2(resource_path, destination)
 
 
+def load_yaml(file_path):
+    if not os.path.exists(file_path):
+        return None
+    with io.open(file_path, encoding='utf-8') as fp:
+        return yaml.load(fp.read())
+
+
 def load_yaml_resource(resource, package='grocker'):
     resource_path = pkg_resources.resource_filename(package, resource)
-    with io.open(resource_path, encoding='utf-8') as fp:
-        return yaml.load(fp.read())
+    return load_yaml(resource_path)
+
+
+def hash_list(l):
+    digest = hashlib.sha256(UNIT_SEPARATOR.join(x.encode('utf-8') for x in l))
+    return digest.hexdigest()
 
 
 def render_template(template_path, output_path, context):
@@ -45,12 +59,12 @@ def render_template(template_path, output_path, context):
 def default_image_name(docker_registry, release):
     req = pkg_resources.Requirement.parse(release)
     assert str(req.specifier).startswith('=='), "Only fixed version can use default image name."
-    return "{}/{}{}:{}-{}".format(
-        docker_registry,
-        req.project_name,
-        '-' + '-'.join(req.extras) if req.extras else '',
-        str(req.specifier)[2:],
-        __version__,
+    return "{registry}/{project}{extra_requirements}:{project_version}-{grocker_version}".format(
+        registry=docker_registry,
+        project=req.project_name,
+        extra_requirements='-' + '-'.join(req.extras) if req.extras else '',
+        project_version=str(req.specifier)[2:],
+        grocker_version=__version__,
     )
 
 

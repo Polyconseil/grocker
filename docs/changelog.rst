@@ -2,6 +2,7 @@ Next version (not yet released)
 -------------------------------
 
 - Only install needed runtime in images.
+- Allow to set system dependencies by project.
 
 
 Grocker 2.3.1 (2016-03-03)
