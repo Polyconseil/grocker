@@ -309,12 +309,18 @@ def inspect_stream(stream):
 
 
 def docker_pull_image(docker_client, name):
+    logger = logging.getLogger(__name__)
+    logger.info('Pulling %s...' % name)
+
     stream = docker_client.pull(name, stream=True)
     inspect_stream(stream)
     return [image for image in docker_client.images() if name in image['RepoTags']]
 
 
 def docker_push_image(docker_client, name):
+    logger = logging.getLogger(__name__)
+    logger.info('Pushing %s...' % name)
+
     stream = docker_client.push(name, stream=True)
     data = inspect_stream(stream)
     return data['sha256']
