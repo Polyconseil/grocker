@@ -57,8 +57,8 @@ def arg_parser():
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
-        '--package-dir', metavar='<dir>', type=file_path_type, default='~/.cache/grocker/packages',
-        help="store build dependencies in this directory.",
+        '--wheels-volume-name', metavar='<volume>', type=str, default='grocker-wheels-cache',
+        help="name of the data volume used to store compiled wheels.",
     )
     parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
@@ -160,7 +160,8 @@ def main():
                 compiler_tag=compiler_tag,
                 config=config,
                 release=args.release,
-                package_dir=args.package_dir,
+                entrypoint=args.entrypoint,
+                wheels_volume_name=args.wheels_volume_name,
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
             )
@@ -173,7 +174,7 @@ def main():
             root_image_tag=root_image_tag,
             config=config,
             release=args.release,
-            package_dir=args.package_dir,
+            wheels_volume_name=args.wheels_volume_name,
             pip_constraint=args.pip_constraint,
             tag=image_name,
         )

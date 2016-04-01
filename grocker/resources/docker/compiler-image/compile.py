@@ -15,13 +15,15 @@ except ImportError:  # Python 2.7
     import ConfigParser as configparser
 
 
+WHEELS_DIRECTORY = os.path.expanduser('~/packages')
+
+
 def arg_parser():
     file_validator = os.path.expanduser
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--python', default='python')
     parser.add_argument('--pip-constraint', type=file_validator)
-    parser.add_argument('--package-dir', type=file_validator, default='~/packages')
     parser.add_argument('--no-color', action='store_true')
     parser.add_argument('release', nargs='+')
 
@@ -94,10 +96,18 @@ def main():
     setup_logging(not args.no_color)
 
     venv = setup_venv(args.python)
-    setup_pip(venv, args.package_dir)
+    setup_pip(venv, WHEELS_DIRECTORY)
+
+    # grocker is a valid sudoer for the command /usr/bin/chown
+    info(WHEELS_DIRECTORY)
+    return_code = subprocess.call(['sudo', '/bin/chown', 'grocker', WHEELS_DIRECTORY])
+    if return_code != 0:
+        logging.getLogger(__name__).error(
+            "grocker could not become the owner of %s, check the sudoers file", WHEELS_DIRECTORY,
+        )
 
     for release in args.release:
-        if not build_wheels(venv, release, args.package_dir, args.pip_constraint):
+        if not build_wheels(venv, release, WHEELS_DIRECTORY, args.pip_constraint):
             exit(1)
 
 
