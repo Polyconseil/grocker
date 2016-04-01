@@ -10,15 +10,11 @@ import shutil
 import tempfile
 import types
 
+
 # pylint: disable=unused-import,import-error
 try:
-    from socketserver import ThreadingMixIn
-    from http.server import HTTPServer, SimpleHTTPRequestHandler
     import configparser
 except ImportError:
-    from SocketServer import ThreadingMixIn
-    from BaseHTTPServer import HTTPServer
-    from SimpleHTTPServer import SimpleHTTPRequestHandler
     import ConfigParser as configparser
 # pylint: enable=unused-import,import-error
 

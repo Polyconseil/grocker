@@ -1,0 +1,1 @@
+grocker ALL=(root) NOPASSWD: /bin/chown grocker /home/grocker/packages

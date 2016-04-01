@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import contextlib
 import functools
 import io
 import itertools
@@ -133,47 +134,77 @@ def build_compiler_image(docker_client, root_image_tag, runtime, tag=None):
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
+def build_pypi_image(docker_client, tag):
+    with six.TemporaryDirectory() as tmp_dir:
+        build_dir = os.path.join(tmp_dir, 'build')
+        helpers.copy_resource('resources/docker/nginx-pypi', build_dir)
+        return docker_build_image(docker_client, build_dir, tag=tag)
 
 
+def get_or_create_data_volume(docker_client, name):
+    for volume in docker_client.volumes()['Volumes']:
+        if volume['Name'] == name:
+            return volume
+    return docker_client.create_volume(name=name)
 
 
+@contextlib.contextmanager
+def http_wheel_server(docker_client, wheels_volume_name):
+    docker_network_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
+    nginx_image = docker_get_or_build_image(docker_client, 'docker.polydev.blue/nginx-pypi:1.0.0', build_pypi_image)
+    nginx = docker_client.create_container(
+        image=nginx_image,
+        host_config=docker_client.create_host_config(
+            binds={
+                wheels_volume_name: {
+                    'bind': '/usr/share/nginx/html',
+                    'mode': 'ro',
+                }
+            },
+            port_bindings={80: (docker_network_ip, 8403)},
+        ),
+    )
+    nginx_container_id = nginx.get('Id')
+    docker_client.start(nginx_container_id)
+
+    yield docker_network_ip
+
+    docker_client.remove_container(nginx_container_id, force=True)
 
 
 def build_runner_image(
-        docker_client, root_image_tag, entrypoint, runtime, release, package_dir, pip_constraint=None, tag=None
+        docker_client, root_image_tag, entrypoint, runtime, release, wheels_volume_name, pip_constraint=None, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
-    docker_host_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
-    pypi_address = (docker_host_ip or '', 8403)
 
-    with six.TemporaryDirectory() as tmp_dir:
-        build_dir = os.path.join(tmp_dir, 'build')
-        helpers.copy_resource('resources/docker/runner-image', build_dir)
-        helpers.render_template(
-            os.path.join(build_dir, 'Dockerfile.j2'),
-            os.path.join(build_dir, 'Dockerfile'),
-            {'root_image_tag': root_image_tag},
-        )
-        helpers.render_template(
-            os.path.join(build_dir, '.grocker.j2'),
-            os.path.join(build_dir, '.grocker'),
-            {
-                'grocker_version': __version__,
-                'runtime': runtime,
-                'entrypoint': entrypoint,
-                'release': release,
-            },
-        )
-        if pip_constraint:
-            with io.open(pip_constraint, 'r') as fp:
-                with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
-                    f.write(fp.read())
+    with http_wheel_server(docker_client, wheels_volume_name) as docker_ip:
+        with six.TemporaryDirectory() as tmp_dir:
+            build_dir = os.path.join(tmp_dir, 'build')
+            helpers.copy_resource('resources/docker/runner-image', build_dir)
+            helpers.render_template(
+                os.path.join(build_dir, 'Dockerfile.j2'),
+                os.path.join(build_dir, 'Dockerfile'),
+                {'root_image_tag': root_image_tag},
+            )
+            helpers.render_template(
+                os.path.join(build_dir, '.grocker.j2'),
+                os.path.join(build_dir, '.grocker'),
+                {
+                    'grocker_version': __version__,
+                    'runtime': runtime,
+                    'entrypoint': entrypoint,
+                    'release': release,
+                },
+            )
+            if pip_constraint:
+                with io.open(pip_constraint, 'r') as fp:
+                    with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
+                        f.write(fp.read())
 
-        with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
-            f.write(docker_host_ip)
+            with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
+                f.write(docker_ip)
 
-        six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-        with helpers.SimpleHTTPServer(package_dir, pypi_address):
+            six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
@@ -221,16 +252,22 @@ def get_pip_env(pip_conf):
     return env
 
 
-def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, package_dir, pip_conf, pip_constraint):
+def compile_wheels(
+    docker_client, compiler_tag, python, release, entrypoint, wheels_volume_name, pip_conf, pip_constraint
+):
+    wheels_destination_volume = get_or_create_data_volume(docker_client, wheels_volume_name)
     binds = {
-        package_dir: {
+        wheels_destination_volume['Name']: {
             'bind': '/home/grocker/packages',
             'mode': 'rw',
+        },
+        pip_conf: {
+            'bind': '/home/grocker/pip.conf',
+            'mode': 'ro',
         },
     }
 
     command = [
-        '--package-dir', '/home/grocker/packages',
         '--python', python,
         release, entrypoint,
     ]
@@ -242,10 +279,8 @@ def compile_wheels(docker_client, compiler_tag, python, release, entrypoint, pac
         }
         command = ['--pip-constraint', '/home/grocker/constraints.txt'] + command
 
-    if not os.path.exists(package_dir):
-        os.makedirs(package_dir)
-
     docker_run_container(docker_client, compiler_tag, command, binds=binds, environment=get_pip_env(pip_conf))
+    return wheels_destination_volume['Name']
 
 
 def docker_get_client():
