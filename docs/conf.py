@@ -23,10 +23,4 @@ intersphinx_mapping = {
 }
 
 html_theme = 'sphinx_rtd_theme'
-html_context = {
-    'display_github': True,
-    'github_user': 'Polyconseil',
-    'github_repo': 'grocker',
-    'github_version': 'master/',
-    'conf_py_path': '',
-}
+html_context['github_repo'] = 'grocker'
