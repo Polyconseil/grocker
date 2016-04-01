@@ -8,14 +8,12 @@ import io
 import os.path
 import shutil
 import tempfile
-import threading
 
 import jinja2
 import pip.baseparser
 import pkg_resources
 import yaml
 
-from . import six
 from . import __version__
 
 UNIT_SEPARATOR = b'\x1F'
@@ -66,27 +64,6 @@ def default_image_name(docker_registry, release):
         project_version=str(req.specifier)[2:],
         grocker_version=__version__,
     )
-
-
-class SimpleHTTPServer(six.ThreadingMixIn, six.HTTPServer):
-    def __init__(self, package_dir, server_address):  # pylint: disable=super-init-not-called
-        six.super6(
-            SimpleHTTPServer, self, '__init__',
-            server_address, six.SimpleHTTPRequestHandler, bind_and_activate=False
-        )
-        self.package_dir = package_dir
-
-    def serve_forever(self, poll_interval=0.5):
-        os.chdir(self.package_dir)
-        six.super6(SimpleHTTPServer, self, 'serve_forever', poll_interval=poll_interval)
-
-    def __enter__(self):
-        self.server_bind()
-        self.server_activate()
-        threading.Thread(target=self.serve_forever).start()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.shutdown()
 
 
 @contextlib.contextmanager

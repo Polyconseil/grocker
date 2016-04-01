@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import contextlib
 import functools
 import io
 import itertools
@@ -10,13 +11,12 @@ import json
 import logging
 import os.path
 import re
+import subprocess
 import sys
 import uuid
 
 import docker
 import docker.utils
-import netaddr
-import netifaces
 
 from . import __version__, DOCKER_MIN_VERSION
 from . import six
@@ -135,63 +135,93 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_ip_interface(ip):
-    for if_name in netifaces.interfaces():
-        for interface in (v for k, v in netifaces.ifaddresses(if_name).items() if k == netifaces.AF_INET):
-            for address in interface:
-                addr = address.get('addr', None)
-                netmask = address.get('netmask', '')
-                network = netaddr.IPNetwork('{0}/{1}'.format(addr, netmask).strip('/'), implicit_prefix=True)
-                if ip in network:
-                    return if_name
+def build_pypi_image(docker_client, tag):
+    with six.TemporaryDirectory() as tmp_dir:
+        build_dir = os.path.join(tmp_dir, 'build')
+        helpers.copy_resource('resources/docker/nginx-pypi', build_dir)
+        return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_docker_host_ip():
-    interface = 'docker0'
+def get_or_create_data_volume(docker_client, name):
+    for volume in docker_client.volumes()['Volumes']:
+        if volume['Name'] == name:
+            return volume
+    return docker_client.create_volume(name=name)
 
+
+@contextlib.contextmanager
+def http_wheel_server(docker_client, wheels_volume_name):
     if 'DOCKER_MACHINE_NAME' in os.environ:
-        docker_machine_ip = subprocess.check_output(['docker-machine', 'ip', os.environ['DOCKER_MACHINE_NAME']])
-        interface = get_ip_interface(docker_machine_ip) or interface
+        # MacOS uses docker machine, which creates it own networking
+        get_ip_command = r"ip addr show docker0"
+        ip_regex = r'\s*inet (?P<ip>[0-9.]+).*'
+        ip_addr_output = subprocess.check_output(
+            'docker-machine ssh %s "%s"' % (os.environ['DOCKER_MACHINE_NAME'], get_ip_command),
+            shell=True,
+        ).decode('utf-8')
+        docker_gateway_ip = re.search(ip_regex, ip_addr_output).groupdict()['ip']
+    else:
+        # Ask the docker daemon about the bridge gateway IP
+        docker_gateway_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
+    nginx_image = docker_get_or_build_image(
+        docker_client,
+        'docker.polydev.blue/grocker-nginx-pypi:1.0.0',
+        build_pypi_image,
+    )
+    nginx = docker_client.create_container(
+        image=nginx_image,
+        host_config=docker_client.create_host_config(
+            binds={
+                wheels_volume_name: {
+                    'bind': '/wheels',
+                    'mode': 'ro',
+                }
+            },
+            port_bindings={80: (docker_gateway_ip, 8403)},
+        ),
+    )
+    nginx_container_id = nginx.get('Id')
+    docker_client.start(nginx_container_id)
 
-    return six.smart_text(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
+    yield docker_gateway_ip
+
+    docker_client.remove_container(nginx_container_id, force=True)
 
 
 def build_runner_image(
-        docker_client, root_image_tag, config, release, package_dir, pip_constraint=None, tag=None
+        docker_client, root_image_tag, config, release, wheels_volume_name, pip_constraint=None, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
-    docker_host_ip = get_docker_host_ip()
-    pypi_address = (docker_host_ip or '', 8403)
-    package_dir = get_package_dir(package_dir, config)
 
-    with six.TemporaryDirectory() as tmp_dir:
-        build_dir = os.path.join(tmp_dir, 'build')
-        helpers.copy_resource('resources/docker/runner-image', build_dir)
-        helpers.render_template(
-            os.path.join(build_dir, 'Dockerfile.j2'),
-            os.path.join(build_dir, 'Dockerfile'),
-            {'root_image_tag': root_image_tag},
-        )
-        helpers.render_template(
-            os.path.join(build_dir, '.grocker.j2'),
-            os.path.join(build_dir, '.grocker'),
-            {
-                'grocker_version': __version__,
-                'runtime': config['runtime'],
-                'entrypoint': config['entrypoint'],
-                'release': release,
-            },
-        )
-        if pip_constraint:
-            with io.open(pip_constraint, 'r') as fp:
-                with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
-                    f.write(fp.read())
+    with http_wheel_server(docker_client, wheels_volume_name) as docker_ip:
+        with six.TemporaryDirectory() as tmp_dir:
+            build_dir = os.path.join(tmp_dir, 'build')
+            helpers.copy_resource('resources/docker/runner-image', build_dir)
+            helpers.render_template(
+                os.path.join(build_dir, 'Dockerfile.j2'),
+                os.path.join(build_dir, 'Dockerfile'),
+                {'root_image_tag': root_image_tag},
+            )
+            helpers.render_template(
+                os.path.join(build_dir, '.grocker.j2'),
+                os.path.join(build_dir, '.grocker'),
+                {
+                    'grocker_version': __version__,
+                    'runtime': config['runtime'],
+                    'entrypoint': config['entrypoint'],
+                    'release': release,
+                },
+            )
+            if pip_constraint:
+                with io.open(pip_constraint, 'r') as fp:
+                    with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
+                        f.write(fp.read())
 
-        with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
-            f.write(docker_host_ip)
+            with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
+                f.write(docker_ip)
 
-        six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-        with helpers.SimpleHTTPServer(package_dir, pypi_address):
+            six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
+
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
@@ -249,28 +279,16 @@ def get_pip_env(pip_conf):
     return env
 
 
-def get_package_dir(package_dir, config):
-    return os.path.join(
-        package_dir,
-        '__version__',
-        '{}-{}'.format(
-            config['runtime'],
-            helpers.hash_list(get_dependencies(config))
-        )
-    )
-
-
-def compile_wheels(docker_client, compiler_tag, config, release, package_dir, pip_conf, pip_constraint):
-    package_dir = get_package_dir(package_dir, config)
+def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_name, pip_conf, pip_constraint):
+    wheels_destination_volume = get_or_create_data_volume(docker_client, wheels_volume_name)
     binds = {
-        package_dir: {
+        wheels_destination_volume['Name']: {
             'bind': '/home/grocker/packages',
             'mode': 'rw',
         },
     }
 
     command = [
-        '--package-dir', '/home/grocker/packages',
         '--python', config['runtime'],
         release, config['entrypoint'],
     ]
@@ -281,9 +299,6 @@ def compile_wheels(docker_client, compiler_tag, config, release, package_dir, pi
             'mode': 'ro',
         }
         command = ['--pip-constraint', '/home/grocker/constraints.txt'] + command
-
-    if not os.path.exists(package_dir):
-        os.makedirs(package_dir)
 
     docker_run_container(docker_client, compiler_tag, command, binds=binds, environment=get_pip_env(pip_conf))
 
@@ -378,6 +393,40 @@ def docker_run_container(docker_client, tag, command, binds=None, environment=No
         raise RuntimeError('Container exit with a non-zero return code (%d).', return_code)
 
 
+def docker_purge_volumes(docker_client, filters=()):
+    """Removes dangling volumes (volumes not referenced by any container).
+
+    Args:
+        docker_client: a docker-py Client.
+        filters: see PurgeAction for choices.
+
+    If ``build`` is in filters, all dangling volumes are deleted.
+    If ``dangling`` is the *only* item of filters, the named volumes used by
+    grocker as a cache are preserved.
+    """
+    if 'build' in filters or 'dangling' in filters:
+        dangling_volumes = docker_client.volumes(filters={'dangling': True})['Volumes']
+        if filters == ['dangling']:
+            # Exclude wheels volumes that acts as a grocker cache
+            volumes = []
+            for volume in dangling_volumes:
+                if 'grocker-wheels-cache' not in volume['Name']:
+                    # Non grocker data volume => clean it.
+                    volumes.append(volume)
+                else:
+                    # grocker data volume, clean it if outdated.
+                    volume_grocker_version = volume['Name'].split('-')[3]
+                    if __version__ < volume_grocker_version:
+                        volumes.append(volume)
+            dangling_volumes = volumes
+        for volume in dangling_volumes:
+            print('Purging volume: {name}'.format(name=volume['Name']))
+            try:
+                docker_client.remove_volume(volume['Name'])
+            except docker.errors.APIError:
+                logging.getLogger(__name__).error("Could not remove volume %s, skipping.", volume['Name'])
+
+
 def docker_purge_images(docker_client, filters=()):
     filter_desc = {
         'dangling': {'dangling': True},
@@ -388,5 +437,5 @@ def docker_purge_images(docker_client, filters=()):
     for filter_name in filters:
         images = docker_client.images(filters=filter_desc[filter_name])
         for image in images:
-            print('Purging: {tags} ({img[Id]})'.format(img=image, tags=', '.join(image['RepoTags'])))
+            print('Purging image: {tags} ({img[Id]})'.format(img=image, tags=', '.join(image['RepoTags'])))
             docker_client.remove_image(image)

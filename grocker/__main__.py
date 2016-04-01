@@ -58,10 +58,6 @@ def arg_parser():
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
-        '--package-dir', metavar='<dir>', type=file_path_type, default='~/.cache/grocker/packages',
-        help="store build dependencies in this directory.",
-    )
-    parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
         help="pip configuration file used to download dependencies (by default use pip config getter).",
     )
@@ -100,8 +96,9 @@ class PurgeAction(argparse.Action):
         )
 
     def __call__(self, parser, namespace, values, *args, **kwargs):
-        filters = [values] if values != 'all' else (x for x in self.choices if x != 'all')
+        filters = [values] if values != 'all' else [x for x in self.choices if x != 'all']
         builders.docker_purge_images(builders.docker_get_client(), filters)
+        builders.docker_purge_volumes(builders.docker_get_client(), filters)
         parser.exit()
 
 
@@ -167,6 +164,11 @@ def main():
     if is_grocker_outdated(skip=args.no_check_version):
         raise RuntimeError('Grocker is outdated')
 
+    wheels_volume_name = 'grocker-wheels-cache-{version}-{hash}'.format(
+        version=__version__,
+        hash=helpers.hash_list(builders.get_dependencies(config)),
+    )
+
     if GrockerActions.build_dep in args.actions:
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, config, args.docker_registry)
@@ -176,7 +178,7 @@ def main():
                 compiler_tag=compiler_tag,
                 config=config,
                 release=args.release,
-                package_dir=args.package_dir,
+                wheels_volume_name=wheels_volume_name,
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
             )
@@ -189,7 +191,7 @@ def main():
             root_image_tag=root_image_tag,
             config=config,
             release=args.release,
-            package_dir=args.package_dir,
+            wheels_volume_name=wheels_volume_name,
             pip_constraint=args.pip_constraint,
             tag=image_name,
         )
