@@ -5,13 +5,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 import collections
-import enum
-# pylint: disable=wrong-import-order
 import logging
 import os
 import os.path
 import subprocess
-# pylint: enable=wrong-import-order
+
+import enum
 
 from . import __version__
 from . import builders
