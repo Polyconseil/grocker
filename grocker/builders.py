@@ -10,14 +10,11 @@ import json
 import logging
 import os.path
 import re
-import subprocess
 import sys
 import uuid
 
 import docker
 import docker.utils
-import netaddr
-import netifaces
 
 from . import __version__, DOCKER_MIN_VERSION
 from . import six
@@ -136,32 +133,11 @@ def build_compiler_image(docker_client, root_image_tag, runtime, tag=None):
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_ip_interface(ip):
-    for if_name in netifaces.interfaces():
-        for interface in (v for k, v in netifaces.ifaddresses(if_name).items() if k == netifaces.AF_INET):
-            for address in interface:
-                addr = address.get('addr', None)
-                netmask = address.get('netmask', '')
-                network = netaddr.IPNetwork('{0}/{1}'.format(addr, netmask).strip('/'), implicit_prefix=True)
-                if ip in network:
-                    return if_name
-
-
-def get_docker_host_ip():
-    interface = 'docker0'
-
-    if 'DOCKER_MACHINE_NAME' in os.environ:
-        docker_machine_ip = subprocess.check_output(['docker-machine', 'ip', os.environ['DOCKER_MACHINE_NAME']])
-        interface = get_ip_interface(docker_machine_ip) or interface
-
-    return six.smart_text(netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'])
-
-
 def build_runner_image(
         docker_client, root_image_tag, entrypoint, runtime, release, package_dir, pip_constraint=None, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
-    docker_host_ip = get_docker_host_ip()
+    docker_host_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
     pypi_address = (docker_host_ip or '', 8403)
 
     with six.TemporaryDirectory() as tmp_dir:
