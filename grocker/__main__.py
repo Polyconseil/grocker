@@ -5,13 +5,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 import collections
-import enum
-# pylint: disable=wrong-import-order
 import logging
 import os
 import os.path
 import subprocess
-# pylint: enable=wrong-import-order
+
+import enum
 
 from . import __version__
 from . import builders
@@ -47,8 +46,8 @@ def arg_parser():
         help="entrypoint used to run this image.",
     )
     parser.add_argument(
-        '--package-dir', metavar='<dir>', type=file_path_type, default='~/.cache/grocker/packages',
-        help="store build dependencies in this directory.",
+        '--wheels-volume-name', metavar='<volume>', type=str, default='grocker-wheels-cache',
+        help="name of the data volume used to store compiled wheels.",
     )
     parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
@@ -130,7 +129,7 @@ def main(args=None):
                 python=args.runtime,
                 release=args.release,
                 entrypoint=args.entrypoint,
-                package_dir=args.package_dir,
+                wheels_volume_name=args.wheels_volume_name,
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
             )
@@ -144,7 +143,7 @@ def main(args=None):
             entrypoint=args.entrypoint,
             runtime=args.runtime,
             release=args.release,
-            package_dir=args.package_dir,
+            wheels_volume_name=args.wheels_volume_name,
             pip_constraint=args.pip_constraint,
             tag=image_name,
         )
