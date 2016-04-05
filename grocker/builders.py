@@ -157,7 +157,7 @@ def http_wheel_server(docker_client, wheels_volume_name):
         host_config=docker_client.create_host_config(
             binds={
                 wheels_volume_name: {
-                    'bind': '/usr/share/nginx/html',
+                    'bind': '/wheels',
                     'mode': 'ro',
                 }
             },
