@@ -10,7 +10,6 @@ import shutil
 import tempfile
 import types
 
-
 # pylint: disable=unused-import,import-error
 try:
     import configparser
