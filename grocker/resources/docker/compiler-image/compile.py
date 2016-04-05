@@ -99,7 +99,6 @@ def main():
     setup_pip(venv, WHEELS_DIRECTORY)
 
     # grocker is a valid sudoer for the command /usr/bin/chown
-    info(WHEELS_DIRECTORY)
     return_code = subprocess.call(['sudo', '/bin/chown', 'grocker', WHEELS_DIRECTORY])
     if return_code != 0:
         logging.getLogger(__name__).error(
