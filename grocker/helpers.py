@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import contextlib
 import hashlib
 import io
-import os
+import os.path
 import shutil
 import tempfile
 
