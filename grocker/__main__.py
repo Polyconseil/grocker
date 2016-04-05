@@ -160,7 +160,6 @@ def main():
                 compiler_tag=compiler_tag,
                 config=config,
                 release=args.release,
-                entrypoint=args.entrypoint,
                 wheels_volume_name=args.wheels_volume_name,
                 pip_conf=pip_conf,
                 pip_constraint=args.pip_constraint,
