@@ -151,7 +151,7 @@ def get_or_create_data_volume(docker_client, name):
 @contextlib.contextmanager
 def http_wheel_server(docker_client, wheels_volume_name):
     docker_network_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
-    nginx_image = docker_get_or_build_image(docker_client, 'docker.polydev.blue/nginx-pypi:1.0.0', build_pypi_image)
+    nginx_image = docker_get_or_build_image(docker_client, 'docker.polydev.blue/grocker-nginx-pypi:1.0.0', build_pypi_image)
     nginx = docker_client.create_container(
         image=nginx_image,
         host_config=docker_client.create_host_config(
