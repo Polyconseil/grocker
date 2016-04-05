@@ -2,7 +2,6 @@ FROM {{ root_image_tag }}
 LABEL grocker.step=build
 
 COPY . /tmp/grocker
-COPY grocker_sudoers /etc/sudoers.d/grocker_sudoers
 
 RUN /tmp/grocker/provision.sh
 
