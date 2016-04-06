@@ -19,7 +19,7 @@ function setup_venv() {  # venv runtime *dependencies
     # Old pip can not deal with constraint file
     ${pip} install --upgrade pip
     ${pip} install --upgrade pip setuptools ${constraint_arg}
-    ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${constraint_arg} ${release}
+    ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${constraint_arg} ${release} --no-compile
 }
 
 function install_python_app() {
