@@ -11,6 +11,7 @@ import logging
 import os
 import os.path
 import subprocess
+import sys
 # pylint: enable=wrong-import-order
 
 from . import __version__
@@ -75,8 +76,8 @@ def arg_parser():
     )
     parser.add_argument('-n', '--image-name', metavar='<name>', help="name used to tag the build image.")
     parser.add_argument(
-        'action', choices=GrockerActions, type=GrockerActions, nargs='+',
-        metavar='<action>', help='should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
+        'actions', choices=GrockerActions, type=GrockerActions, nargs='+',
+        metavar='<actions>', help='should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
     )
     parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier).")
 
@@ -131,16 +132,31 @@ def parse_config(config_path, **kwargs):
     return config
 
 
+def clean_actions(actions):
+    if GrockerActions.all in actions:
+        actions_without_all = set(GrockerActions) - {GrockerActions.all}
+        if actions != [GrockerActions.all]:
+            sys.exit(
+                "The {all} action already specifies {actions_without_all}.\n"
+                "Please use either {all} or any combination of ({actions_without_all}).".format(
+                    all=GrockerActions.all.value,
+                    actions_without_all=', '.join(sorted(action.value for action in actions_without_all)),
+                )
+            )
+        actions = actions_without_all
+    return actions
+
+
 def main():
     parser = arg_parser()
     args = parser.parse_args()
     config = parse_config(args.config, runtime=args.runtime, entrypoint=args.entrypoint)
 
-    if GrockerActions.all in args.action:
-        args.action = set(GrockerActions) - {GrockerActions.all}
-
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
+
+    args.actions = clean_actions(args.actions)
+
     docker_client = builders.docker_get_client()
     image_name = args.image_name or helpers.default_image_name(args.docker_registry, args.release)
 
@@ -151,7 +167,7 @@ def main():
     if is_grocker_outdated(skip=args.no_check_version):
         raise RuntimeError('Grocker is outdated')
 
-    if GrockerActions.build_dep in args.action:
+    if GrockerActions.build_dep in args.actions:
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, config, args.docker_registry)
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
@@ -165,7 +181,7 @@ def main():
                 pip_constraint=args.pip_constraint,
             )
 
-    if GrockerActions.build_img in args.action:
+    if GrockerActions.build_img in args.actions:
         logger.info('Building image...')
         root_image_tag = builders.get_root_image(docker_client, config, args.docker_registry)
         builders.build_runner_image(
@@ -178,7 +194,7 @@ def main():
             tag=image_name,
         )
 
-    if GrockerActions.push_img in args.action:
+    if GrockerActions.push_img in args.actions:
         logger.info('Pushing image...')
         sha256 = builders.docker_push_image(docker_client, image_name)
         return Image(image_name, sha256)
