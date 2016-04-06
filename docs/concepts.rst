@@ -8,12 +8,15 @@ du code de cette application.
 Comment est construite l'image ?
 ================================
 
-Grocker construit l'image en deux temps :
+Grocker construit l'image en trois temps :
 
  - Dans une première phase, il compile l'application, le point d'entrée et leurs dépendances (par exemple, il crée des
    *wheel* pour les projets *Python*). Pour cela une image contenant les dépendances de construction est utilisée.
+   Le résultat de la compilation est enregistré dans un data volume, géré par docker, utilisé comme un cache.
 
- - Dans la seconde phase, il installe les résultats de la compilation sur une image propre (i.e. sans les dépendances
+ - Dans une seconde phase, un serveur web est lancé pour servir le résultat de la compilation.
+
+ - Dans la dernière phase, il installe les résultats de la compilation sur une image propre (i.e. sans les dépendances
    de construction). Le point d'entrée permet alors de simplifier le lancement de l'applicatif.
 
 .. graphviz::
@@ -44,12 +47,21 @@ Grocker construit l'image en deux temps :
 
         }
 
-        subgraph PKG {
-            node [label=pkg, shape=box3d, color=darkcyan];
+        subgraph cluster_WHEEL_STORAGE {
+            label = "Data volume for wheels";
 
-            PKG_1
-            PKG_2
-            PKG_3
+            subgraph PKG {
+                node [label=pkg, shape=box3d, color=darkcyan];
+
+                PKG_1
+                PKG_2
+                PKG_3
+            }
+
+        }
+
+        subgraph WEB_SERVER {
+            WEB_SERVER [label="Web server", color=grey];
         }
 
         subgraph cluster_RUN {
@@ -61,7 +73,10 @@ Grocker construit l'image en deux temps :
 
         BASE -> {RUN_BASE, CMP_BASE} [ltail=cluster_BASE, color=grey];
         CMP -> {PKG_1, PKG_2, PKG_3} [ltail=cluster_CMP, color=darkcyan];
-        {PKG_1, PKG_2, PKG_3} -> RUN_RUNNER [color=darkcyan];
+        {PKG_1, PKG_2, PKG_3} -> WEB_SERVER [color="darkcyan"];
+        WEB_SERVER -> RUN_RUNNER [ltail=WEB_SERVER, color=darkcyan];
+
+        RUN_RUNNER [color=darkcyan];
 
     }
 
