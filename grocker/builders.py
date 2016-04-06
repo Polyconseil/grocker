@@ -183,9 +183,10 @@ def http_wheel_server(docker_client, wheels_volume_name):
     nginx_container_id = nginx.get('Id')
     docker_client.start(nginx_container_id)
 
-    yield docker_gateway_ip
-
-    docker_client.remove_container(nginx_container_id, force=True)
+    try:
+        yield docker_gateway_ip
+    finally:
+        docker_client.remove_container(nginx_container_id, force=True)
 
 
 def build_runner_image(
