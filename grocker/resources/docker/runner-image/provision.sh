@@ -4,7 +4,7 @@ set -xe
 GROCKER_USER=grocker
 WORKING_DIR=$(dirname $0)
 
-function get_gateway_ip() {
+function get_grocker_pypi_ip() {
     local ip_file=${WORKING_DIR}/pypi.ip
     if [ -e ${ip_file} ]; then
         cat ${ip_file}
@@ -18,14 +18,14 @@ function setup_venv() {  # venv runtime *dependencies
     local runtime=$2
     shift 2
     local release="$*"
-    local gateway_ip=$(get_gateway_ip)
-    local wheelhouse=http://${gateway_ip}:8403/
+    local grocker_pypi_ip=$(get_grocker_pypi_ip)
+    local wheelhouse=http://${grocker_pypi_ip}/
 
     local pip=${venv}/bin/pip
 
     ${runtime} -m virtualenv -p ${runtime} ${venv}
     ${pip} install --upgrade pip setuptools
-    ${pip} install --find-links=${wheelhouse} --trusted-host=${gateway_ip} --no-index ${release}
+    ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${release}
 }
 
 function install_python_app() {

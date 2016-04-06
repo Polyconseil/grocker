@@ -11,7 +11,6 @@ import json
 import logging
 import os.path
 import re
-import subprocess
 import sys
 import uuid
 
@@ -151,18 +150,6 @@ def get_or_create_data_volume(docker_client, name):
 
 @contextlib.contextmanager
 def http_wheel_server(docker_client, wheels_volume_name):
-    if 'DOCKER_MACHINE_NAME' in os.environ:
-        # MacOS uses docker machine, which creates it own networking
-        get_ip_command = r"ip addr show docker0"
-        ip_regex = r'\s*inet (?P<ip>[0-9.]+).*'
-        ip_addr_output = subprocess.check_output(
-            'docker-machine ssh %s "%s"' % (os.environ['DOCKER_MACHINE_NAME'], get_ip_command),
-            shell=True,
-        ).decode('utf-8')
-        docker_gateway_ip = re.search(ip_regex, ip_addr_output).groupdict()['ip']
-    else:
-        # Ask the docker daemon about the bridge gateway IP
-        docker_gateway_ip = docker_client.inspect_network('bridge')['IPAM']['Config'][0]['Gateway']
     nginx_image = docker_get_or_build_image(
         docker_client,
         'docker.polydev.blue/grocker-nginx-pypi:1.0.0',
@@ -177,14 +164,14 @@ def http_wheel_server(docker_client, wheels_volume_name):
                     'mode': 'ro',
                 }
             },
-            port_bindings={80: (docker_gateway_ip, 8403)},
         ),
     )
     nginx_container_id = nginx.get('Id')
     docker_client.start(nginx_container_id)
+    nginx_server_ip = docker_client.inspect_container(nginx_container_id)['NetworkSettings']['IPAddress']
 
     try:
-        yield docker_gateway_ip
+        yield nginx_server_ip
     finally:
         docker_client.remove_container(nginx_container_id, force=True)
 
