@@ -38,7 +38,7 @@ setup(
             'enum34',
         ],
     },
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
@@ -48,7 +48,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Topic :: Software Development :: Build Tools',
         'Topic :: System :: Software Distribution',
-    ),
+    ],
     entry_points={
         'console_scripts': (
             'grocker = grocker.__main__:main',
