@@ -4,8 +4,6 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import ctypes
-import os
 import shutil
 import tempfile
 import types
@@ -52,17 +50,6 @@ class TemporaryDirectory(object):
 
     def __exit__(self, exc, value, tb):
         shutil.rmtree(self.name)
-
-
-def sync():
-    if hasattr(os, 'sync'):
-        os.sync()
-    else:
-        try:
-            libc = ctypes.CDLL("libc.so.6")
-            libc.sync()
-        except OSError:
-            pass
 
 
 def smart_text(text, encoding='utf-8'):

@@ -3,6 +3,7 @@ LABEL grocker.step=run
 
 # Provisionning
 COPY . /tmp/grocker
+RUN sync  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
 RUN install --owner=grocker --mode=0444 /tmp/grocker/.grocker ~grocker/.grocker
 RUN /tmp/grocker/provision.sh
 

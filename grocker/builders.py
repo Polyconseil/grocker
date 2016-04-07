@@ -208,8 +208,6 @@ def build_runner_image(
             with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
                 f.write(docker_ip)
 
-            six.sync()  # Avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
