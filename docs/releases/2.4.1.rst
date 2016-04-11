@@ -1,0 +1,15 @@
+2.4.1
+=====
+
+.. Voici le mail de livraison, merci de vérifier le contenu et de corriger les erreurs.
+
+**Objet : Livraison de grocker-2.4.1**
+
+Bonjour,
+
+La version 2.4.1 de grocker est gelée et disponible.
+
+**Les principaux changements sont :**
+  - Fix the use of grocker as a library (broken in previous release)
+
+Je reste à votre disposition pour toute question,

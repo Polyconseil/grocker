@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.4.1 (2016-04-11)
+--------------------------
 
 - Fix the use of grocker as a library (broken in previous release)
 
