@@ -1,8 +1,8 @@
-Next version (not yet released)
--------------------------------
+Grocker 2.4.0 (2016-04-11)
+--------------------------
 
-- Only install needed runtime in images.
-- Allow to set system dependencies by project.
+- Only install needed runtime in images
+- Allow to set system dependencies by project
 - Remove dependencies to host UID
 
 
