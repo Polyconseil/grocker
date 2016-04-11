@@ -142,7 +142,8 @@ def build_pypi_image(docker_client, tag):
 
 
 def get_or_create_data_volume(docker_client, name):
-    for volume in docker_client.volumes()['Volumes']:
+    volumes = docker_client.volumes()['Volumes'] or ()
+    for volume in volumes:
         if volume['Name'] == name:
             return volume
     return docker_client.create_volume(name=name)
