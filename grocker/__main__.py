@@ -144,9 +144,9 @@ def clean_actions(actions):
     return actions
 
 
-def main():
+def main(cli_args=None):
     parser = arg_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(cli_args)
     config = parse_config(args.config, runtime=args.runtime, entrypoint=args.entrypoint)
 
     loggers.setup(verbose=args.verbose)
