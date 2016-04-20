@@ -9,21 +9,23 @@ function setup_venv() {  # venv runtime *dependencies
     local runtime=$2
     shift 2
     local release="$*"
+    local constraint_arg=$([ -f ${WORKING_DIR}/constraints.txt ] && echo "--constraint ${WORKING_DIR}/constraints.txt")
     local grocker_pypi_ip=$(cat ${WORKING_DIR}/pypi.ip)
     local wheelhouse=http://${grocker_pypi_ip}/
 
     local pip=${venv}/bin/pip
 
     ${runtime} -m virtualenv -p ${runtime} ${venv}
-    ${pip} install --upgrade pip setuptools
-    ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${release}
+    # Old pip can not deal with constraint file
+    ${pip} install --upgrade pip
+    ${pip} install --upgrade pip setuptools ${constraint_arg}
+    ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${constraint_arg} ${release}
 }
 
 function install_python_app() {
     local runtime=$(cat ~/.grocker | grep runtime | cut -f2- -d:)
     local release=$(cat ~/.grocker | grep release | cut -f2- -d:)
-    local constraint=$([ -f ${WORKING_DIR}/constraints.txt ] && echo "--constraint ${WORKING_DIR}/constraints.txt")
-    setup_venv ~/app.venv ${runtime} ${constraint} ${release}
+    setup_venv ~/app.venv ${runtime} ${release}
 }
 
 function run_as_user() {  # script_or_function

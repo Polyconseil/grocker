@@ -1,6 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
+- Also use the constraint file to upgrade pip and setuptools in the app venv
 - Add pip_constraint entry to config yaml file
 - Remove default dependencies list
 - Make --docker-image-prefix optional
