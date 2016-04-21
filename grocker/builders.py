@@ -150,10 +150,10 @@ def get_or_create_data_volume(docker_client, name):
 
 
 @contextlib.contextmanager
-def http_wheel_server(docker_client, wheels_volume_name):
+def http_wheel_server(docker_client, wheels_volume_name, config):
     nginx_image = docker_get_or_build_image(
         docker_client,
-        'docker.polydev.blue/grocker-nginx-pypi:1.0.0',
+        '{prefix}/grocker-nginx-pypi:1.0.0'.format(prefix=config['docker_image_prefix']),
         build_pypi_image,
     )
     nginx = docker_client.create_container(
@@ -182,7 +182,7 @@ def build_runner_image(
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
 
-    with http_wheel_server(docker_client, wheels_volume_name) as docker_ip:
+    with http_wheel_server(docker_client, wheels_volume_name, config) as docker_ip:
         with six.TemporaryDirectory() as tmp_dir:
             build_dir = os.path.join(tmp_dir, 'build')
             helpers.copy_resource('resources/docker/runner-image', build_dir)
@@ -201,6 +201,7 @@ def build_runner_image(
                     'release': release,
                 },
             )
+
             if config['pip_constraint']:
                 with io.open(config['pip_constraint'], 'r') as fp:
                     with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
@@ -212,9 +213,9 @@ def build_runner_image(
             return docker_build_image(docker_client, build_dir, tag=tag)
 
 
-def get_root_image(docker_client, config, docker_registry):
-    tag = '{registry}/grocker-{runtime}-root:{version}-{hash}'.format(
-        registry=docker_registry,
+def get_root_image(docker_client, config):
+    tag = '{prefix}/grocker-{runtime}-root:{version}-{hash}'.format(
+        prefix=config['docker_image_prefix'],
         runtime=config['runtime'],
         version=__version__,
         hash=helpers.hash_list(get_dependencies(config)),
@@ -226,14 +227,14 @@ def get_root_image(docker_client, config, docker_registry):
     )
 
 
-def get_compiler_image(docker_client, config, docker_registry):
-    tag = '{registry}/grocker-{runtime}-compiler:{version}-{hash}'.format(
-        registry=docker_registry,
+def get_compiler_image(docker_client, config):
+    tag = '{prefix}/grocker-{runtime}-compiler:{version}-{hash}'.format(
+        prefix=config['docker_image_prefix'],
         runtime=config['runtime'],
         version=__version__,
         hash=helpers.hash_list(get_dependencies(config)),
     )
-    root_tag = get_root_image(docker_client, config, docker_registry)
+    root_tag = get_root_image(docker_client, config)
     return docker_get_or_build_image(
         docker_client,
         tag,
