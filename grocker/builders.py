@@ -156,7 +156,8 @@ def get_or_create_data_volume(docker_client, name):
 def http_wheel_server(docker_client, wheels_volume_name, config):
     nginx_image = docker_get_or_build_image(
         docker_client,
-        '{prefix}/grocker-nginx-pypi:1.0.0'.format(prefix=config['docker_image_prefix']),
+        config['docker_image_prefix'],
+        'grocker-nginx-pypi:1.0.0',
         build_pypi_image,
     )
     nginx = docker_client.create_container(
@@ -217,22 +218,21 @@ def build_runner_image(
 
 
 def get_root_image(docker_client, config):
-    tag = '{prefix}/grocker-{runtime}-root:{version}-{hash}'.format(
-        prefix=config['docker_image_prefix'],
+    img_name = 'grocker-{runtime}-root:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
         hash=helpers.hash_list(get_dependencies(config)),
     )
     return docker_get_or_build_image(
         docker_client,
-        tag,
+        config['docker_image_prefix'],
+        img_name,
         functools.partial(build_root_image, config=config),
     )
 
 
 def get_compiler_image(docker_client, config):
-    tag = '{prefix}/grocker-{runtime}-compiler:{version}-{hash}'.format(
-        prefix=config['docker_image_prefix'],
+    img_name = 'grocker-{runtime}-compiler:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
         hash=helpers.hash_list(get_dependencies(config)),
@@ -240,7 +240,8 @@ def get_compiler_image(docker_client, config):
     root_tag = get_root_image(docker_client, config)
     return docker_get_or_build_image(
         docker_client,
-        tag,
+        config['docker_image_prefix'],
+        img_name,
         functools.partial(build_compiler_image, config=config, root_image_tag=root_tag),
     )
 
@@ -354,14 +355,16 @@ def docker_push_image(docker_client, name):
     return data['sha256']
 
 
-def docker_get_or_build_image(docker_client, name, builder):
-    images = [image for image in docker_client.images() if name in image['RepoTags']]
+def docker_get_or_build_image(docker_client, prefix, name, builder):
+    full_name = '/'.join((prefix, name)) if prefix else name
+    images = [image for image in docker_client.images() if full_name in image['RepoTags']]
+    if not images and prefix:
+        images = docker_pull_image(docker_client, full_name)
     if not images:
-        images = docker_pull_image(docker_client, name)
-    if not images:
-        builder(docker_client, tag=name)
-        docker_push_image(docker_client, name)
-    return name
+        builder(docker_client, tag=full_name)
+        if prefix:
+            docker_push_image(docker_client, full_name)
+    return full_name
 
 
 def docker_run_container(docker_client, tag, command, binds=None, environment=None):

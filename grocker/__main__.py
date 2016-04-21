@@ -154,9 +154,6 @@ def main(cli_args=None):
         docker_image_prefix=args.docker_image_prefix,
     )
 
-    if not config['docker_image_prefix']:
-        raise parser.error('No --docker-image-prefix defined')
-
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
 
