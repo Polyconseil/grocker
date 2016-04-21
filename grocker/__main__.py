@@ -147,7 +147,12 @@ def clean_actions(actions):
 def main(cli_args=None):
     parser = arg_parser()
     args = parser.parse_args(cli_args)
-    config = parse_config(args.config, runtime=args.runtime, entrypoint=args.entrypoint)
+    config = parse_config(
+        args.config,
+        runtime=args.runtime,
+        entrypoint=args.entrypoint,
+        pip_constraint=args.pip_constraint,
+    )
 
     loggers.setup(verbose=args.verbose)
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
@@ -180,7 +185,6 @@ def main(cli_args=None):
                 release=args.release,
                 wheels_volume_name=wheels_volume_name,
                 pip_conf=pip_conf,
-                pip_constraint=args.pip_constraint,
             )
 
     if GrockerActions.build_img in args.actions:
@@ -192,7 +196,6 @@ def main(cli_args=None):
             config=config,
             release=args.release,
             wheels_volume_name=wheels_volume_name,
-            pip_constraint=args.pip_constraint,
             tag=image_name,
         )
 

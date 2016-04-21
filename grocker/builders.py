@@ -178,7 +178,7 @@ def http_wheel_server(docker_client, wheels_volume_name):
 
 
 def build_runner_image(
-        docker_client, root_image_tag, config, release, wheels_volume_name, pip_constraint=None, tag=None
+        docker_client, root_image_tag, config, release, wheels_volume_name, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
 
@@ -201,8 +201,8 @@ def build_runner_image(
                     'release': release,
                 },
             )
-            if pip_constraint:
-                with io.open(pip_constraint, 'r') as fp:
+            if config['pip_constraint']:
+                with io.open(config['pip_constraint'], 'r') as fp:
                     with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
                         f.write(fp.read())
 
@@ -266,7 +266,7 @@ def get_pip_env(pip_conf):
     return env
 
 
-def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_name, pip_conf, pip_constraint):
+def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_name, pip_conf):
     wheels_destination_volume = get_or_create_data_volume(docker_client, wheels_volume_name)
     binds = {
         wheels_destination_volume['Name']: {
@@ -280,8 +280,8 @@ def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_n
         release, config['entrypoint'],
     ]
 
-    if pip_constraint:
-        binds[pip_constraint] = {
+    if config['pip_constraint']:
+        binds[config['pip_constraint']] = {
             'bind': '/home/grocker/constraints.txt',
             'mode': 'ro',
         }

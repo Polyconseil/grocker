@@ -34,6 +34,8 @@ system:  # grocker internal configuration
 # There begin the project configuration (so all values below are use as default)
 
 runtime: python2
+# pip_constraint is optional
+pip_constraint:
 entrypoint: grocker-pyapp
 dependencies:
     - libpq5: libpq-dev
