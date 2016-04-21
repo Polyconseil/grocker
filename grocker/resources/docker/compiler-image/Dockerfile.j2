@@ -8,4 +8,4 @@ RUN /tmp/grocker/provision.sh
 # Make the entry point run the compile script
 USER grocker
 WORKDIR /home/grocker
-ENTRYPOINT ["/home/grocker/compile.py"]
+ENTRYPOINT ["{{ runtime }}", "/home/grocker/compile.py"]
