@@ -200,8 +200,12 @@ def main(cli_args=None):
         )
 
     if GrockerActions.push_img in args.actions:
-        logger.info('Pushing image...')
-        sha256 = builders.docker_push_image(docker_client, image_name)
+        if '/' not in image_name:
+            logger.warning('Not pushing any image since the registry is unclear in %s', image_name)
+            sha256 = None
+        else:
+            logger.info('Pushing image...')
+            sha256 = builders.docker_push_image(docker_client, image_name)
         return Image(image_name, sha256)
 
 
