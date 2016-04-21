@@ -2,6 +2,7 @@ Next version (not yet released)
 -------------------------------
 
 - Add pip_constraint entry to config yaml file
+- Remove default dependencies list
 
 
 Grocker 2.4.2 (2016-04-11)
