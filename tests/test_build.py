@@ -40,12 +40,10 @@ def docker_run(image, command):
 
 
 class BuildTestCase(unittest.TestCase):
-    RELEASE = 'grocker-test-project==1.0.0'
 
-    def run_grocker(self, cwd=None):
+    def run_grocker(self, release, command, cwd=None):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
         runtime = 'python{}'.format(sys.version_info[0])
-        msg = 'Grocker build this successfully !'
         try:
             subprocess.check_call(
                 [
@@ -54,24 +52,28 @@ class BuildTestCase(unittest.TestCase):
                     '--runtime', runtime,
                     '--docker-image-prefix', 'docker.polydev.blue',
                     'dep', 'img',
-                    self.RELEASE
+                    release,
                 ],
                 cwd=cwd,
             )
 
             return_code, logs = docker_run(
                 image_name,
-                ['--', 'python', '-m', 'gtp', msg]
+                command,
             )
 
             self.assertEqual(return_code, 0, msg=logs)
-            matches = re.findall(msg, logs.decode('utf-8'))
-            self.assertEqual(len(matches), 2)
+            return logs.decode('utf-8')
         finally:
             docker_rmi(image_name)
 
-    def test_dep_img_steps(self):  # but not push
-        self.run_grocker()
+    def test_simple_img(self):  # but not push
+        logs = self.run_grocker(
+            'flake8==2.5.4',
+            command=['--', 'python', '-m', 'flake8', '--version'],
+        )
+        matches = re.findall('2.5.4 \(pep8: [\w.-]+, pyflakes: [\w.-]+, mccabe: [\w.-]+\)', logs)
+        self.assertEqual(len(matches), 1)
 
     def test_minimal_dependencies(self):
         config = """
@@ -82,8 +84,14 @@ class BuildTestCase(unittest.TestCase):
             - libtiff5: libtiff5-dev
         """
 
+        msg = 'Grocker build this successfully !'
         with grocker_six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 fp.write(textwrap.dedent(config[1:]))
 
-            self.run_grocker(cwd=tmp_dir)
+            logs = self.run_grocker(
+                'grocker-test-project==1.0.0',
+                command=['--', 'python', '-m', 'gtp', msg],
+                cwd=tmp_dir)
+        matches = re.findall(msg, logs)
+        self.assertEqual(len(matches), 2)
