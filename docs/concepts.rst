@@ -17,7 +17,8 @@ Grocker construit l'image en trois temps :
  - Dans une seconde phase, un serveur web est lancé pour servir le résultat de la compilation.
 
  - Dans la dernière phase, il installe les résultats de la compilation sur une image propre (i.e. sans les dépendances
-   de construction). Le point d'entrée permet alors de simplifier le lancement de l'applicatif.
+   de construction). L'application doit fournir un point point d'entrée nommé ``grocker-runner`` pour permettre de
+   simplifier son lancement.
 
 .. graphviz::
 
@@ -82,17 +83,11 @@ Grocker construit l'image en trois temps :
 
 Grocker construit trois images *Docker*, dont les deux premières sont réutilisées entre les constructions :
 
- 1. L'**image de base** contient les dépendances systèmes nécessaires aux deux autres images. Elle contient entre
-    autres:
-
-    - *Python* (2 et 3) ;
-    - les bibliothèques d'accès aux bases de données (*libpq*) ;
-    - les bibliothèques de manipulation d'images.
+ 1. L'**image de base** contient les dépendances systèmes nécessaires aux deux autres images et le *runtime* utilisé.
 
  #. L'**image de compilation** (*compiler*) est l'image de base augmentée des dépendances de construction et d'un
     script décrivant comment doivent être compilés les projets en fonction de leur langage de programmation. Cette image
     exporte dans un dossier sur la machine hôte le résultat de la compilation.
 
  #. L'**image finale** (*runner*) est le produit final de la chaîne de construction *Grocker*. Elle contient
-    l'application et ses dépendances (hors services externes) et un point d'entrée permettant de lancer facilement les
-    différents services de l'application.
+    l'application et ses dépendances (hors services externes).

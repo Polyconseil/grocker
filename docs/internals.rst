@@ -31,7 +31,6 @@ Arborescence de *Grocker*::
   ├── MANIFEST.in
   ├── Readme.rst
   ├── requirements-dev.txt
-  ├── requirements.txt
   ├── setup.cfg
   └── setup.py
 
