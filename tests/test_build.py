@@ -67,14 +67,6 @@ class BuildTestCase(unittest.TestCase):
         finally:
             docker_rmi(image_name)
 
-    def test_simple_img(self):  # but not push
-        logs = self.run_grocker(
-            'flake8==2.5.4',
-            command=['--', 'python', '-m', 'flake8', '--version'],
-        )
-        matches = re.findall('2.5.4 \(pep8: [\w.-]+, pyflakes: [\w.-]+, mccabe: [\w.-]+\)', logs)
-        self.assertEqual(len(matches), 1)
-
     def test_minimal_dependencies(self):
         config = """
         dependencies:
@@ -90,8 +82,8 @@ class BuildTestCase(unittest.TestCase):
                 fp.write(textwrap.dedent(config[1:]))
 
             logs = self.run_grocker(
-                'grocker-test-project==1.0.0',
-                command=['--', 'python', '-m', 'gtp', msg],
+                'grocker-test-project==1.0.1',
+                command=[msg],
                 cwd=tmp_dir)
         matches = re.findall(msg, logs)
-        self.assertEqual(len(matches), 2)
+        self.assertEqual(len(matches), 1)

@@ -39,7 +39,6 @@ Il est possible d'ajouter un fichier ``.grocker.yml`` à la racine de l'environn
 Ce fichier suit la syntax YAML et contient trois entrées :
 
     :runtime: le runtime à utiliser
-    :entrypoint: le point d'entrée à utiliser
     :dependencies: la liste des dépendances.
 
 Chaque entrée de la liste de dépendances peut-être selon le cas :

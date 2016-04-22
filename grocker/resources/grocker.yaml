@@ -36,6 +36,5 @@ system:  # grocker internal configuration
 runtime: python2
 # pip_constraint is optional
 pip_constraint:
-entrypoint: grocker-pyapp
 dependencies: []
 docker_image_prefix:

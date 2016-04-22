@@ -201,7 +201,6 @@ def build_runner_image(
                 {
                     'grocker_version': __version__,
                     'runtime': config['runtime'],
-                    'entrypoint': config['entrypoint'],
                     'release': release,
                 },
             )
@@ -280,10 +279,7 @@ def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_n
         },
     }
 
-    command = [
-        '--python', config['runtime'],
-        release, config['entrypoint'],
-    ]
+    command = ['--python', config['runtime'], release]
 
     if config['pip_constraint']:
         binds[config['pip_constraint']] = {

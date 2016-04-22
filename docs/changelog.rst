@@ -4,6 +4,7 @@ Next version (not yet released)
 - Add pip_constraint entry to config yaml file
 - Remove default dependencies list
 - Make --docker-image-prefix optional
+- Merge entrypoint into app
 
 
 Grocker 2.4.2 (2016-04-11)

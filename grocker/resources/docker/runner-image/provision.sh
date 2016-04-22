@@ -4,21 +4,12 @@ set -xe
 GROCKER_USER=grocker
 WORKING_DIR=$(dirname $0)
 
-function get_grocker_pypi_ip() {
-    local ip_file=${WORKING_DIR}/pypi.ip
-    if [ -e ${ip_file} ]; then
-        cat ${ip_file}
-    else
-        ip route show 0.0.0.0/0 | awk '{ print $3 }'
-    fi
-}
-
 function setup_venv() {  # venv runtime *dependencies
     local venv=$1
     local runtime=$2
     shift 2
     local release="$*"
-    local grocker_pypi_ip=$(get_grocker_pypi_ip)
+    local grocker_pypi_ip=$(cat ${WORKING_DIR}/pypi.ip)
     local wheelhouse=http://${grocker_pypi_ip}/
 
     local pip=${venv}/bin/pip
@@ -33,12 +24,6 @@ function install_python_app() {
     local release=$(cat ~/.grocker | grep release | cut -f2- -d:)
     local constraint=$([ -f ${WORKING_DIR}/constraints.txt ] && echo "--constraint ${WORKING_DIR}/constraints.txt")
     setup_venv ~/app.venv ${runtime} ${constraint} ${release}
-}
-
-function install_grocker_entrypoint() {
-    local runtime=$(cat ~/.grocker | grep runtime | cut -f2- -d:)
-    local entrypoint=$(cat ~/.grocker | grep entrypoint | cut -f2- -d: | xargs echo)
-    setup_venv ~/ep.venv ${runtime} ${entrypoint}
 }
 
 function run_as_user() {  # script_or_function
@@ -62,7 +47,6 @@ function only_run_as_root() {  # script_or_function
 
 function provision() {
     install_python_app
-    install_grocker_entrypoint
 }
 
 function system_provision() {

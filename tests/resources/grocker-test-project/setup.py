@@ -21,4 +21,9 @@ setup(
         'qrcode',
     ],
     include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'grocker-runner = gtp.__main__:main',
+        ],
+    },
 )
