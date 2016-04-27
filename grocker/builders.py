@@ -385,7 +385,7 @@ def docker_run_container(docker_client, tag, command, binds=None, environment=No
 
 
 def docker_purge_volumes(docker_client, filters=()):
-    """Removes dangling volumes (volumes not referenced by any container).
+    """Remove dangling volumes (volumes not referenced by any container).
 
     Args:
         docker_client: a docker-py Client.
