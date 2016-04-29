@@ -99,9 +99,13 @@ class PurgeAction(argparse.Action):
 
 def is_grocker_outdated(skip=False):
     logger = logging.getLogger(__name__)
-    if not skip and 'grocker' in six.smart_text(subprocess.check_output(['pip', 'list', '--outdated'])):
-        logger.critical('Grocker needs to be updated')
-        return True
+    if not skip:
+        words = [line.split(' ')[0] for line in six.smart_text(
+            subprocess.check_output(['pip', 'list', '--outdated'])
+        ).splitlines()]
+        if 'grocker' in words:
+            logger.critical('Grocker needs to be updated')
+            return True
     return False
 
 
