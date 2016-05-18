@@ -3,11 +3,13 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import contextlib
+import functools
 import hashlib
 import io
 import os.path
 import shutil
 import tempfile
+import time
 
 import jinja2
 import pip.baseparser
@@ -85,3 +87,18 @@ def pip_conf(pip_conf_path=None):
             yield f.name
     else:
         yield pip_conf_path
+
+
+def retry(exception, tries=3, delay=1):
+    def decorator(function):
+        @functools.wraps(function)
+        def inner(*args, **kwargs):
+            for i in range(tries):
+                try:
+                    return function(*args, **kwargs)
+                except exception:
+                    if i + 1 == tries:
+                        raise
+                    time.sleep(1)
+        return inner
+    return decorator

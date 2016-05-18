@@ -15,6 +15,7 @@ import sys
 import uuid
 
 import docker
+import docker.errors
 import docker.utils
 
 from . import __version__, DOCKER_MIN_VERSION
@@ -178,7 +179,8 @@ def http_wheel_server(docker_client, wheels_volume_name, config):
     try:
         yield nginx_server_ip
     finally:
-        docker_client.remove_container(nginx_container_id, force=True)
+        remove_container = helpers.retry(docker.errors.APIError)(docker_client.remove_container)
+        remove_container(nginx_container_id, force=True)
 
 
 def build_runner_image(
