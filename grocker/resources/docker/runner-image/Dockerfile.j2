@@ -17,4 +17,4 @@ EXPOSE 8080 8081
 # Make the entry point run the compile script
 USER grocker
 WORKDIR /home/grocker
-ENTRYPOINT ["/home/grocker/app.venv/bin/grocker-runner"]
+ENTRYPOINT ["/home/grocker/app.venv/bin/{{ entrypoint_name }}"]

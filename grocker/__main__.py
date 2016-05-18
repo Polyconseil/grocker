@@ -53,6 +53,10 @@ def arg_parser():
         '-r', '--runtime', default=None, choices=('python2', 'python3'),
         help="runtime used to build and run this image.",
     )
+    parser.add_argument(  # precedence
+        '-e', '--entrypoint-name', default=None,
+        help="Docker entrypoint to use to run this image.",
+    )
     parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
         help="pip configuration file used to download dependencies (by default use pip config getter).",
@@ -149,6 +153,7 @@ def main(cli_args=None):
     config = parse_config(
         args.config,
         runtime=args.runtime,
+        entrypoint_name=args.entrypoint_name,
         pip_constraint=args.pip_constraint,
         docker_image_prefix=args.docker_image_prefix,
     )

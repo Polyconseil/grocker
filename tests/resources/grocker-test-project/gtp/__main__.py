@@ -32,5 +32,10 @@ def identity(content):
 def main():
     print(identity(sys.argv[1] if len(sys.argv) > 1 else 'Missing parameter !'))
 
+
+def custom():
+    msg = identity(sys.argv[1] if len(sys.argv) > 1 else 'Missing parameter !')
+    print('custom: %s' % msg)
+
 if __name__ == '__main__':
     main()

@@ -38,3 +38,4 @@ runtime: python2
 pip_constraint:
 dependencies: []
 docker_image_prefix:
+entrypoint_name: grocker-runner

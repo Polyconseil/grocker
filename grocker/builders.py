@@ -195,7 +195,10 @@ def build_runner_image(
             helpers.render_template(
                 os.path.join(build_dir, 'Dockerfile.j2'),
                 os.path.join(build_dir, 'Dockerfile'),
-                {'root_image_tag': root_image_tag},
+                {
+                    'root_image_tag': root_image_tag,
+                    'entrypoint_name': config['entrypoint_name'],
+                },
             )
             helpers.render_template(
                 os.path.join(build_dir, '.grocker.j2'),

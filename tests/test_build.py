@@ -40,6 +40,13 @@ def docker_run(image, command):
 
 
 class BuildTestCase(unittest.TestCase):
+    release = 'grocker-test-project==1.0.3'
+    dependencies = """
+        - libzbar0: libzbar-dev
+        - libjpeg62-turbo: libjpeg62-turbo-dev
+        - libffi6: libffi-dev
+        - libtiff5: libtiff5-dev
+    """
 
     def run_grocker(self, release, command, cwd=None):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
@@ -67,23 +74,32 @@ class BuildTestCase(unittest.TestCase):
         finally:
             docker_rmi(image_name)
 
-    def test_minimal_dependencies(self):
-        config = """
-        dependencies:
-            - libzbar0: libzbar-dev
-            - libjpeg62-turbo: libjpeg62-turbo-dev
-            - libffi6: libffi-dev
-            - libtiff5: libtiff5-dev
-        """
-
-        msg = 'Grocker build this successfully !'
+    def check(self, config, msg, expected):
         with grocker_six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 fp.write(textwrap.dedent(config[1:]))
 
             logs = self.run_grocker(
-                'grocker-test-project==1.0.1',
+                self.release,
                 command=[msg],
-                cwd=tmp_dir)
-        matches = re.findall(msg, logs)
-        self.assertEqual(len(matches), 1)
+                cwd=tmp_dir
+            )
+        matches = re.findall(expected, logs)
+        self.assertEqual(len(matches), 1, msg=logs)
+
+    def test_dependencies(self):
+        config = """
+            dependencies: %s
+        """ % textwrap.indent(self.dependencies, '    ')
+        msg = 'Grocker build this successfully !'
+        expected = msg
+        self.check(config, msg, expected)
+
+    def test_entrypoint_name(self):
+        config = """
+            entrypoint_name: my-custom-runner
+            dependencies: %s
+        """ % textwrap.indent(self.dependencies, '    ')
+        msg = 'Grocker build this successfully !'
+        expected = 'custom: %s' % msg
+        self.check(config, msg, expected)
