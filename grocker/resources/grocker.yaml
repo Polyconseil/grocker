@@ -22,18 +22,18 @@ system:  # grocker internal configuration
     - nodejs-legacy
 
   runtime:  # dependencies needed for specified runtime
-    python2:
+    python2.7:
       - python: python-dev
       - libpython2.7
       - python-virtualenv
-    python3:
+    python3.4:
       - python3: python3-dev
       - libpython3.4
       - python3-virtualenv
 
 # There begin the project configuration (so all values below are use as default)
 
-runtime: python2
+runtime: python3.4
 # pip_constraint is optional
 pip_constraint:
 dependencies: []
