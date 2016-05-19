@@ -50,7 +50,7 @@ def arg_parser():
         help='Grocker config file',
     )
     parser.add_argument(  # precedence
-        '-r', '--runtime', default=None, choices=('python2', 'python3'),
+        '-r', '--runtime', default=None,
         help="runtime used to build and run this image.",
     )
     parser.add_argument(  # precedence
@@ -162,6 +162,9 @@ def main(cli_args=None):
     logger = logging.getLogger('grocker' if __name__ == '__main__' else __name__)
 
     args.actions = clean_actions(args.actions)
+
+    if config['runtime'] not in config['system']['runtime']:
+        raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
     docker_client = builders.docker_get_client()
     image_name = args.image_name or helpers.default_image_name(config['docker_image_prefix'], args.release)

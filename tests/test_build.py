@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import re
 import subprocess
-import sys
 import textwrap
 import unittest
 import uuid
@@ -66,20 +65,21 @@ class BuildTestCase(unittest.TestCase):
         - libffi6: libffi-dev
         - libtiff5: libtiff5-dev
     """
+    runtime = None
 
     def run_grocker(self, release, command, cwd=None):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
-        runtime = 'python{}'.format(sys.version_info[0])
         try:
             subprocess.check_call(
                 [
                     'python', '-m', 'grocker',
                     '--image-name', image_name,
-                    '--runtime', runtime,
                     '--docker-image-prefix', 'docker.polydev.blue',
                     'dep', 'img',
                     release,
-                ],
+                ] + (
+                    ['--runtime', self.runtime] if self.runtime else []
+                ),
                 cwd=cwd,
             )
 
@@ -122,3 +122,7 @@ class BuildTestCase(unittest.TestCase):
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
         self.check(config, msg, expected)
+
+
+class BuildCustomRuntimeTestCase(BuildTestCase):
+    runtime = 'python2.7'
