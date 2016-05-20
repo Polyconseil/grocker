@@ -46,7 +46,7 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-c', '--config', type=file_path_or_none_type, default='./.grocker.yml',
+        '-c', '--config', action='append', type=file_path_or_none_type, default=['./.grocker.yml'],
         help='Grocker config file',
     )
     parser.add_argument(  # precedence
@@ -113,7 +113,7 @@ def is_grocker_outdated(skip=False):
     return False
 
 
-def parse_config(config_path, **kwargs):
+def parse_config(config_paths, **kwargs):
     """
     Generate config regarding precedence order
 
@@ -124,9 +124,10 @@ def parse_config(config_path, **kwargs):
     3. the grocker ``resources/grocker.yaml`` file
     """
     config = helpers.load_yaml_resource('resources/grocker.yaml')
-    project_config = helpers.load_yaml(config_path) or {}
+    for config_path in config_paths:
+        project_config = helpers.load_yaml(config_path) or {}
+        config.update(project_config)
 
-    config.update(project_config)
     config.update({k: v for k, v in kwargs.items() if v})
 
     return config
