@@ -63,7 +63,7 @@ class ConfigTestCase(unittest.TestCase):
         try:
             raised_error = FileNotFoundError
         except NameError:
-            raised_error = OSError
+            raised_error = IOError
 
         with mkchtmpdir() as tmp_dir:
             write_file(tmp_dir, '.grocker.yml', self.grocker_yml_content)
