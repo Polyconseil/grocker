@@ -46,7 +46,7 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-c', '--config', action='append', type=file_path_or_none_type, default=['./.grocker.yml'],
+        '-c', '--config', action='append', type=file_path_or_none_type, default=None,
         help='Grocker config file',
     )
     parser.add_argument(  # precedence
@@ -124,8 +124,14 @@ def parse_config(config_paths, **kwargs):
     3. the grocker ``resources/grocker.yaml`` file
     """
     config = helpers.load_yaml_resource('resources/grocker.yaml')
+    only_existing_file = True
+
+    if not config_paths:
+        only_existing_file = False
+        config_paths = ['.grocker.yml']
+
     for config_path in config_paths:
-        project_config = helpers.load_yaml(config_path) or {}
+        project_config = helpers.load_yaml(config_path, only_existing_file)
         config.update(project_config)
 
     config.update({k: v for k, v in kwargs.items() if v})
