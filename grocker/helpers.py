@@ -30,8 +30,6 @@ def copy_resource(resource, destination, package='grocker'):
 
 
 def load_yaml(file_path):
-    if not os.path.exists(file_path):
-        return None
     with io.open(file_path, encoding='utf-8') as fp:
         return yaml.load(fp.read())
 
