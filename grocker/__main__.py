@@ -124,14 +124,12 @@ def parse_config(config_paths, **kwargs):
     3. the grocker ``resources/grocker.yaml`` file
     """
     config = helpers.load_yaml_resource('resources/grocker.yaml')
-    only_existing_file = True
 
-    if not config_paths:
-        only_existing_file = False
+    if not config_paths and os.path.exists('.grocker.yml'):
         config_paths = ['.grocker.yml']
 
-    for config_path in config_paths:
-        project_config = helpers.load_yaml(config_path, only_existing_file)
+    for config_path in config_paths or []:
+        project_config = helpers.load_yaml(config_path)
         config.update(project_config)
 
     config.update({k: v for k, v in kwargs.items() if v})

@@ -29,11 +29,9 @@ def copy_resource(resource, destination, package='grocker'):
         shutil.copy2(resource_path, destination)
 
 
-def load_yaml(file_path, only_existing_file=False):
+def load_yaml(file_path):
     if not os.path.exists(file_path):
-        if only_existing_file:
-            raise RuntimeError('File %s does not exist', file_path)
-        return {}
+        raise RuntimeError('file %s does not exist', file_path)
     with io.open(file_path, encoding='utf-8') as fp:
         return yaml.load(fp.read())
 
