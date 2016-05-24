@@ -97,6 +97,6 @@ def retry(exception, tries=3, delay=1):
                 except exception:
                     if i + 1 == tries:
                         raise
-                    time.sleep(1)
+                    time.sleep(delay)
         return inner
     return decorator
