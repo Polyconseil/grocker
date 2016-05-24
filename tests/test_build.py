@@ -11,6 +11,7 @@ import unittest
 import uuid
 
 import docker.errors
+import yaml
 
 import grocker.builders as grocker_builders
 import grocker.six as grocker_six
@@ -72,14 +73,16 @@ class BuildTestCase(unittest.TestCase):
     """
     runtime = None
 
-    def run_grocker(self, release, command, cwd=None):
+    def run_grocker(self, release, command, cwd):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
+        result_file_path = os.path.join(cwd, 'grocker.results.yml')
         try:
             subprocess.check_call(
                 [
                     'python', '-m', 'grocker',
                     '--image-name', image_name,
                     '--docker-image-prefix', 'docker.polydev.blue',
+                    '--result-file', result_file_path,
                     'dep', 'img',
                     release,
                 ] + (
@@ -87,6 +90,13 @@ class BuildTestCase(unittest.TestCase):
                 ),
                 cwd=cwd,
             )
+
+            with open(result_file_path) as fp:
+                results = yaml.load(fp)
+
+            self.assertNotIn('hash', results)
+            self.assertIn('image', results)
+            self.assertEqual(image_name, results['image'])
 
             return_code, logs = docker_run(
                 image_name,

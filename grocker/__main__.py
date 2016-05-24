@@ -4,9 +4,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
-import collections
 import enum
 # pylint: disable=wrong-import-order
+import io
 import logging
 import os
 import os.path
@@ -14,14 +14,13 @@ import subprocess
 import sys
 # pylint: enable=wrong-import-order
 
+import yaml
+
 from . import __version__
 from . import builders
 from . import helpers
 from . import loggers
 from . import six
-
-
-Image = collections.namedtuple('Image', ['name', 'sha256'])
 
 
 class GrockerActions(enum.Enum):
@@ -73,6 +72,11 @@ def arg_parser():
     parser.add_argument(
         'actions', choices=GrockerActions, type=GrockerActions, nargs='+',
         metavar='<actions>', help='should be one of {}.'.format(', '.join(x.value for x in GrockerActions))
+    )
+
+    parser.add_argument(
+        '--result-file', metavar='<filename>', default=None,
+        help="yaml file where results (image name, ...) are writen."
     )
     parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier).")
 
@@ -152,9 +156,9 @@ def clean_actions(actions):
     return actions
 
 
-def main(cli_args=None):
+def main():
     parser = arg_parser()
-    args = parser.parse_args(cli_args)
+    args = parser.parse_args()
     config = parse_config(
         args.config,
         runtime=args.runtime,
@@ -173,6 +177,10 @@ def main(cli_args=None):
 
     docker_client = builders.docker_get_client()
     image_name = args.image_name or helpers.default_image_name(config['docker_image_prefix'], args.release)
+    results = {
+        'release': args.release,
+        'image': image_name,
+    }
 
     logger.info('Checking prerequisites...')
     if builders.is_docker_outdated(docker_client):
@@ -189,6 +197,7 @@ def main(cli_args=None):
     if GrockerActions.build_dep in args.actions:
         logger.info('Compiling dependencies...')
         compiler_tag = builders.get_compiler_image(docker_client, config)
+        results['compiler_image'] = compiler_tag
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
             builders.compile_wheels(
                 docker_client=docker_client,
@@ -202,6 +211,7 @@ def main(cli_args=None):
     if GrockerActions.build_img in args.actions:
         logger.info('Building image...')
         root_image_tag = builders.get_root_image(docker_client, config)
+        results['root_image'] = root_image_tag
         builders.build_runner_image(
             docker_client=docker_client,
             root_image_tag=root_image_tag,
@@ -214,12 +224,13 @@ def main(cli_args=None):
     if GrockerActions.push_img in args.actions:
         if '/' not in image_name:
             logger.warning('Not pushing any image since the registry is unclear in %s', image_name)
-            sha256 = None
         else:
             logger.info('Pushing image...')
-            sha256 = builders.docker_push_image(docker_client, image_name)
-        return Image(image_name, sha256)
+            results['hash'] = builders.docker_push_image(docker_client, image_name)
 
+    if args.result_file:
+        with io.open(args.result_file, 'w') as fp:
+            yaml.dump(results, fp, indent=True)
 
 if __name__ == '__main__':
     main()
