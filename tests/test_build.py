@@ -10,13 +10,18 @@ import textwrap
 import unittest
 import uuid
 
+import docker.errors
+
 import grocker.builders as grocker_builders
 import grocker.six as grocker_six
 
 
 def docker_rmi(image):
     client = grocker_builders.docker_get_client()
-    client.remove_image(image)
+    try:
+        client.remove_image(image)
+    except docker.errors.APIError:
+        pass  # do not fail when image does not exist
 
 
 def docker_run(image, command):
