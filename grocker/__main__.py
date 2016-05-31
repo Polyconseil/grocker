@@ -229,6 +229,9 @@ def main():
             results['hash'] = builders.docker_push_image(docker_client, image_name)
 
     if args.result_file:
+        result_dir = os.path.dirname(args.result_file)
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
         with io.open(args.result_file, 'w') as fp:
             yaml.dump(results, fp, indent=True)
 

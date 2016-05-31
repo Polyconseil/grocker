@@ -75,7 +75,11 @@ class BuildTestCase(unittest.TestCase):
 
     def run_grocker(self, release, command, cwd):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
-        result_file_path = os.path.join(cwd, 'grocker.results.yml')
+        result_file_path = os.path.join(
+            cwd,
+            'created-by-grocker',
+            'grocker.results.yml',
+        )
         try:
             subprocess.check_call(
                 [
