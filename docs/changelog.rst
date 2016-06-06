@@ -1,5 +1,5 @@
-Next version (not yet released)
--------------------------------
+Grocker 3.0.0 (2016-06-06)
+--------------------------
 
 - Also use the constraint file to upgrade pip and setuptools in the app venv
 - Add pip_constraint entry to config yaml file
