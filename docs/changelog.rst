@@ -1,6 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
+- Allow pip_constraint to be a relative path
 
 
 Grocker 3.0.0 (2016-06-06)

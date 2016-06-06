@@ -287,7 +287,7 @@ def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_n
     command = ['--python', config['runtime'], release]
 
     if config['pip_constraint']:
-        binds[config['pip_constraint']] = {
+        binds[os.path.abspath(config['pip_constraint'])] = {
             'bind': '/home/grocker/constraints.txt',
             'mode': 'ro',
         }
