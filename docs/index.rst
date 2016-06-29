@@ -11,4 +11,4 @@
     usage/build
     usage/publish
 
-    changes
+    changelog
