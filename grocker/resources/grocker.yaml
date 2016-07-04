@@ -34,8 +34,9 @@ system:  # grocker internal configuration
 # There begin the project configuration (so all values below are use as default)
 
 runtime: python3.4
-# pip_constraint is optional
-pip_constraint:
+pip_constraint: # pip_constraint is optional
+volumes: []
+ports: []
 dependencies: []
 docker_image_prefix:
 entrypoint_name: grocker-runner

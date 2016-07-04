@@ -135,6 +135,8 @@ class BuildTestCase(unittest.TestCase):
 
     def test_entrypoint_name(self):
         config = """
+            volumes: ['/data', '/config']
+            ports: [8080, 9090]
             entrypoint_name: my-custom-runner
             dependencies: %s
         """ % indent(self.dependencies, '    ')
