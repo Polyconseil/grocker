@@ -56,6 +56,14 @@ def arg_parser():
         '-e', '--entrypoint-name', default=None,
         help="Docker entrypoint to use to run this image.",
     )
+    parser.add_argument(  # precedence
+        '--volume', action='append', default=[], dest='volumes',
+        help="Container storage and configuration area.",
+    )
+    parser.add_argument(  # precedence
+        '--port', action='append', default=[], dest='ports',
+        help="Port on which a container will listen for connections."
+    )
     parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
         help="pip configuration file used to download dependencies (by default use pip config getter).",
@@ -165,6 +173,8 @@ def main():
         entrypoint_name=args.entrypoint_name,
         pip_constraint=args.pip_constraint,
         docker_image_prefix=args.docker_image_prefix,
+        volumes=args.volumes,
+        ports=args.ports,
     )
 
     loggers.setup(verbose=args.verbose)

@@ -6,6 +6,7 @@ import contextlib
 import functools
 import hashlib
 import io
+import json
 import os.path
 import shutil
 import tempfile
@@ -45,8 +46,11 @@ def hash_list(l):
 
 
 def render_template(template_path, output_path, context):
+    env = jinja2.Environment()
+    env.filters['jsonify'] = json.dumps
+
     with io.open(template_path, encoding='utf-8') as template_file:
-        template = jinja2.Template(template_file.read())
+        template = env.from_string(template_file.read())
 
     output = template.render(**context)
 

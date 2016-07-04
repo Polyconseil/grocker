@@ -198,6 +198,8 @@ def build_runner_image(
                 {
                     'root_image_tag': root_image_tag,
                     'entrypoint_name': config['entrypoint_name'],
+                    'volumes': config['volumes'],
+                    'ports': config['ports'],
                 },
             )
             helpers.render_template(

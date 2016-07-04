@@ -6,12 +6,9 @@ COPY . /tmp/grocker
 # always sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
 RUN sync; /bin/bash /tmp/grocker/provision.sh
 
-# Prepare the image to run the entry point
-VOLUME ["/media", "/scripts", "/config"]
-RUN ln -s /config /scripts /media /home/grocker/
-
-# Exposed ports
-EXPOSE 8080 8081
+# Ports and Volumes
+{% if ports %}EXPOSE{% for port in ports %} {{ port }}{% endfor %}{% endif %}
+{% if volumes %}VOLUME {{volumes | jsonify }}{% endif %}
 
 # Make the entry point run the compile script
 USER grocker

@@ -44,6 +44,11 @@ def docker_run(image, command):
     return return_code, logs
 
 
+def docker_inspect(image):
+    client = grocker_builders.docker_get_client()
+    return client.inspect_image(image)
+
+
 # Python 3 backport: textwrap.indent
 def indent(text, prefix, predicate=None):
     """Adds 'prefix' to the beginning of selected lines in 'text'.
@@ -108,7 +113,7 @@ class BuildTestCase(unittest.TestCase):
             )
 
             self.assertEqual(return_code, 0, msg=logs)
-            return logs.decode('utf-8')
+            return logs.decode('utf-8'), docker_inspect(image_name)
         finally:
             docker_rmi(image_name)
 
@@ -117,13 +122,14 @@ class BuildTestCase(unittest.TestCase):
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 fp.write(textwrap.dedent(config[1:]))
 
-            logs = self.run_grocker(
+            logs, inspect_data = self.run_grocker(
                 self.release,
                 command=[msg],
                 cwd=tmp_dir
             )
         matches = re.findall(expected, logs)
         self.assertEqual(len(matches), 1, msg=logs)
+        return logs, inspect_data
 
     def test_dependencies(self):
         config = """
@@ -135,12 +141,19 @@ class BuildTestCase(unittest.TestCase):
 
     def test_entrypoint_name(self):
         config = """
+            volumes: ['/data', '/config']
+            ports: [8080, 9090]
             entrypoint_name: my-custom-runner
             dependencies: %s
         """ % indent(self.dependencies, '    ')
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
-        self.check(config, msg, expected)
+        _, inspect_data = self.check(config, msg, expected)
+
+        volumes = sorted(inspect_data['Config'].get('Volumes', []))
+        ports = sorted(inspect_data['Config'].get('ExposedPorts', []))
+        self.assertEqual(volumes, ['/config', '/data'])
+        self.assertEqual(ports, ['8080/tcp', '9090/tcp'])
 
 
 class BuildCustomRuntimeTestCase(BuildTestCase):
