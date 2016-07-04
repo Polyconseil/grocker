@@ -54,6 +54,9 @@ function provision() {
 function system_provision() {
     local sys_config_dir=/home/grocker/sys.cfg
 
+    # install Grocker config file
+    install --owner=grocker --mode=0444 /tmp/grocker/.grocker ~grocker/.grocker
+
     # Allow ssmtp configuration
     rm /etc/ssmtp/ssmtp.conf
     ln -s ${sys_config_dir}/ssmtp.conf /etc/ssmtp/ssmtp.conf

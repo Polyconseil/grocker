@@ -1,9 +1,8 @@
 FROM {{ root_image_tag }}
 LABEL grocker.step=run
 
-# Provisionning
+# Provisioning
 COPY . /tmp/grocker
-RUN install --owner=grocker --mode=0444 /tmp/grocker/.grocker ~grocker/.grocker
 # always sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
 RUN sync; /tmp/grocker/provision.sh
 
