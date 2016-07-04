@@ -1,6 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
+- tags: Rename ``grocker.step`` into ``grocker.image.kind``
 
 
 Grocker 3.0.1 (2016-06-06)

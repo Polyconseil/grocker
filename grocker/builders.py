@@ -427,8 +427,8 @@ def docker_purge_volumes(docker_client, filters=()):
 def docker_purge_images(docker_client, filters=()):
     filter_desc = {
         'dangling': {'dangling': True},
-        'run': {'label': 'grocker.step=run'},
-        'build': {'label': 'grocker.step=build'},
+        'runners': {'label': 'grocker.image.kind=runner'},
+        'builders': {'label': 'grocker.image.kind=builder'},
     }
 
     for filter_name in filters:

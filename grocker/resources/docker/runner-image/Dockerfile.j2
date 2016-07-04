@@ -1,5 +1,5 @@
 FROM {{ root_image_tag }}
-LABEL grocker.step=run
+LABEL grocker.image.kind=runner
 
 # Provisioning
 COPY . /tmp/grocker

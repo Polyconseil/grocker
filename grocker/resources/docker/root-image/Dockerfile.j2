@@ -1,6 +1,5 @@
 FROM debian:jessie
-LABEL grocker.step=build
-LABEL grocker.version={{ version }}
+LABEL grocker.image.kind=builder grocker.version={{ version }}
 
 ENV LANG C.UTF-8
 
