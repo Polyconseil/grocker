@@ -201,7 +201,7 @@ def main():
 
     wheels_volume_name = 'grocker-wheels-cache-{version}-{hash}'.format(
         version=__version__,
-        hash=helpers.hash_list(builders.get_dependencies(config)),
+        hash=helpers.hash_list(helpers.get_dependencies(config)),
     )
 
     if GrockerActions.build_dep in args.actions:

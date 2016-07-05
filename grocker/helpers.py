@@ -6,6 +6,7 @@ import contextlib
 import functools
 import hashlib
 import io
+import itertools
 import json
 import os.path
 import shutil
@@ -38,6 +39,66 @@ def load_yaml(file_path):
 def load_yaml_resource(resource, package='grocker'):
     resource_path = pkg_resources.resource_filename(package, resource)
     return load_yaml(resource_path)
+
+
+def get_run_dependencies(dependency_list):
+    """
+    Parse list of dependencies to only get run dependencies.
+
+    Dependency list is a list of string or dict, which match the following
+    format:
+
+     [
+        'run_dependency_1',
+        {'run_dependency_2': 'build_dependency_2'},
+        {'run_dependency_3': ['build_dependency_3.1', 'build_dependency_3.2']},
+    ]
+    """
+    for dependency in dependency_list:
+        if isinstance(dependency, dict):
+            for key in dependency:
+                yield key
+        else:
+            yield dependency
+
+
+def get_build_dependencies(dependency_list):
+    """
+    Parse list of dependencies to only get build dependencies
+
+    see get_run_dependencies() for dependency list format
+    """
+    for dependency in dependency_list:
+        if isinstance(dependency, dict):
+            for value_or_list in dependency.values():
+                if isinstance(value_or_list, list):
+                    for value in value_or_list:
+                        yield value
+                else:
+                    yield value_or_list
+        else:
+            yield dependency
+
+
+def get_dependencies(config, with_build_dependencies=False):
+    runtime_dependencies = config['system']['runtime'][config['runtime']]
+
+    dependencies = itertools.chain(
+        config['system']['base'],
+        get_run_dependencies(runtime_dependencies),
+        get_run_dependencies(config['dependencies'])
+    )
+
+    if with_build_dependencies:
+        build_dependencies = itertools.chain(
+            config['system']['build'],
+            get_build_dependencies(runtime_dependencies),
+            get_build_dependencies(config['dependencies'])
+        )
+
+        dependencies = itertools.chain(dependencies, build_dependencies)
+
+    return list(dependencies)
 
 
 def hash_list(l):
