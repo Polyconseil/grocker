@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import contextlib
 import functools
 import io
-import itertools
 import json
 import logging
 import os.path
@@ -39,66 +38,6 @@ def is_docker_outdated(docker_client):
     return need_update
 
 
-def get_run_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get run dependencies.
-
-    Dependency list is a list of string or dict, which match the following
-    format:
-
-     [
-        'run_dependency_1',
-        {'run_dependency_2': 'build_dependency_2'},
-        {'run_dependency_3': ['build_dependency_3.1', 'build_dependency_3.2']},
-    ]
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for key in dependency:
-                yield key
-        else:
-            yield dependency
-
-
-def get_build_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get build dependencies
-
-    see get_run_dependencies() for dependency list format
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for value_or_list in dependency.values():
-                if isinstance(value_or_list, list):
-                    for value in value_or_list:
-                        yield value
-                else:
-                    yield value_or_list
-        else:
-            yield dependency
-
-
-def get_dependencies(config, with_build_dependencies=False):
-    runtime_dependencies = config['system']['runtime'][config['runtime']]
-
-    dependencies = itertools.chain(
-        config['system']['base'],
-        get_run_dependencies(runtime_dependencies),
-        get_run_dependencies(config['dependencies'])
-    )
-
-    if with_build_dependencies:
-        build_dependencies = itertools.chain(
-            config['system']['build'],
-            get_build_dependencies(runtime_dependencies),
-            get_build_dependencies(config['dependencies'])
-        )
-
-        dependencies = itertools.chain(dependencies, build_dependencies)
-
-    return list(dependencies)
-
-
 def build_root_image(docker_client, config, tag=None):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
     with six.TemporaryDirectory() as tmp_dir:
@@ -110,7 +49,13 @@ def build_root_image(docker_client, config, tag=None):
             {'version': __version__},
         )
 
-        dependencies = get_dependencies(config)
+        helpers.render_template(
+            os.path.join(build_dir, 'apt-repositories.sh.j2'),
+            os.path.join(build_dir, 'apt-repositories.sh'),
+            {'repositories': config['repositories']},
+        )
+
+        dependencies = helpers.get_dependencies(config)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
@@ -131,7 +76,7 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
             },
         )
 
-        dependencies = get_dependencies(config, with_build_dependencies=True)
+        dependencies = helpers.get_dependencies(config, with_build_dependencies=True)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
@@ -227,7 +172,7 @@ def get_root_image(docker_client, config):
     img_name = 'grocker-{runtime}-root:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.hash_list(get_dependencies(config)),
+        hash=helpers.hash_from_config(config),
     )
     return docker_get_or_build_image(
         docker_client,
@@ -241,7 +186,7 @@ def get_compiler_image(docker_client, config):
     img_name = 'grocker-{runtime}-compiler:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.hash_list(get_dependencies(config)),
+        hash=helpers.hash_from_config(config),
     )
     root_tag = get_root_image(docker_client, config)
     return docker_get_or_build_image(

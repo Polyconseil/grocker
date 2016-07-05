@@ -37,6 +37,7 @@ runtime: python3.4
 pip_constraint: # pip_constraint is optional
 volumes: []
 ports: []
+repositories: {}  # name: {uri: '<deb line>', key: '<PGP key for this repository>'}
 dependencies: []
 docker_image_prefix:
 entrypoint_name: grocker-runner

@@ -8,6 +8,7 @@ COPY . /tmp/grocker/
 
 # Configure apt for a lighter & quieter use.
 RUN /tmp/grocker/apt-setup.sh
+RUN /bin/sh /tmp/grocker/apt-repositories.sh
 
 # Do provisioning
 RUN /tmp/grocker/provision.sh

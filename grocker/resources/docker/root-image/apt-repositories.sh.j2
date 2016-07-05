@@ -1,0 +1,15 @@
+#!/bin/sh
+set -xe
+
+{% if repositories %}
+apt update
+apt install -qy apt-transport-https
+apt-get clean
+
+{% for name, desc in repositories.items() %}
+apt-key add - <<EOF
+{{ desc['key'].strip() }}
+EOF
+echo "{{desc['uri']}}" > /etc/apt/sources.list.d/{{name}}.list
+{% endfor %}
+{% endif %}
