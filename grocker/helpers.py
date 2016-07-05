@@ -20,6 +20,7 @@ import yaml
 
 from . import __version__
 
+GROUP_SEPARATOR = b'\x1D'
 UNIT_SEPARATOR = b'\x1F'
 
 
@@ -101,8 +102,24 @@ def get_dependencies(config, with_build_dependencies=False):
     return list(dependencies)
 
 
-def hash_list(l):
-    digest = hashlib.sha256(UNIT_SEPARATOR.join(x.encode('utf-8') for x in l))
+def config_identifier(config):
+    """
+    Hash config to get an unique identifier
+
+    Args:
+        config (dict): Grocker config
+
+    Returns:
+        str: Config identifier (SHA 256)
+    """
+    def unit_list(l):
+        return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in l))
+
+    dependencies = unit_list(get_dependencies(config, with_build_dependencies=True))
+    data = GROUP_SEPARATOR.join([
+        dependencies,
+    ])
+    digest = hashlib.sha256(data)
     return digest.hexdigest()
 
 

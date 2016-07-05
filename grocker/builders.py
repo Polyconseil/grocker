@@ -166,7 +166,7 @@ def get_root_image(docker_client, config):
     img_name = 'grocker-{runtime}-root:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.hash_list(helpers.get_dependencies(config)),
+        hash=helpers.config_identifier(config),
     )
     return docker_get_or_build_image(
         docker_client,
@@ -180,7 +180,7 @@ def get_compiler_image(docker_client, config):
     img_name = 'grocker-{runtime}-compiler:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.hash_list(helpers.get_dependencies(config)),
+        hash=helpers.config_identifier(config),
     )
     root_tag = get_root_image(docker_client, config)
     return docker_get_or_build_image(
