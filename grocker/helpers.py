@@ -21,6 +21,7 @@ import yaml
 from . import __version__
 
 GROUP_SEPARATOR = b'\x1D'
+RECORD_SEPARATOR = b'\x1E'
 UNIT_SEPARATOR = b'\x1F'
 
 
@@ -116,8 +117,13 @@ def config_identifier(config):
         return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in l))
 
     dependencies = unit_list(get_dependencies(config, with_build_dependencies=True))
+    repositories = RECORD_SEPARATOR.join(
+        unit_list([name] + [cfg[x] for x in sorted(cfg)])
+        for name, cfg in config['repositories'].items()
+    )
     data = GROUP_SEPARATOR.join([
         dependencies,
+        repositories,
     ])
     digest = hashlib.sha256(data)
     return digest.hexdigest()

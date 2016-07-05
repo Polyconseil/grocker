@@ -1,6 +1,7 @@
 Next version (not yet released)
 -------------------------------
 
+- Drop predefined extra apt repositories
 - Drop predefined exposed ports and volumes
 - tags: Rename ``grocker.step`` into ``grocker.image.kind``
 

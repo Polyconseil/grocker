@@ -49,6 +49,12 @@ def build_root_image(docker_client, config, tag=None):
             {'version': __version__},
         )
 
+        helpers.render_template(
+            os.path.join(build_dir, 'apt-repositories.sh.j2'),
+            os.path.join(build_dir, 'apt-repositories.sh'),
+            {'repositories': config['repositories']},
+        )
+
         dependencies = helpers.get_dependencies(config)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
