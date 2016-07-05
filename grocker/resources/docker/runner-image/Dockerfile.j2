@@ -4,7 +4,7 @@ LABEL grocker.image.kind=runner
 # Provisioning
 COPY . /tmp/grocker
 # always sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-RUN sync; /tmp/grocker/provision.sh
+RUN sync; /bin/bash /tmp/grocker/provision.sh
 
 # Prepare the image to run the entry point
 VOLUME ["/media", "/scripts", "/config"]
