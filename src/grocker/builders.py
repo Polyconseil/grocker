@@ -80,7 +80,12 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
-        return docker_build_image(docker_client, build_dir, tag=tag)
+        return docker_build_image(
+            docker_client,
+            build_dir,
+            tag=tag,
+            pull=bool(config['docker_image_prefix']),
+        )
 
 
 def build_pypi_image(docker_client, tag):
@@ -165,7 +170,12 @@ def build_runner_image(
             with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
                 f.write(docker_ip)
 
-            return docker_build_image(docker_client, build_dir, tag=tag)
+            return docker_build_image(
+                docker_client,
+                build_dir,
+                tag=tag,
+                pull=bool(config['docker_image_prefix']),
+            )
 
 
 def get_root_image(docker_client, config):
@@ -251,8 +261,8 @@ def docker_get_client(**kwargs):
     return docker.Client(**all_extra_kwargs)
 
 
-def docker_build_image(docker_client, path, tag=None):
-    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=True)
+def docker_build_image(docker_client, path, tag=None, pull=True):
+    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=pull)
     data = inspect_stream(stream)
     if not data['success']:
         raise RuntimeError('Image build failed')
