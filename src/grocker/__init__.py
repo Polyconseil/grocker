@@ -2,9 +2,9 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+import pkg_resources
 
-__version__ = '3.1.dev2'
+__version__ = pkg_resources.get_distribution('grocker').version
 __copyright__ = '2015, Polyconseil'
-__description__ = 'Docker image builder'
 
 DOCKER_MIN_VERSION = '1.8.2'

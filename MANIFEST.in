@@ -1,5 +1,5 @@
 include Readme.rst requirements.txt
-graft grocker
+graft src/grocker
 prune docs
 prune tests
 exclude requirements-dev.txt release.conf Makefile release.txt

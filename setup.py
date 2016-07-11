@@ -6,25 +6,25 @@ import io
 
 from setuptools import setup, find_packages
 
-from grocker import __version__, __description__
-
 
 def read(filename):
     with io.open(filename) as f:
         return f.read()
 
 
+__version__ = '3.1.dev2'
 setup(
     name='grocker',
     version=__version__,
-    description=__description__,
+    description="Docker image builder",
     long_description=read('Readme.rst'),
     keywords='docker build packaging',
     url='http://github.com/polyconseil/grocker',
     author='Polyconseil',
     author_email='TBD on first public release',
     license='TBD on first public release',
-    packages=find_packages(exclude=('tests', 'docs')),
+    packages=find_packages(where='src', exclude=('tests', 'docs')),
+    package_dir={'': str('src')},
     include_package_data=True,
     install_requires=[
         'docker-py',
