@@ -1,3 +1,14 @@
--e .
 blease>=0.69.0
-nose
+
+# Documentation
+docutils
+pygments
+Sphinx
+sphinx_rtd_theme
+
+# Tests and Quality
+check-manifest
+flake8
+pytest
+readme-renderer
+tox

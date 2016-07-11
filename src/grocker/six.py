@@ -12,7 +12,7 @@ import types
 try:
     import configparser
 except ImportError:
-    import ConfigParser as configparser
+    import ConfigParser as configparser  # noqa
 # pylint: enable=unused-import,import-error
 
 

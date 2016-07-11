@@ -2,5 +2,5 @@ include Readme.rst requirements.txt
 graft src/grocker
 prune docs
 prune tests
-exclude requirements-dev.txt release.conf Makefile release.txt
+exclude requirements-dev.txt release.conf Makefile release.txt tox.ini
 global-exclude *.py[cod] __pycache__ *.so
