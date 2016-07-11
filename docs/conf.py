@@ -19,7 +19,7 @@ master_doc = 'index'
 graphviz_output_format = "svg"
 
 intersphinx_mapping = {
-    'devguide': ('http://docs.polydev.blue/devguide/', None),
+    'devguide': ('https://docs.polydev.blue/devguide/', None),
 }
 
 html_theme = 'sphinx_rtd_theme'
