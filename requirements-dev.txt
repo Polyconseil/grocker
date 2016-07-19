@@ -10,3 +10,6 @@ flake8
 pytest
 readme-renderer
 tox
+
+# Release
+zest.releaser[recommended]
