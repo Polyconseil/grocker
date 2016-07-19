@@ -90,7 +90,6 @@ class BuildTestCase(unittest.TestCase):
                 [
                     'python', '-m', 'grocker',
                     '--image-name', image_name,
-                    '--docker-image-prefix', 'docker.polydev.blue',
                     '--result-file', result_file_path,
                     'dep', 'img',
                     release,
