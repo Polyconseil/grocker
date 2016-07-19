@@ -1,3 +1,5 @@
+.tox/
+.cache/
 build/
 dist/
 *.py[co]
@@ -5,7 +7,3 @@ __pycache__/
 
 *.egg-info/
 reports/
-
-bundles/compiler/Dockerfile
-bundles/runner/Dockerfile
-bundles/runner/output/
