@@ -52,19 +52,15 @@ Actions
 Grocker splits the build chain into three steps:
 
 1. ``dep``, compiles wheels and stores them in a data volume.
-2. ``img``, builds **runner** image using stored wheels.
-3. ``push``, pushes **runner** image on configured Docker registry (only if a
-   docker image prefix is given)
+2. ``img``, builds the **runner** image using stored wheels.
+3. ``push``, pushes the **runner** image on the configured Docker registry (
+   only if a docker image prefix is given)
 
-The order of action does not matter, wheels are always compiled before building
-the image and the image is always build before it was pushed (only if the action
-is required). The ``build`` action is a shortcut for ``dep``, ``img`` and ``push``.
+The command line accepts multiple steps and runs all that were specified. The order in
+which they are provided does not matter, Grocker runs them like so: ``dep``, ``img``
+and ``push``. ``build`` is a shortcut for the whole sequence.
 
-Actions are independent: you have to build dependencies before building the image
-and build the image before pushing it. But you do not have to do them within the
-same run.
-
-You should, for example, build an image without pushing it, do some tests,
+This allows you, for example, to build an image without pushing it, then do some tests,
 and after your tests passed push the image.
 
 Purge
