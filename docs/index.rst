@@ -13,4 +13,5 @@ Topics
     concepts
     advanced
     troubleshooting
+    talks/index
     changelog
