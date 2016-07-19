@@ -1,14 +1,16 @@
 .. _index:
 
-.. include:: ../Readme.rst
+.. include:: intro.rst
+
+
+Topics
+======
 
 .. toctree::
     :maxdepth: 2
 
-    installation
+    intro
     concepts
-    internals
-    usage/build
-    usage/publish
-
+    advanced
+    troubleshooting
     changelog
