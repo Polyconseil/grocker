@@ -10,7 +10,6 @@ import io
 import logging
 import os
 import os.path
-import subprocess
 import sys
 # pylint: enable=wrong-import-order
 
@@ -20,7 +19,6 @@ from . import __version__
 from . import builders
 from . import helpers
 from . import loggers
-from . import six
 
 
 class GrockerActions(enum.Enum):
@@ -88,7 +86,6 @@ def arg_parser():
     )
     parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier)")
 
-    parser.add_argument('--no-check-version', action='store_true', help='do not check if Grocker is up to date.')
     parser.add_argument('--purge', action=PurgeAction, help="purge docker images")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
@@ -111,18 +108,6 @@ class PurgeAction(argparse.Action):
         builders.docker_purge_images(builders.docker_get_client(), filters)
         builders.docker_purge_volumes(builders.docker_get_client(), filters)
         parser.exit()
-
-
-def is_grocker_outdated(skip=False):
-    logger = logging.getLogger(__name__)
-    if not skip:
-        words = [line.split(' ')[0] for line in six.smart_text(
-            subprocess.check_output(['pip', 'list', '--outdated'])
-        ).splitlines()]
-        if 'grocker' in words:
-            logger.critical('Grocker needs to be updated')
-            return True
-    return False
 
 
 def parse_config(config_paths, **kwargs):
@@ -195,9 +180,6 @@ def main():
     logger.info('Checking prerequisites...')
     if builders.is_docker_outdated(docker_client):
         raise RuntimeError('Docker is outdated')
-
-    if is_grocker_outdated(skip=args.no_check_version):
-        raise RuntimeError('Grocker is outdated')
 
     wheels_volume_name = 'grocker-wheels-cache-{version}-{hash}'.format(
         version=__version__,
