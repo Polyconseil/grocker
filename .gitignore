@@ -7,3 +7,5 @@ __pycache__/
 
 *.egg-info/
 reports/
+
+docs/talks/europython2016/slides.html
