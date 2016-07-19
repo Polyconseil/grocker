@@ -100,7 +100,7 @@ class PurgeAction(argparse.Action):
         super(PurgeAction, self).__init__(
             option_strings=option_strings,
             dest=argparse.SUPPRESS,
-            choices=('all', 'build', 'dangling', 'run'),
+            choices=('all', 'builders', 'dangling', 'runners'),
         )
 
     def __call__(self, parser, namespace, values, *args, **kwargs):
