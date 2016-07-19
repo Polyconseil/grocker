@@ -1,0 +1,10 @@
+language: python
+sudo: required
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+services:
+  - docker
+install: pip install tox-travis pytest-travis-fold
+script: tox
