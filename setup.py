@@ -1,14 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-from __future__ import absolute_import, division, print_function, unicode_literals
-import io
-
 from setuptools import setup, find_packages
 
 
 def read(filename):
-    with io.open(filename) as f:
+    with open(filename) as f:
         return f.read()
 
 
