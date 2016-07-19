@@ -7,6 +7,7 @@ Next version (not yet released)
 - Drop predefined extra apt repositories
 - Drop predefined exposed ports and volumes
 - tags: Rename ``grocker.step`` into ``grocker.image.kind``
+- Keep the hash type (``sha256``) in the result file
 
 Grocker 3.0.1 (2016-06-06)
 --------------------------

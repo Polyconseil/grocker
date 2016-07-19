@@ -22,7 +22,7 @@ from . import six
 from . import helpers
 
 
-DIGEST_RE = re.compile(r'[\w\.-]+: digest: sha256:(\w+) size: \d+')
+DIGEST_RE = re.compile(r'[\w\.-]+: digest: (sha256:\w+) size: \d+')
 
 
 def is_docker_outdated(docker_client):
@@ -278,7 +278,7 @@ def inspect_stream(stream):
             status = line['status']
             match = DIGEST_RE.match(status)
             if match:
-                data['sha256'] = match.group(1)
+                data['hash'] = match.group(1)
             if old_status != status:
                 old_status = status
                 print()
@@ -312,7 +312,7 @@ def docker_push_image(docker_client, name):
 
     stream = docker_client.push(name, stream=True)
     data = inspect_stream(stream)
-    return data['sha256']
+    return data['hash']
 
 
 def docker_get_or_build_image(docker_client, prefix, name, builder):
