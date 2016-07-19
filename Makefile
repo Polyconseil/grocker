@@ -1,11 +1,3 @@
-PACKAGE = grocker
-include $(shell makefile_path release.mk)
-
-.PHONY: jenkins-test jenkins-docs jenkins-quality
-jenkins-test: tests
-jenkins-docs: docs
-jenkins-quality: quality
-
 .PHONY: update docs quality tests clean
 
 update:

@@ -12,10 +12,9 @@ def read(filename):
         return f.read()
 
 
-__version__ = '3.1.dev2'
 setup(
     name='grocker',
-    version=__version__,
+    version='4.0.dev1',
     description="Docker image builder",
     long_description=read('Readme.rst'),
     keywords='docker build packaging',

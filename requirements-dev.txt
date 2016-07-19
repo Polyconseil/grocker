@@ -1,5 +1,3 @@
-blease>=0.69.0
-
 # Documentation
 docutils
 pygments
