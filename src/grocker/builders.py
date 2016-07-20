@@ -17,25 +17,12 @@ import docker
 import docker.errors
 import docker.utils
 
-from . import __version__, DOCKER_MIN_VERSION
+from . import __version__, DOCKER_API_VERSION
 from . import six
 from . import helpers
 
 
 DIGEST_RE = re.compile(r'[\w\.-]+: digest: (sha256:\w+) size: \d+')
-
-
-def is_docker_outdated(docker_client):
-    def version2tuple(version):
-        return [int(x) for x in version.split('.')]
-
-    logger = logging.getLogger(__name__)
-    docker_version = docker_client.version().get('Version', '0')
-    need_update = version2tuple(docker_version) < version2tuple(DOCKER_MIN_VERSION)
-    if need_update:
-        logger.critical('Grocker needs Docker >= %s', DOCKER_MIN_VERSION)
-
-    return need_update
 
 
 def build_root_image(docker_client, config, tag=None):
@@ -258,7 +245,10 @@ def docker_get_client(**kwargs):
     extra_kwargs = {'assert_hostname': False} if 'DOCKER_MACHINE_NAME' in os.environ else {}
     all_extra_kwargs = docker.utils.kwargs_from_env(**extra_kwargs)
     all_extra_kwargs.update(kwargs)
-    return docker.Client(**all_extra_kwargs)
+    all_extra_kwargs['version'] = DOCKER_API_VERSION
+    client = docker.Client(**all_extra_kwargs)
+    client.version()  # Call the API, this will raise if API version is not compatible.
+    return client
 
 
 def docker_build_image(docker_client, path, tag=None, pull=True):

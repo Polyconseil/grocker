@@ -4,8 +4,7 @@ ChangeLog
 4.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Ask for a specific verison of the Docker API (1.21)
 
 4.0 (2016-07-20)
 ----------------

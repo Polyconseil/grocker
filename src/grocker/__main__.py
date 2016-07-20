@@ -177,10 +177,6 @@ def main():
         'image': image_name,
     }
 
-    logger.info('Checking prerequisites...')
-    if builders.is_docker_outdated(docker_client):
-        raise RuntimeError('Docker is outdated')
-
     wheels_volume_name = 'grocker-wheels-cache-{version}-{hash}'.format(
         version=__version__,
         hash=helpers.config_identifier(config),
