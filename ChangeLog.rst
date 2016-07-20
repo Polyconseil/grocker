@@ -1,8 +1,8 @@
 ChangeLog
 =========
 
-Next version (not yet released)
--------------------------------
+4.0 (2016-07-20)
+----------------
 
 - Drop predefined extra apt repositories
 - Drop predefined exposed ports and volumes
