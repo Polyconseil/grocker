@@ -1,10 +1,17 @@
 language: python
 sudo: required
+dist: trusty
 python:
   - "2.7"
   - "3.4"
   - "3.5"
-services:
-  - docker
+#services:
+#  - docker
+before_install:
+    - sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    - sudo add-apt-repository 'deb https://apt.dockerproject.org/repo ubuntu-trusty main' -y
+    - sudo apt-get update
+    - sudo apt-get install -y -o Dpkg::Options::='--force-confnew' docker-engine
+
 install: pip install tox-travis pytest-travis-fold
 script: tox
