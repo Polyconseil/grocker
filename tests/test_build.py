@@ -89,6 +89,7 @@ class BuildTestCase(unittest.TestCase):
             subprocess.check_call(
                 [
                     'python', '-m', 'grocker',
+                    '--docker-image-prefix', 'grocker',
                     '--image-name', image_name,
                     '--result-file', result_file_path,
                     'dep', 'img',
