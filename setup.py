@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
     install_requires=[
-        'docker-py',
+        'docker-py!=1.10.*',
         'Jinja2',
         'setuptools>=18.0.1',
         'pip>=7.1.2',
