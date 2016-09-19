@@ -307,7 +307,7 @@ def docker_push_image(docker_client, name):
 
 def docker_get_or_build_image(docker_client, prefix, name, builder):
     full_name = '/'.join((prefix, name)) if prefix else name
-    images = [image for image in docker_client.images() if full_name in image['RepoTags']]
+    images = [image for image in docker_client.images() if full_name in image['RepoTags'] or []]
     if not images and prefix:
         images = docker_pull_image(docker_client, full_name)
     if not images:

@@ -4,7 +4,7 @@ ChangeLog
 4.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix image search when repoTags is None and not an empty list
 
 
 4.1 (2016-09-19)
