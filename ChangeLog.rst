@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.1 (unreleased)
+4.1 (2016-09-19)
 ----------------
 
 - Ask for a specific verison of the Docker API (1.21)
