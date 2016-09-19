@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Ask for a specific verison of the Docker API (1.21)
+- Exclude docker-py 1.10.x (require requests < 2.11)
 
 4.0 (2016-07-20)
 ----------------
