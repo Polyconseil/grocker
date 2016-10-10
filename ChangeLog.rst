@@ -4,6 +4,7 @@ ChangeLog
 4.2 (unreleased)
 ----------------
 
+- Add a sync after chmod call to avoid an AUFS issue
 - Fix image search when repoTags is None and not an empty list
 
 

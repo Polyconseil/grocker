@@ -34,6 +34,7 @@ function run_as_user() {  # script_or_function
         ${script_or_function}
     else
         chmod -R go+rX ${WORKING_DIR}  # Allow non-root user to use file in grocker temporary directory
+        sync  # sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
         sudo -u ${GROCKER_USER} $0  # Run this script with grocker user
         rm -r ${WORKING_DIR}  # clean up
     fi
