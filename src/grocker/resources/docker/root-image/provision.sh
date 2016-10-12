@@ -1,9 +1,6 @@
 #!/bin/bash
 set -xe
 
-cd $(dirname $0)  # Go to Grocker build dir
-[ -e provision.env ] && source provision.env  # Retrieve config vars
-
 # Configure system
 echo "LANG=C.UTF-8" > /etc/default/locale
 

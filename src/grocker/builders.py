@@ -33,7 +33,10 @@ def build_root_image(docker_client, config, tag=None):
         helpers.render_template(
             os.path.join(build_dir, 'Dockerfile.j2'),
             os.path.join(build_dir, 'Dockerfile'),
-            {'version': __version__},
+            {
+                'version': __version__,
+                'runtime': config['runtime'],
+            },
         )
 
         helpers.render_template(
@@ -126,6 +129,7 @@ def build_runner_image(
     tag = tag or '{}.grocker'.format(uuid.uuid4())
 
     with http_wheel_server(docker_client, wheels_volume_name, config) as docker_ip:
+        app_name, app_version = release.split('==')
         with six.TemporaryDirectory() as tmp_dir:
             build_dir = os.path.join(tmp_dir, 'build')
             helpers.copy_resource('resources/docker/runner-image', build_dir)
@@ -135,10 +139,14 @@ def build_runner_image(
                 {
                     'root_image_tag': root_image_tag,
                     'entrypoint_name': config['entrypoint_name'],
+                    'app_name': app_name,
+                    'app_version': app_version,
                     'volumes': config['volumes'],
                     'ports': config['ports'],
                 },
             )
+
+            # TODO(fbochu): .grocker file will be obsolete in next major version, so drop it.
             helpers.render_template(
                 os.path.join(build_dir, '.grocker.j2'),
                 os.path.join(build_dir, '.grocker'),

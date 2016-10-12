@@ -1,7 +1,9 @@
 FROM debian:jessie
 LABEL grocker.image.kind=builder grocker.version={{ version }}
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8 \
+    GROCKER_VERSION={{ version }} \
+    GROCKER_RUNTIME={{ runtime }}
 
 # Copy all files to /tmp/grocker
 COPY . /tmp/grocker/

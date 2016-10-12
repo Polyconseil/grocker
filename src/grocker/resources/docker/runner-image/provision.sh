@@ -22,11 +22,6 @@ function setup_venv() {  # venv runtime *dependencies
     ${pip} install --find-links=${wheelhouse} --trusted-host=${grocker_pypi_ip} --no-index ${constraint_arg} ${release} --no-compile
 }
 
-function install_python_app() {
-    local runtime=$(cat ~/.grocker | grep runtime | cut -f2- -d:)
-    local release=$(cat ~/.grocker | grep release | cut -f2- -d:)
-    setup_venv ~/app.venv ${runtime} ${release}
-}
 
 function run_as_user() {  # script_or_function
     local script_or_function="$*"
@@ -35,7 +30,7 @@ function run_as_user() {  # script_or_function
     else
         chmod -R go+rX ${WORKING_DIR}  # Allow non-root user to use file in grocker temporary directory
         sync  # sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-        sudo -u ${GROCKER_USER} $0  # Run this script with grocker user
+        sudo --preserve-env --set-home -u ${GROCKER_USER} /bin/bash $0  # Run this script with grocker user
         rm -r ${WORKING_DIR}  # clean up
     fi
 }
@@ -48,13 +43,16 @@ function only_run_as_root() {  # script_or_function
     fi
 }
 
+
 function provision() {
-    install_python_app
+    setup_venv ~/app.venv ${GROCKER_RUNTIME} ${GROCKER_APP}==${GROCKER_APP_VERSION}
 }
+
 
 function system_provision() {
     local sys_config_dir=/home/grocker/sys.cfg
 
+    # TODO(fbochu): .grocker file will be obsolete in next major version, so drop it.
     # install Grocker config file
     install --owner=grocker --mode=0444 /tmp/grocker/.grocker ~grocker/.grocker
 

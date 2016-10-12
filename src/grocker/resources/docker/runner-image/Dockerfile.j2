@@ -1,5 +1,7 @@
 FROM {{ root_image_tag }}
 LABEL grocker.image.kind=runner
+ENV GROCKER_APP={{ app_name }} \
+    GROCKER_APP_VERSION={{ app_version }}
 
 # Provisioning
 COPY . /tmp/grocker
@@ -13,4 +15,5 @@ RUN sync; /bin/bash /tmp/grocker/provision.sh
 # Make the entry point run the compile script
 USER grocker
 WORKDIR /home/grocker
+ENTRYPOINT ["{{ entrypoint_name }}"]
 ENTRYPOINT ["/home/grocker/app.venv/bin/{{ entrypoint_name }}"]
