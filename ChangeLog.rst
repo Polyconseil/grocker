@@ -8,6 +8,7 @@ ChangeLog
 - Fix image search when repoTags is None and not an empty list
 - Use env vars to expose grocker meta-data to the application
 - Expose some meta-data using image labels
+- Use docker build args to pass some build parameters
 
 4.1 (2016-09-19)
 ----------------

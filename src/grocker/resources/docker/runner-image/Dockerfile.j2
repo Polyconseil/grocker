@@ -7,6 +7,7 @@ ENV GROCKER_APP={{ app_name }} \
     GROCKER_APP_VERSION={{ app_version }}
 
 # Provisioning
+ARG GROCKER_PYPI_IP
 COPY . /tmp/grocker
 # always sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
 RUN sync; /bin/bash /tmp/grocker/provision.sh

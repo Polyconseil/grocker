@@ -46,10 +46,8 @@ def build_root_image(docker_client, config, tag=None):
         )
 
         dependencies = helpers.get_dependencies(config)
-        with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
-            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
-
-        return docker_build_image(docker_client, build_dir, tag=tag)
+        build_env = {'SYSTEM_DEPS': ' '.join(dependencies)}
+        return docker_build_image(docker_client, build_dir, tag=tag, buildargs=build_env)
 
 
 def build_compiler_image(docker_client, root_image_tag, config, tag=None):
@@ -128,7 +126,7 @@ def build_runner_image(
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
 
-    with http_wheel_server(docker_client, wheels_volume_name, config) as docker_ip:
+    with http_wheel_server(docker_client, wheels_volume_name, config) as pypi_ip:
         app_name, app_version = release.split('==')
         with six.TemporaryDirectory() as tmp_dir:
             build_dir = os.path.join(tmp_dir, 'build')
@@ -162,14 +160,12 @@ def build_runner_image(
                     with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
                         f.write(fp.read())
 
-            with io.open(os.path.join(build_dir, 'pypi.ip'), 'w') as f:
-                f.write(docker_ip)
-
             return docker_build_image(
                 docker_client,
                 build_dir,
                 tag=tag,
                 pull=bool(config['docker_image_prefix']),
+                buildargs={'GROCKER_PYPI_IP': pypi_ip},
             )
 
 
@@ -259,8 +255,8 @@ def docker_get_client(**kwargs):
     return client
 
 
-def docker_build_image(docker_client, path, tag=None, pull=True):
-    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=pull)
+def docker_build_image(docker_client, path, tag=None, pull=True, buildargs=None):
+    stream = docker_client.build(path=path, tag=tag, rm=True, forcerm=True, pull=pull, buildargs=buildargs)
     data = inspect_stream(stream)
     if not data['success']:
         raise RuntimeError('Image build failed')
