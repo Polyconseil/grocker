@@ -4,7 +4,8 @@ LABEL grocker.image.kind=runner\
       grocker.app.version={{ app_version }}
 
 ENV GROCKER_APP={{ app_name }} \
-    GROCKER_APP_VERSION={{ app_version }}
+    GROCKER_APP_VERSION={{ app_version }} \
+    PATH=/home/grocker/app.venv/bin/:${PATH}
 
 # Provisioning
 ARG GROCKER_PYPI_IP
@@ -20,4 +21,3 @@ RUN sync; /bin/bash /tmp/grocker/provision.sh
 USER grocker
 WORKDIR /home/grocker
 ENTRYPOINT ["{{ entrypoint_name }}"]
-ENTRYPOINT ["/home/grocker/app.venv/bin/{{ entrypoint_name }}"]
