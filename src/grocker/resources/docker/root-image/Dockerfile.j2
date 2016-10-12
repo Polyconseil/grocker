@@ -1,5 +1,7 @@
 FROM debian:jessie
-LABEL grocker.image.kind=builder grocker.version={{ version }}
+LABEL grocker.image.kind=builder \
+      grocker.app.runtime={{ runtime }} \
+      grocker.version={{ version }}
 
 ENV LANG=C.UTF-8 \
     GROCKER_VERSION={{ version }} \

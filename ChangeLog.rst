@@ -7,7 +7,7 @@ ChangeLog
 - Add a sync after chmod call to avoid an AUFS issue
 - Fix image search when repoTags is None and not an empty list
 - Use env vars to expose grocker meta-data to the application
-
+- Expose some meta-data using image labels
 
 4.1 (2016-09-19)
 ----------------
