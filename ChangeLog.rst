@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.2 (unreleased)
+4.2 (2016-10-13)
 ----------------
 
 - Add a sync after chmod call to avoid an AUFS issue
