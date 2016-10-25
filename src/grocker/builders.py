@@ -16,6 +16,7 @@ import uuid
 import docker
 import docker.errors
 import docker.utils
+from packaging import requirements
 
 from . import __version__, DOCKER_API_VERSION
 from . import six
@@ -125,9 +126,12 @@ def build_runner_image(
         docker_client, root_image_tag, config, release, wheels_volume_name, tag=None
 ):
     tag = tag or '{}.grocker'.format(uuid.uuid4())
+    requirement = requirements.Requirement(release)
+    # Markers would not make much sense here and url are unsupported.
+    assert requirement.marker is None, requirement
+    assert requirement.url is None, requirement
 
     with http_wheel_server(docker_client, wheels_volume_name, config) as pypi_ip:
-        app_name, app_version = release.split('==')
         with six.TemporaryDirectory() as tmp_dir:
             build_dir = os.path.join(tmp_dir, 'build')
             helpers.copy_resource('resources/docker/runner-image', build_dir)
@@ -137,8 +141,9 @@ def build_runner_image(
                 {
                     'root_image_tag': root_image_tag,
                     'entrypoint_name': config['entrypoint_name'],
-                    'app_name': app_name,
-                    'app_version': app_version,
+                    'app_name': requirement.name,
+                    'app_extras': ','.join(sorted(requirement.extras)),
+                    'app_version': helpers.get_version_from_requirement(requirement),
                     'volumes': config['volumes'],
                     'ports': config['ports'],
                 },

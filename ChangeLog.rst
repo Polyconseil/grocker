@@ -4,7 +4,7 @@ ChangeLog
 4.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Correctly parse the release string and store extras as label and environment variable
 
 
 4.2 (2016-10-13)

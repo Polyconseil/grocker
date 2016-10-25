@@ -28,6 +28,7 @@ setup(
         'setuptools>=18.0.1',
         'pip>=7.1.2',
         'pyyaml>=3.11',
+        'packaging',
     ],
     extras_require={
         ":python_version == '2.7'": [

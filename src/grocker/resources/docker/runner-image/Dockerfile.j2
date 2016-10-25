@@ -1,9 +1,11 @@
 FROM {{ root_image_tag }}
 LABEL grocker.image.kind=runner\
       grocker.app.name={{ app_name }} \
+      grocker.app.extras={{ app_extras }} \
       grocker.app.version={{ app_version }}
 
 ENV GROCKER_APP={{ app_name }} \
+    GROCKER_APP_EXTRAS={{ app_extras }} \
     GROCKER_APP_VERSION={{ app_version }} \
     PATH=/home/grocker/app.venv/bin/:${PATH}
 
