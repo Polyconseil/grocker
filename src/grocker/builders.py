@@ -35,6 +35,7 @@ def build_root_image(docker_client, config, tag=None):
             os.path.join(build_dir, 'Dockerfile.j2'),
             os.path.join(build_dir, 'Dockerfile'),
             {
+                'image': config['system']['image'],
                 'version': __version__,
                 'runtime': config['runtime'],
             },

@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Correctly parse the release string and store extras as label and environment variable
+- Use the image defined in the configuration (it still needs to be debian based - for the moment)
 
 
 4.2 (2016-10-13)

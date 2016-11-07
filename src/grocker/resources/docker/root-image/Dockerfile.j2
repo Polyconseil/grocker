@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM {{ image }}
 LABEL grocker.image.kind=builder \
       grocker.app.runtime={{ runtime }} \
       grocker.version={{ version }}
