@@ -35,7 +35,7 @@ run_as_user() {  # script_or_function
     else
         chmod -R go+rX ${WORKING_DIR}  # Allow non-root user to use file in grocker temporary directory
         sync  # sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-        HOME=/home/${GROCKER_USER} su --preserve-env --command $0 - ${GROCKER_USER}  # Run this script as grocker user
+        HOME=/home/${GROCKER_USER} su -c $0 ${GROCKER_USER}  # Run this script as grocker user
         rm -r ${WORKING_DIR}  # clean up
     fi
 }
@@ -56,12 +56,23 @@ provision() {
         "${GROCKER_APP:=should-be-defined}[${GROCKER_APP_EXTRAS:=should-be-defined}]==${GROCKER_APP_VERSION:=should-be-defined}"
 }
 
-
-system_provision() {
-    # Security updates
+debian_up() {
     apt update
     apt upgrade -qy
     apt-get clean
+}
+
+alpine_up() {
+    apk upgrade --no-cache
+}
+
+system_provision() {
+    # Security updates
+    if which apt; then
+        debian_up
+    elif which apk; then
+        alpine_up
+    fi
 }
 
 only_run_as_root system_provision

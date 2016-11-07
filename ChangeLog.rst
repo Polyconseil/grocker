@@ -10,6 +10,7 @@ ChangeLog
 - Switch to docker(-py) 2
 - Only manage Grocker created stuff when purging
 - Drop cron, ssmtp and sudo specific code
+- Add support for alpine base images
 
 4.6 (2016-12-22)
 ----------------
