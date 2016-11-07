@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -xe
 
 cd $(dirname $0)  # Go to Grocker build dir

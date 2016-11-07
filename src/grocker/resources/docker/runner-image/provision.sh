@@ -1,18 +1,23 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -xe
 
 GROCKER_USER=grocker
 WORKING_DIR=$(dirname $0)
 
-function setup_venv() {  # venv runtime *dependencies
-    local venv=$1
-    local runtime=$2
+setup_venv() {  # venv runtime *dependencies
+    local venv runtime release constraint_arg wheelhouse pip
+    venv=$1
+    runtime=$2
     shift 2
-    local release="$*"
-    local constraint_arg=$([ -f ${WORKING_DIR}/constraints.txt ] && echo "--constraint ${WORKING_DIR}/constraints.txt")
-    local wheelhouse=http://${GROCKER_PYPI_IP}/
+    release="$*"
+    if [ -f ${WORKING_DIR}/constraints.txt ]; then
+        constraint_arg="--constraint ${WORKING_DIR}/constraints.txt"
+    else
+        constraint_arg=""
+    fi
+    wheelhouse=http://${GROCKER_PYPI_IP}/
 
-    local pip=${venv}/bin/pip
+    pip=${venv}/bin/pip
 
     ${runtime} -m virtualenv -p ${runtime} ${venv}
     # Old pip can not deal with constraint file
@@ -22,8 +27,9 @@ function setup_venv() {  # venv runtime *dependencies
 }
 
 
-function run_as_user() {  # script_or_function
-    local script_or_function="$*"
+run_as_user() {  # script_or_function
+    local script_or_function
+    script_or_function="$*"
     if [ "$(whoami)" == ${GROCKER_USER} ]; then
         ${script_or_function}
     else
@@ -35,21 +41,23 @@ function run_as_user() {  # script_or_function
 }
 
 
-function only_run_as_root() {  # script_or_function
-    local script_or_function="$*"
+only_run_as_root() {  # script_or_function
+    local script_or_function
+    script_or_function="$*"
     if [ "$(whoami)" == 'root' ]; then
         ${script_or_function}
     fi
 }
 
 
-function provision() {
+provision() {
     setup_venv ~/app.venv ${GROCKER_RUNTIME} ${GROCKER_APP}==${GROCKER_APP_VERSION}
 }
 
 
-function system_provision() {
-    local sys_config_dir=/home/grocker/sys.cfg
+system_provision() {
+    local sys_config_dir
+    sys_config_dir=/home/grocker/sys.cfg
 
     # TODO(fbochu): .grocker file will be obsolete in next major version, so drop it.
     # install Grocker config file
