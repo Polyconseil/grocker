@@ -46,7 +46,7 @@ def docker_inspect(image):
     return client.images.get(image).attrs
 
 
-class BuildTestCase(unittest.TestCase):
+class AbstractBuildTestCase(unittest.TestCase):
     dependencies = yaml.safe_load("""
         - libzbar0: libzbar-dev
         - libjpeg62-turbo: libjpeg62-turbo-dev
@@ -107,6 +107,9 @@ class BuildTestCase(unittest.TestCase):
         matches = re.findall(expected, logs)
         self.assertEqual(len(matches), 1, msg=logs)
         return logs, inspect_data
+
+
+class BuildTestCase(AbstractBuildTestCase):
 
     def test_dependencies(self):
         config = {
@@ -208,3 +211,26 @@ class BuildTestCase(unittest.TestCase):
 
 class BuildCustomRuntimeTestCase(BuildTestCase):
     runtime = 'python2.7'
+
+
+class AlpineTestCase(AbstractBuildTestCase):
+    runtime = 'python2.7'
+    dependencies = []
+
+    def test_with_alpine(self):
+        config = {
+            'system': {
+                'image': 'alpine',
+                'base': [],
+                'build': [],
+                'runtime': {
+                    'python2.7': [
+                        'python2',
+                        'py2-pip',
+                        'py-virtualenv',
+                    ],
+                },
+            },
+            'entrypoint_name': '/bin/sh'
+        }
+        self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')

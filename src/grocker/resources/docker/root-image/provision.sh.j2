@@ -1,0 +1,71 @@
+#!/bin/sh
+set -xe
+
+debian_setup () {
+    # Adapt APT config for Docker
+    echo 'force-unsafe-io' > /etc/dpkg/dpkg.cfg.d/docker-apt-speedup
+    cat <<EOF > /etc/apt/apt.conf.d/docker-clean
+    DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+    APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+
+    Dir::Cache::pkgcache ""; Dir::Cache::srcpkgcache "";
+
+    Acquire::Languages "none";
+
+    APT::Install-Recommends=false;
+    APT::Install-Suggests=false;
+EOF
+
+{% if repositories %}
+    apt update
+    apt install -qy apt-transport-https
+
+{% for name, desc in repositories.items() %}
+    apt-key add - <<EOF
+{{ desc['key'].strip() }}
+EOF
+    echo "{{desc['uri']}}" > /etc/apt/sources.list.d/{{name}}.list
+{% endfor %}
+{% endif %}
+
+    # Install System Packages
+    export DEBIAN_FRONTEND=noninteractive
+    apt update
+    apt upgrade -qy
+    apt install -qy ${SYSTEM_DEPENDENCIES}
+    apt-get clean
+
+    # Create grocker user (Debian does not support short options)
+    adduser --shell /bin/bash --disabled-password --gecos ",,,," grocker
+
+    # Configure system
+    echo "LANG=C.UTF-8" > /etc/default/locale
+}
+
+alpine_setup() {
+{% if repositories %}
+{% for name, desc in repositories.items() %}
+    echo "@{{name}} {{desc['uri']}}" >> /etc/apk/repositories
+{% endfor %}
+{% endif %}
+    apk upgrade --no-cache
+    apk add --no-cache ${SYSTEM_DEPENDENCIES:=}
+
+    # Create grocker user (alpine does not support long options)
+    adduser -s /bin/sh -D -g ",,,," grocker
+
+    # No need to configure system's locale
+}
+
+# Configure the package manager for a lighter & quieter use.
+if which apt; then
+    debian_setup
+elif which apk; then
+    alpine_setup
+else
+    echo "Unknown distribution, exiting" 2>&1
+    exit 1
+fi
+
+# Clean
+rm -r $(dirname $0)
