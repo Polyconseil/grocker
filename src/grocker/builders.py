@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import contextlib
 import functools
+import itertools
 import io
 import json
 import logging
@@ -272,7 +273,8 @@ def inspect_stream(stream):
     """Return some data about the stream."""
     old_status = None
     data = {'success': True}
-    for line in (json.loads(six.smart_text(x)) for x in stream):
+    for line in itertools.chain.from_iterable(six.smart_text(x).splitlines() for x in stream):
+        line = json.loads(line)
         if 'status' in line:
             status = line['status']
             match = DIGEST_RE.match(status)
