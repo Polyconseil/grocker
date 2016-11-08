@@ -1,15 +1,16 @@
 ChangeLog
 =========
 
-4.4 (unreleased)
-----------------
+4.3.1 (unreleased)
+------------------
 
-- Nothing changed yet.
+- Fix ``compiler-image/provision.sh`` sh syntax. ``source`` replaced by ``.``
 
 
 4.3 (2016-11-08)
 ----------------
 
+- **Warning** - This version is broken, use 4.3.1 instead.
 - Correctly parse the release string and store extras as label and environment variable
 - Use the image defined in the configuration (it still needs to be debian based - for the moment)
 - Provision scripts now only require sh (instead of bash previously)
