@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.3 (unreleased)
+4.3 (2016-11-08)
 ----------------
 
 - Correctly parse the release string and store extras as label and environment variable
