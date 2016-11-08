@@ -2,7 +2,9 @@
 set -xe
 
 cd $(dirname $0)  # Go to Grocker build dir
-[ -e provision.env ] && source provision.env  # Retrieve config vars
+if [ -e ./provision.env ]; then
+    . ./provision.env  # Retrieve config vars
+fi
 
 apt install -qy ${SYSTEM_DEPS}
 install --mode=0555 --owner=grocker /tmp/grocker/compile.py /home/grocker/compile.py
