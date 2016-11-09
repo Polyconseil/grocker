@@ -77,7 +77,7 @@ class BuildTestCase(unittest.TestCase):
     """
     runtime = None
 
-    def run_grocker(self, release, command, cwd):
+    def run_grocker(self, release, command, cwd, docker_prefix):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
         result_file_path = os.path.join(
             cwd,
@@ -85,19 +85,18 @@ class BuildTestCase(unittest.TestCase):
             'grocker.results.yml',
         )
         try:
-            subprocess.check_call(
-                [
-                    'python', '-m', 'grocker',
-                    '--docker-image-prefix', 'grocker',
-                    '--image-name', image_name,
-                    '--result-file', result_file_path,
-                    'dep', 'img',
-                    release,
-                ] + (
-                    ['--runtime', self.runtime] if self.runtime else []
-                ),
-                cwd=cwd,
-            )
+            call_args = [
+                'python', '-m', 'grocker',
+                '--image-name', image_name,
+                '--result-file', result_file_path,
+                'dep', 'img',
+                release,
+            ]
+            if docker_prefix:
+                call_args += ['--docker-image-prefix', docker_prefix]
+            if self.runtime:
+                call_args += ['--runtime', self.runtime]
+            subprocess.check_call(call_args, cwd=cwd)
 
             with open(result_file_path) as fp:
                 results = yaml.load(fp)
@@ -116,7 +115,7 @@ class BuildTestCase(unittest.TestCase):
         finally:
             docker_rmi(image_name)
 
-    def check(self, config, release, cmd, expected):
+    def check(self, config, release, cmd, expected, docker_prefix=None):
         with grocker_six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 fp.write(textwrap.dedent(config[1:]))
@@ -124,7 +123,8 @@ class BuildTestCase(unittest.TestCase):
             logs, inspect_data = self.run_grocker(
                 release,
                 command=[cmd] if not isinstance(cmd, list) else cmd,
-                cwd=tmp_dir
+                cwd=tmp_dir,
+                docker_prefix=docker_prefix,
             )
         matches = re.findall(expected, logs)
         self.assertEqual(len(matches), 1, msg=logs)
@@ -144,6 +144,12 @@ class BuildTestCase(unittest.TestCase):
             dependencies: %s
         """ % indent(self.dependencies, '    ')
         self.check(config, 'grocker-test-project[pep8]==2.0', ['-c', 'pip list'], 'pep8')
+
+    def test_with_docker_prefix(self):
+        config = """
+            entrypoint_name: /bin/bash
+        """
+        self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
 
     def test_entrypoints(self):
         config = """
