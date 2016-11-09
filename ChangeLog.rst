@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.3.2 (unreleased)
+4.3.2 (2016-11-09)
 ------------------
 
 - Fix grocker for releases with extras.
