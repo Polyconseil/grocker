@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.3.1 (unreleased)
+4.3.1 (2016-11-09)
 ------------------
 
 - Fix ``compiler-image/provision.sh`` sh syntax. ``source`` replaced by ``.``
