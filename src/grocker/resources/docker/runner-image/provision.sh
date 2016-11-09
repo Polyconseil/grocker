@@ -51,7 +51,7 @@ only_run_as_root() {  # script_or_function
 
 
 provision() {
-    setup_venv ~/app.venv ${GROCKER_RUNTIME} ${GROCKER_APP}==${GROCKER_APP_VERSION}
+    setup_venv ~/app.venv ${GROCKER_RUNTIME} ${GROCKER_APP}[${GROCKER_APP_EXTRAS}]==${GROCKER_APP_VERSION}
 }
 
 

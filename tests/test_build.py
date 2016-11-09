@@ -69,7 +69,6 @@ def indent(text, prefix, predicate=None):
 
 
 class BuildTestCase(unittest.TestCase):
-    release = 'grocker-test-project==1.0.3'
     dependencies = """
         - libzbar0: libzbar-dev
         - libjpeg62-turbo: libjpeg62-turbo-dev
@@ -117,13 +116,13 @@ class BuildTestCase(unittest.TestCase):
         finally:
             docker_rmi(image_name)
 
-    def check(self, config, cmd, expected):
+    def check(self, config, release, cmd, expected):
         with grocker_six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 fp.write(textwrap.dedent(config[1:]))
 
             logs, inspect_data = self.run_grocker(
-                self.release,
+                release,
                 command=[cmd] if not isinstance(cmd, list) else cmd,
                 cwd=tmp_dir
             )
@@ -137,7 +136,14 @@ class BuildTestCase(unittest.TestCase):
         """ % indent(self.dependencies, '    ')
         msg = 'Grocker build this successfully !'
         expected = msg
-        self.check(config, msg, expected)
+        self.check(config, 'grocker-test-project==2.0', msg, expected)
+
+    def test_extras(self):
+        config = """
+            entrypoint_name: /bin/bash
+            dependencies: %s
+        """ % indent(self.dependencies, '    ')
+        self.check(config, 'grocker-test-project[pep8]==2.0', ['-c', 'pip list'], 'pep8')
 
     def test_entrypoints(self):
         config = """
@@ -148,7 +154,7 @@ class BuildTestCase(unittest.TestCase):
         """ % indent(self.dependencies, '    ')
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
-        _, inspect_data = self.check(config, msg, expected)
+        _, inspect_data = self.check(config, 'grocker-test-project==2.0', msg, expected)
 
         volumes = sorted(inspect_data['Config'].get('Volumes', []))
         ports = sorted(inspect_data['Config'].get('ExposedPorts', []))
@@ -198,7 +204,7 @@ class BuildTestCase(unittest.TestCase):
             "output = subprocess.check_output(['apt-cache', 'policy'])",
             "print('nginx' in output.decode())",
         ])
-        self.check(config, ['-c', script], 'True')
+        self.check(config, 'grocker-test-project==2.0', ['-c', script], 'True')
 
 
 class BuildCustomRuntimeTestCase(BuildTestCase):

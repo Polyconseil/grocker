@@ -11,7 +11,7 @@ def read(filename):
 
 setup(
     name='grocker',
-    version='4.4.dev0',
+    version='4.3.2.dev1',
     description="Docker image builder",
     long_description=read('Readme.rst'),
     keywords='docker build packaging',
