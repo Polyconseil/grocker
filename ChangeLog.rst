@@ -5,6 +5,7 @@ ChangeLog
 ------------------
 
 - Fix grocker for releases with extras.
+- Make sure most tests run without ``--docker-image-prefix`` hence without cache.
 
 
 4.3.1 (2016-11-09)
