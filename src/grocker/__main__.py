@@ -74,6 +74,10 @@ def arg_parser():
         '--docker-image-prefix', metavar='<url>',
         help='docker registry or account on Docker official registry to use',
     )
+    parser.add_argument(
+        '--image-base-name', metavar='<name>',
+        help="base name for the image (eg '<docker-image-prefix>/<image-base-name>:<image-version>')",
+    )
     parser.add_argument('-n', '--image-name', metavar='<name>', help="name used to tag the build image")
     parser.add_argument(
         'actions', choices=GrockerActions, type=GrockerActions, nargs='+',
@@ -158,6 +162,7 @@ def main():
         entrypoint_name=args.entrypoint_name,
         pip_constraint=args.pip_constraint,
         docker_image_prefix=args.docker_image_prefix,
+        image_base_name=args.image_base_name,
         volumes=args.volumes,
         ports=args.ports,
     )
@@ -171,7 +176,7 @@ def main():
         raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
     docker_client = builders.docker_get_client()
-    image_name = args.image_name or helpers.default_image_name(config['docker_image_prefix'], args.release)
+    image_name = args.image_name or helpers.default_image_name(config, args.release)
     results = {
         'release': args.release,
         'image': image_name,

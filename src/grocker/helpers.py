@@ -142,12 +142,20 @@ def render_template(template_path, output_path, context):
         output_file.write(output)
 
 
-def default_image_name(docker_image_prefix, release):
+def default_image_name(config, release):
     req = pkg_resources.Requirement.parse(release)
     assert str(req.specifier).startswith('=='), "Only fixed version can use default image name."
-    img_name = "{project}{extra_requirements}:{project_version}-{grocker_version}".format(
-        project=req.project_name,
-        extra_requirements='-' + '-'.join(req.extras) if req.extras else '',
+    docker_image_prefix = config['docker_image_prefix']
+    if config['image_base_name']:
+        img_name = config['image_base_name']
+    elif req.extras:
+        img_name = "{project}-{extra_requirements}".format(
+            project=req.project_name,
+            extra_requirements='-'.join(req.extras),
+        )
+    else:
+        img_name = req.project_name
+    img_name += ":{project_version}-{grocker_version}".format(
         project_version=str(req.specifier)[2:],
         grocker_version=__version__,
     )

@@ -40,4 +40,5 @@ ports: []
 repositories: {}  # {<repository name>: {uri: '<deb line>', key: '<PGP key for this repository>'}}
 dependencies: []
 docker_image_prefix:
+image_base_name:
 entrypoint_name: grocker-runner

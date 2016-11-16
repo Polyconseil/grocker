@@ -8,8 +8,11 @@ import os
 import os.path
 import textwrap
 import unittest
+import itertools
 
+from grocker import __version__
 from grocker.__main__ import parse_config
+from grocker.helpers import default_image_name
 import grocker.six as grocker_six
 
 
@@ -80,3 +83,29 @@ class ConfigTestCase(unittest.TestCase):
             config = parse_config([])
             self.assertIn('not_used_key', config)  # .grocker.yml is read
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
+
+
+class DefaultImageNameTC(unittest.TestCase):
+    def test_default_image_name(self):
+        releases = ('grocker-test-project==2.0.0', 'grocker-test-project[pep8]==2.0.0')
+        image_names = (None, 'demo-app')
+        docker_prefixes = (None, 'registry.local')
+        product = itertools.product(releases, image_names, docker_prefixes)
+        expected_names = [
+            'grocker-test-project:2.0.0-{}',
+            'registry.local/grocker-test-project:2.0.0-{}',
+            'demo-app:2.0.0-{}',
+            'registry.local/demo-app:2.0.0-{}',
+            'grocker-test-project-pep8:2.0.0-{}',
+            'registry.local/grocker-test-project-pep8:2.0.0-{}',
+            'demo-app:2.0.0-{}',
+            'registry.local/demo-app:2.0.0-{}',
+        ]
+
+        for (release, image_base_name, docker_image_prefix), expected in zip(product, expected_names):
+            config = {
+                'image_base_name': image_base_name,
+                'docker_image_prefix': docker_image_prefix,
+            }
+            got = default_image_name(config, release)
+            self.assertEqual(got, expected.format(__version__))
