@@ -223,5 +223,6 @@ def main():
         with io.open(args.result_file, 'w') as fp:
             yaml.dump(results, fp, indent=True)
 
+
 if __name__ == '__main__':
     main()
