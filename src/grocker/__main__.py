@@ -60,7 +60,7 @@ def arg_parser():
     )
     parser.add_argument(  # precedence
         '--port', action='append', default=[], dest='ports',
-        help="Port on which a container will listen for connections"
+        help="Port on which a container will listen for connections",
     )
     parser.add_argument(
         '--pip-conf', metavar='<file>', type=file_path_or_none_type, default=None,
@@ -72,17 +72,17 @@ def arg_parser():
     )
     parser.add_argument(
         '--docker-image-prefix', metavar='<url>',
-        help='docker registry or account on Docker official registry to use'
+        help='docker registry or account on Docker official registry to use',
     )
     parser.add_argument('-n', '--image-name', metavar='<name>', help="name used to tag the build image")
     parser.add_argument(
         'actions', choices=GrockerActions, type=GrockerActions, nargs='+',
-        metavar='<action>', help='should be one of {}'.format(', '.join(x.value for x in GrockerActions))
+        metavar='<action>', help='should be one of {}'.format(', '.join(x.value for x in GrockerActions)),
     )
 
     parser.add_argument(
         '--result-file', metavar='<filename>', default=None,
-        help="yaml file where results (image name, ...) are written"
+        help="yaml file where results (image name, ...) are written",
     )
     parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier)")
 
