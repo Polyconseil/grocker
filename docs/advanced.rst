@@ -13,8 +13,9 @@ Command line interface
     usage: grocker [-h] [-c CONFIG] [-r RUNTIME] [-e ENTRYPOINT_NAME]
                    [--volume VOLUMES] [--port PORTS] [--pip-conf <file>]
                    [--pip-constraint <file>] [--docker-image-prefix <url>]
-                   [-n <name>] [--result-file <filename>] [--no-check-version]
-                   [--purge {all,build,dangling,run}] [--version] [-v]
+                   [--image-base-name <name>] [-n <name>]
+                   [--result-file <filename>]
+                   [--purge {all,builders,dangling,runners}] [--version] [-v]
                    <action> [<action> ...] <release>
 
     positional arguments:
@@ -38,11 +39,14 @@ Command line interface
       --docker-image-prefix <url>
                             docker registry or account on Docker official registry
                             to use
+      --image-base-name <name>
+                            base name for the image (eg '<docker-image-prefix
+                            >/<image-base-name>:<image-version>')
       -n <name>, --image-name <name>
-                            name used to tag the build image.
+                            name used to tag the build image
       --result-file <filename>
                             yaml file where results (image name, ...) are written
-      --purge {all,build,dangling,run}
+      --purge {all,builders,dangling,runners}
       --version             show program's version number and exit
       -v, --verbose         verbose mode
 
@@ -98,6 +102,7 @@ It is written in YAML. By default, Grocker looks for this file in the current di
     repositories: {}
     dependencies: []
     docker_image_prefix: # optional
+    image_base_name: # optional
     entrypoint_name: grocker-runner
 
 Dependencies

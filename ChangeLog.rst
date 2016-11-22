@@ -4,7 +4,7 @@ ChangeLog
 4.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add ``--image-base-name`` option to allow customizing the generated image name
 
 
 4.3.2 (2016-11-09)
