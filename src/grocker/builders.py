@@ -23,6 +23,8 @@ from . import __version__, DOCKER_API_VERSION
 from . import six
 from . import helpers
 
+logger = logging.getLogger(__name__)
+
 
 DIGEST_RE = re.compile(r'[\w\.-]+: digest: (sha256:\w+) size: \d+')
 
@@ -114,8 +116,10 @@ def http_wheel_server(docker_client, wheels_volume_name, config):
         ),
     )
     nginx_container_id = nginx.get('Id')
+    logger.info('Starting nginx server in container: %s', nginx_container_id)
     docker_client.start(nginx_container_id)
     nginx_server_ip = docker_client.inspect_container(nginx_container_id)['NetworkSettings']['IPAddress']
+    logger.debug('nginx server running with ip: %s', nginx_server_ip)
 
     try:
         yield nginx_server_ip
@@ -206,8 +210,6 @@ def get_compiler_image(docker_client, config):
 
 
 def get_pip_env(pip_conf):
-    logger = logging.getLogger(__name__)
-
     def get(cfg, section, option, default=None):
         try:
             return cfg.get(section, option)
@@ -300,7 +302,6 @@ def inspect_stream(stream):
 
 
 def docker_pull_image(docker_client, name):
-    logger = logging.getLogger(__name__)
     logger.info('Pulling %s...', name)
 
     stream = docker_client.pull(name, stream=True)
@@ -309,7 +310,6 @@ def docker_pull_image(docker_client, name):
 
 
 def docker_push_image(docker_client, name):
-    logger = logging.getLogger(__name__)
     logger.info('Pushing %s...', name)
 
     stream = docker_client.push(name, stream=True)
@@ -330,6 +330,10 @@ def docker_get_or_build_image(docker_client, prefix, name, builder):
 
 
 def docker_run_container(docker_client, tag, command, binds=None, environment=None):
+    logger.info(
+        'Running %s on image %s (binds:%s, environment:%s)',
+        command, tag, binds, environment,
+    )
     container = docker_client.create_container(
         image=tag,
         command=command,
