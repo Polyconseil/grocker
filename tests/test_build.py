@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import re
 import subprocess
+import tempfile
 import unittest
 import uuid
 
@@ -117,6 +118,18 @@ class BuildTestCase(unittest.TestCase):
         msg = 'Grocker build this successfully !'
         expected = msg
         self.check(config, 'grocker-test-project==2.0', msg, expected)
+
+    def test_pip_constraints(self):
+        with tempfile.NamedTemporaryFile() as fp:
+            fp.write(b'qrcode==5.2')
+            fp.flush()
+
+            config = {
+                'pip_constraint': fp.name,
+                'entrypoint_name': '/bin/bash',
+                'dependencies': self.dependencies,
+            }
+            self.check(config, 'grocker-test-project==2.0', ['-c', 'pip freeze'], 'qrcode==5.2')
 
     def test_extras(self):
         config = {
