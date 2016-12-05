@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import re
 import subprocess
-import textwrap
 import unittest
 import uuid
 
@@ -49,32 +48,13 @@ def docker_inspect(image):
     return client.inspect_image(image)
 
 
-# Python 3 backport: textwrap.indent
-def indent(text, prefix, predicate=None):
-    """Adds 'prefix' to the beginning of selected lines in 'text'.
-
-    If 'predicate' is provided, 'prefix' will only be added to the lines
-    where 'predicate(line)' is True. If 'predicate' is not provided,
-    it will default to adding 'prefix' to all non-empty lines that do not
-    consist solely of whitespace characters.
-    """
-    if predicate is None:
-        def predicate(line):
-            return line.strip()
-
-    def prefixed_lines():
-        for line in text.splitlines(True):
-            yield (prefix + line if predicate(line) else line)
-    return ''.join(prefixed_lines())
-
-
 class BuildTestCase(unittest.TestCase):
-    dependencies = """
+    dependencies = yaml.safe_load("""
         - libzbar0: libzbar-dev
         - libjpeg62-turbo: libjpeg62-turbo-dev
         - libffi6: libffi-dev
         - libtiff5: libtiff5-dev
-    """
+    """)
     runtime = None
 
     def run_grocker(self, release, command, cwd, docker_prefix):
@@ -118,7 +98,7 @@ class BuildTestCase(unittest.TestCase):
     def check(self, config, release, cmd, expected, docker_prefix=None):
         with grocker_six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
-                fp.write(textwrap.dedent(config[1:]))
+                yaml.dump(config, fp)
 
             logs, inspect_data = self.run_grocker(
                 release,
@@ -131,33 +111,33 @@ class BuildTestCase(unittest.TestCase):
         return logs, inspect_data
 
     def test_dependencies(self):
-        config = """
-            dependencies: %s
-        """ % indent(self.dependencies, '    ')
+        config = {
+            'dependencies': self.dependencies,
+        }
         msg = 'Grocker build this successfully !'
         expected = msg
         self.check(config, 'grocker-test-project==2.0', msg, expected)
 
     def test_extras(self):
-        config = """
-            entrypoint_name: /bin/bash
-            dependencies: %s
-        """ % indent(self.dependencies, '    ')
+        config = {
+            'entrypoint_name': '/bin/bash',
+            'dependencies': self.dependencies,
+        }
         self.check(config, 'grocker-test-project[pep8]==2.0', ['-c', 'pip list'], 'pep8')
 
     def test_with_docker_prefix(self):
-        config = """
-            entrypoint_name: /bin/bash
-        """
+        config = {
+            'entrypoint_name': '/bin/bash'
+        }
         self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
 
     def test_entrypoints(self):
-        config = """
-            volumes: ['/data', '/config']
-            ports: [8080, 9090]
-            entrypoint_name: my-custom-runner
-            dependencies: %s
-        """ % indent(self.dependencies, '    ')
+        config = {
+            'volumes': ['/data', '/config'],
+            'ports': [8080, 9090],
+            'entrypoint_name': 'my-custom-runner',
+            'dependencies': self.dependencies,
+        }
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
         _, inspect_data = self.check(config, 'grocker-test-project==2.0', msg, expected)
@@ -168,13 +148,13 @@ class BuildTestCase(unittest.TestCase):
         self.assertEqual(ports, ['8080/tcp', '9090/tcp'])
 
     def test_repositories(self):
-        config = """
-            dependencies: %s
-            entrypoint_name: python
-            repositories:
-                nginx:
-                    uri: deb http://nginx.org/packages/debian/ jessie nginx
-                    key: |
+        config = {
+            'dependencies': self.dependencies,
+            'entrypoint_name': 'python',
+            'repositories': {
+                'nginx': {
+                    'uri': 'deb http://nginx.org/packages/debian/ jessie nginx',
+                    'key': """
                         -----BEGIN PGP PUBLIC KEY BLOCK-----
                         Version: GnuPG v1.4.11 (FreeBSD)
 
@@ -203,7 +183,10 @@ class BuildTestCase(unittest.TestCase):
                         Va3l3WuB+rgKjsQ=
                         =A015
                         -----END PGP PUBLIC KEY BLOCK-----
-        """ % indent(self.dependencies, '    ')
+                    """,
+                },
+            },
+        }
         script = ";".join([
             "from __future__ import print_function",
             "import subprocess",
