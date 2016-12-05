@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import contextlib
 import functools
 import itertools
@@ -13,6 +14,7 @@ import os.path
 import re
 import sys
 import uuid
+import zlib
 
 import docker
 import docker.errors
@@ -242,15 +244,14 @@ def compile_wheels(docker_client, compiler_tag, config, release, wheels_volume_n
     }
 
     command = ['--python', config['runtime'], release]
+    environment = get_pip_env(pip_conf)
 
     if config['pip_constraint']:
-        binds[os.path.abspath(config['pip_constraint'])] = {
-            'bind': '/home/grocker/constraints.txt',
-            'mode': 'ro',
-        }
-        command = ['--pip-constraint', '/home/grocker/constraints.txt'] + command
+        with open(config['pip_constraint'], 'rb') as fp:
+            constraints = fp.read()
+        environment['PIP_CONSTRAINT_CONTENT'] = base64.b64encode(zlib.compress(constraints)).decode()
 
-    docker_run_container(docker_client, compiler_tag, command, binds=binds, environment=get_pip_env(pip_conf))
+    docker_run_container(docker_client, compiler_tag, command, binds=binds, environment=environment)
 
 
 def docker_get_client(**kwargs):

@@ -2,11 +2,14 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 from __future__ import absolute_import, print_function, unicode_literals
 import argparse
+import base64
 import logging
 import logging.config
+import os
 import os.path
 import subprocess
 import tempfile
+import zlib
 
 try:  # Python 3+
     import configparser
@@ -18,11 +21,8 @@ WHEELS_DIRECTORY = os.path.expanduser('~/packages')
 
 
 def arg_parser():
-    file_validator = os.path.expanduser
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--python', default='python')
-    parser.add_argument('--pip-constraint', type=file_validator)
     parser.add_argument('--no-color', action='store_true')
     parser.add_argument('release', nargs='+')
 
@@ -104,9 +104,14 @@ def main():
             "grocker could not become the owner of %s, check the sudoers file", WHEELS_DIRECTORY,
         )
 
-    for release in args.release:
-        if not build_wheels(venv, release, WHEELS_DIRECTORY, args.pip_constraint):
-            exit(1)
+    constraints = os.environ.get('PIP_CONSTRAINT_CONTENT', base64.b64encode(zlib.compress(b'')))
+    with tempfile.NamedTemporaryFile() as fp:
+        fp.write(zlib.decompress(base64.b64decode(constraints)))
+        fp.flush()
+
+        for release in args.release:
+            if not build_wheels(venv, release, WHEELS_DIRECTORY, fp.name):
+                exit(1)
 
 
 if __name__ == '__main__':
