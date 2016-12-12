@@ -1,5 +1,5 @@
 # Documentation
-docutils
+docutils!=0.13,!=0.13.1 # not compatible with current version of Sphinx  # FIXME(fbochu): Drop restriction
 pygments
 Sphinx
 sphinx_rtd_theme
