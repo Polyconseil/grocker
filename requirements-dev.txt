@@ -8,7 +8,7 @@ sphinx_rtd_theme
 check-manifest
 flake8
 pytest
-readme-renderer
+readme-renderer!=16.0  # FIXME(fbochu) seen docutils
 tox
 
 # Release
