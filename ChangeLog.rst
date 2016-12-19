@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.5 (unreleased)
+4.5 (2016-12-19)
 ----------------
 
 - Use env vars to pass pip constraint file to wheel compiler.
