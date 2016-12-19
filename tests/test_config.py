@@ -72,6 +72,12 @@ class ConfigTestCase(unittest.TestCase):
             write_file(tmp_dir, '.grocker.yml', self.grocker_yml_content)
             self.assertRaises(raised_error, parse_config, ['not_existing_config_file.yml'])
 
+    def test_empty_config(self):
+        with mkchtmpdir() as tmp_dir:
+            write_file(tmp_dir, 'empty.yml', '')
+            config = parse_config(['empty.yml'])
+            self.assertIn('entrypoint_name', config)  # grocker internal config is read
+
     def test_not_grocker_yml(self):
         with mkchtmpdir():
             config = parse_config([])

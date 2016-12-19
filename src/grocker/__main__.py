@@ -131,7 +131,7 @@ def parse_config(config_paths, **kwargs):
 
     for config_path in config_paths:
         project_config = helpers.load_yaml(config_path)
-        config.update(project_config)
+        config.update(project_config or {})
 
     config.update({k: v for k, v in kwargs.items() if v})
 

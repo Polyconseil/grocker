@@ -5,13 +5,12 @@ ChangeLog
 ----------------
 
 - Use env vars to pass pip constraint file to wheel compiler.
-
+- Fix empty config file bug
 
 4.4 (2016-11-22)
 ----------------
 
 - Add ``--image-base-name`` option to allow customizing the generated image name
-
 
 4.3.2 (2016-11-09)
 ------------------
@@ -19,13 +18,11 @@ ChangeLog
 - Fix grocker for releases with extras.
 - Make sure most tests run without ``--docker-image-prefix`` hence without cache.
 
-
 4.3.1 (2016-11-09)
 ------------------
 
 - **Warning** - This version is broken for extras, use 4.3.2 instead.
 - Fix ``compiler-image/provision.sh`` sh syntax. ``source`` replaced by ``.``
-
 
 4.3 (2016-11-08)
 ----------------
