@@ -30,7 +30,7 @@ setup_venv() {  # venv runtime *dependencies
 run_as_user() {  # script_or_function
     local script_or_function
     script_or_function="$*"
-    if [ "$(whoami)" == ${GROCKER_USER} ]; then
+    if [ "$(whoami)" = ${GROCKER_USER} ]; then
         ${script_or_function}
     else
         chmod -R go+rX ${WORKING_DIR}  # Allow non-root user to use file in grocker temporary directory
@@ -44,7 +44,7 @@ run_as_user() {  # script_or_function
 only_run_as_root() {  # script_or_function
     local script_or_function
     script_or_function="$*"
-    if [ "$(whoami)" == 'root' ]; then
+    if [ "$(whoami)" = 'root' ]; then
         ${script_or_function}
     fi
 }

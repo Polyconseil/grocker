@@ -4,7 +4,7 @@ ChangeLog
 4.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix shell equality test
 
 
 4.5 (2016-12-19)
