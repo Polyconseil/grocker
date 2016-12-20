@@ -9,11 +9,8 @@ system:  # grocker internal configuration
   image: debian:jessie  # base image to use to build root image
 
   base:  # dependencies installed on root image
-    - cron
     - less
     - netcat-traditional
-    - ssmtp
-    - sudo
     - vim
 
   build:  # dependencies installed on build image

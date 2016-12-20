@@ -11,11 +11,8 @@ apt upgrade -qy
 apt install -qy ${SYSTEM_DEPENDENCIES:=}
 apt-get clean
 
-# Create User and allow it to run crond
+# Create grocker user
 adduser --shell /bin/bash --disabled-password --gecos ",,,," grocker
-cat <<EOF > /etc/sudoers.d/grocker
-grocker ALL=NOPASSWD: /usr/sbin/cron
-EOF
 
 # Clean
 rm -r $(dirname $0)

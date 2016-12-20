@@ -35,7 +35,7 @@ run_as_user() {  # script_or_function
     else
         chmod -R go+rX ${WORKING_DIR}  # Allow non-root user to use file in grocker temporary directory
         sync  # sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-        sudo --preserve-env --set-home -u ${GROCKER_USER} /bin/bash $0  # Run this script with grocker user
+        HOME=/home/${GROCKER_USER} su --preserve-env --command $0 - ${GROCKER_USER}  # Run this script as grocker user
         rm -r ${WORKING_DIR}  # clean up
     fi
 }
@@ -60,10 +60,6 @@ provision() {
 system_provision() {
     local sys_config_dir
     sys_config_dir=/home/grocker/sys.cfg
-
-    # Allow ssmtp configuration
-    rm /etc/ssmtp/ssmtp.conf
-    ln -s ${sys_config_dir}/ssmtp.conf /etc/ssmtp/ssmtp.conf
 
     # Security updates
     apt update

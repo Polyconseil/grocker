@@ -9,6 +9,7 @@ ChangeLog
 - Drop obsolete .grocker file
 - Switch to docker(-py) 2
 - Only manage Grocker created stuff when purging
+- Drop cron, ssmtp and sudo specific code
 
 4.6 (2016-12-22)
 ----------------
