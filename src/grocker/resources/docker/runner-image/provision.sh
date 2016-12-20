@@ -22,8 +22,8 @@ setup_venv() {  # venv runtime *dependencies
     ${runtime} -m virtualenv -p ${runtime} ${venv}
     # Old pip can not deal with constraint file
     ${pip} install --upgrade pip
-    ${pip} install --upgrade pip setuptools ${constraint_arg}
-    ${pip} install --find-links=${wheelhouse} --trusted-host=${GROCKER_PYPI_IP} --no-index ${constraint_arg} ${release} --no-compile
+    ${pip} install --no-cache-dir --upgrade pip setuptools ${constraint_arg}
+    ${pip} install --no-cache-dir --find-links=${wheelhouse} --trusted-host=${GROCKER_PYPI_IP} --no-index ${constraint_arg} ${release} --no-compile
 }
 
 

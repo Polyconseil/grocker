@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Fix shell equality test
+- Disable useless pip cache
 
 
 4.5 (2016-12-19)
