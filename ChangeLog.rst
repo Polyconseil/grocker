@@ -6,6 +6,7 @@ ChangeLog
 
 - Fix shell equality test
 - Disable useless pip cache
+- Stop using sudo in compiler script
 
 
 4.5 (2016-12-19)

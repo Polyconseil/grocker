@@ -2,8 +2,8 @@ FROM {{ root_image_tag }}
 LABEL grocker.image.kind=builder
 
 COPY . /tmp/grocker
-
 RUN /tmp/grocker/provision.sh
+VOLUME /home/grocker/packages
 
 # Make the entry point run the compile script
 USER grocker

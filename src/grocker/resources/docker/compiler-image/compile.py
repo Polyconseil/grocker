@@ -97,13 +97,6 @@ def main():
     venv = setup_venv(args.python)
     setup_pip(venv, WHEELS_DIRECTORY)
 
-    # grocker is a valid sudoer for the command /usr/bin/chown
-    return_code = subprocess.call(['sudo', '/bin/chown', 'grocker', WHEELS_DIRECTORY])
-    if return_code != 0:
-        logging.getLogger(__name__).error(
-            "grocker could not become the owner of %s, check the sudoers file", WHEELS_DIRECTORY,
-        )
-
     constraints = os.environ.get('PIP_CONSTRAINT_CONTENT', base64.b64encode(zlib.compress(b'')))
     with tempfile.NamedTemporaryFile() as fp:
         fp.write(zlib.decompress(base64.b64decode(constraints)))

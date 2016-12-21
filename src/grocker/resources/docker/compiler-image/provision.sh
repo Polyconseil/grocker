@@ -8,7 +8,6 @@ fi
 
 apt install -qy ${SYSTEM_DEPS}
 install --mode=0555 --owner=grocker /tmp/grocker/compile.py /home/grocker/compile.py
-
-cp grocker_sudoers /etc/sudoers.d/grocker_sudoers
+install --mode=0777 --owner=grocker -d /home/grocker/packages
 
 rm -r $(dirname $0)
