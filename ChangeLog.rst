@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-4.6 (unreleased)
+4.6 (2016-12-22)
 ----------------
 
 - Fix shell equality test
