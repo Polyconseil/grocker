@@ -11,8 +11,8 @@ import unittest
 import itertools
 
 from grocker import __version__
-from grocker.__main__ import parse_config
-from grocker.helpers import default_image_name
+from grocker.utils import parse_config
+from grocker.utils import default_image_name
 import grocker.six as grocker_six
 
 
