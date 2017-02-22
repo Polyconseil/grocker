@@ -41,8 +41,8 @@ def build_root_image(docker_client, config, tag=None):
             os.path.join(build_dir, 'Dockerfile.j2'),
             os.path.join(build_dir, 'Dockerfile'),
             {
-                'image': config['system']['image'],
-                'version': __version__,
+                'base_image': config['system']['image'],
+                'grocker_version': __version__,
                 'runtime': config['runtime'],
             },
         )
@@ -54,7 +54,7 @@ def build_root_image(docker_client, config, tag=None):
         )
 
         dependencies = utils.get_dependencies(config)
-        build_env = {'SYSTEM_DEPS': ' '.join(dependencies)}
+        build_env = {'SYSTEM_DEPENDENCIES': ' '.join(dependencies)}
         return docker_build_image(docker_client, build_dir, tag=tag, buildargs=build_env)
 
 
@@ -149,7 +149,7 @@ def build_runner_image(
                 os.path.join(build_dir, 'Dockerfile.j2'),
                 os.path.join(build_dir, 'Dockerfile'),
                 {
-                    'root_image_tag': root_image_tag,
+                    'base_image': root_image_tag,
                     'entrypoint_name': config['entrypoint_name'],
                     'app_name': requirement.name,
                     'app_extras': ','.join(sorted(requirement.extras)),
@@ -169,7 +169,7 @@ def build_runner_image(
                 build_dir,
                 tag=tag,
                 pull=bool(config['docker_image_prefix']),
-                buildargs={'GROCKER_PYPI_IP': pypi_ip},
+                buildargs={'GROCKER_WHEEL_SERVER_IP': pypi_ip},
             )
 
 
