@@ -157,17 +157,6 @@ def build_runner_image(
                 },
             )
 
-            # TODO(fbochu): .grocker file will be obsolete in next major version, so drop it.
-            helpers.render_template(
-                os.path.join(build_dir, '.grocker.j2'),
-                os.path.join(build_dir, '.grocker'),
-                {
-                    'grocker_version': __version__,
-                    'runtime': config['runtime'],
-                    'release': release,
-                },
-            )
-
             if config['pip_constraint']:
                 with io.open(config['pip_constraint'], 'r') as fp:
                     with io.open(os.path.join(build_dir, 'constraints.txt'), 'w') as f:
