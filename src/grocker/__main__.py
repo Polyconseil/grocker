@@ -19,6 +19,7 @@ from . import __version__
 from . import builders
 from . import helpers
 from . import loggers
+from . import utils
 
 
 class GrockerActions(enum.Enum):
@@ -33,7 +34,7 @@ def arg_parser():
     Create an CLI args parser
 
     Some default value (marked as #precedence) are set to None due to precedence
-    order (see parse_config() doc string for more information).
+    order (see utils.parse_config() doc string for more information).
     """
     def file_path_type(x):
         return os.path.abspath(os.path.expanduser(x))
@@ -114,30 +115,6 @@ class PurgeAction(argparse.Action):
         parser.exit()
 
 
-def parse_config(config_paths, **kwargs):
-    """
-    Generate config regarding precedence order
-
-    Precedence order is defined as :
-
-    1. Command line arguments
-    2. project ``.grocker.yml`` file (or the one specified on the command line)
-    3. the grocker ``resources/grocker.yaml`` file
-    """
-    config = helpers.load_yaml_resource('resources/grocker.yaml')
-
-    if not config_paths and os.path.exists('.grocker.yml'):
-        config_paths = ['.grocker.yml']
-
-    for config_path in config_paths:
-        project_config = helpers.load_yaml(config_path)
-        config.update(project_config or {})
-
-    config.update({k: v for k, v in kwargs.items() if v})
-
-    return config
-
-
 def clean_actions(actions):
     if GrockerActions.all in actions:
         actions_without_all = set(GrockerActions) - {GrockerActions.all}
@@ -156,7 +133,7 @@ def clean_actions(actions):
 def main():
     parser = arg_parser()
     args = parser.parse_args()
-    config = parse_config(
+    config = utils.parse_config(
         args.config,
         runtime=args.runtime,
         entrypoint_name=args.entrypoint_name,
@@ -176,7 +153,7 @@ def main():
         raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
     docker_client = builders.docker_get_client()
-    image_name = args.image_name or helpers.default_image_name(config, args.release)
+    image_name = args.image_name or utils.default_image_name(config, args.release)
     results = {
         'release': args.release,
         'image': image_name,

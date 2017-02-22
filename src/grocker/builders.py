@@ -24,6 +24,7 @@ from packaging import requirements
 from . import __version__, DOCKER_API_VERSION
 from . import six
 from . import helpers
+from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ def build_root_image(docker_client, config, tag=None):
             {'repositories': config['repositories']},
         )
 
-        dependencies = helpers.get_dependencies(config)
+        dependencies = utils.get_dependencies(config)
         build_env = {'SYSTEM_DEPS': ' '.join(dependencies)}
         return docker_build_image(docker_client, build_dir, tag=tag, buildargs=build_env)
 
@@ -71,7 +72,7 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
             },
         )
 
-        dependencies = helpers.get_dependencies(config, with_build_dependencies=True)
+        dependencies = utils.get_dependencies(config, with_build_dependencies=True)
         with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
             fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
 
@@ -175,7 +176,7 @@ def get_root_image(docker_client, config):
     img_name = 'grocker-{runtime}-root:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.config_identifier(config),
+        hash=utils.config_identifier(config),
     )
     return docker_get_or_build_image(
         docker_client,
@@ -189,7 +190,7 @@ def get_compiler_image(docker_client, config):
     img_name = 'grocker-{runtime}-compiler:{version}-{hash}'.format(
         runtime=config['runtime'],
         version=__version__,
-        hash=helpers.config_identifier(config),
+        hash=utils.config_identifier(config),
     )
     root_tag = get_root_image(docker_client, config)
     return docker_get_or_build_image(
