@@ -8,7 +8,7 @@ echo "LANG=C.UTF-8" > /etc/default/locale
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -qy
-apt install -qy ${SYSTEM_DEPS}
+apt install -qy ${SYSTEM_DEPENDENCIES:=}
 apt-get clean
 
 # Create User and allow it to run crond

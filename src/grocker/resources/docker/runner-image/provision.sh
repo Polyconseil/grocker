@@ -15,7 +15,7 @@ setup_venv() {  # venv runtime *dependencies
     else
         constraint_arg=""
     fi
-    wheelhouse=http://${GROCKER_PYPI_IP}/
+    wheelhouse=http://${GROCKER_WHEEL_SERVER_IP:=should-be-defined}/
 
     pip=${venv}/bin/pip
 
@@ -23,7 +23,7 @@ setup_venv() {  # venv runtime *dependencies
     # Old pip can not deal with constraint file
     ${pip} install --upgrade pip
     ${pip} install --no-cache-dir --upgrade pip setuptools ${constraint_arg}
-    ${pip} install --no-cache-dir --find-links=${wheelhouse} --trusted-host=${GROCKER_PYPI_IP} --no-index ${constraint_arg} ${release} --no-compile
+    ${pip} install --no-cache-dir --find-links=${wheelhouse} --trusted-host=${GROCKER_WHEEL_SERVER_IP} --no-index ${constraint_arg} ${release} --no-compile
 }
 
 
@@ -51,7 +51,9 @@ only_run_as_root() {  # script_or_function
 
 
 provision() {
-    setup_venv ~/app.venv ${GROCKER_RUNTIME} ${GROCKER_APP}[${GROCKER_APP_EXTRAS}]==${GROCKER_APP_VERSION}
+    setup_venv ~/app.venv \
+        ${GROCKER_RUNTIME:=should-be-defined} \
+        "${GROCKER_APP:=should-be-defined}[${GROCKER_APP_EXTRAS:=should-be-defined}]==${GROCKER_APP_VERSION:=should-be-defined}"
 }
 
 
