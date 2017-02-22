@@ -67,19 +67,20 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
             os.path.join(build_dir, 'Dockerfile.j2'),
             os.path.join(build_dir, 'Dockerfile'),
             {
-                'root_image_tag': root_image_tag,
+                'base_image': root_image_tag,
                 'runtime': config['runtime'],
             },
         )
 
         dependencies = utils.get_dependencies(config, with_build_dependencies=True)
-        with io.open(os.path.join(build_dir, 'provision.env'), 'w') as fp:
-            fp.write('SYSTEM_DEPS="{}"'.format(' '.join(dependencies)))
-
+        build_env = {
+            'SYSTEM_DEPENDENCIES': ' '.join(dependencies),
+        }
         return docker_build_image(
             docker_client,
             build_dir,
             tag=tag,
+            buildargs=build_env,
             pull=bool(config['docker_image_prefix']),
         )
 
