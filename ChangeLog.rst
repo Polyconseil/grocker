@@ -1,11 +1,11 @@
 ChangeLog
 =========
 
-4.7 (unreleased)
+5.0 (unreleased)
 ----------------
 
 - Add support for Python 3.6
-
+- Drop obsolete .grocker file
 
 4.6 (2016-12-22)
 ----------------
@@ -13,7 +13,6 @@ ChangeLog
 - Fix shell equality test
 - Disable useless pip cache
 - Stop using sudo in compiler script
-
 
 4.5 (2016-12-19)
 ----------------
