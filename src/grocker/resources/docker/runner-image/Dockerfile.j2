@@ -1,6 +1,5 @@
 FROM {{ base_image }}
-LABEL grocker.image.kind=runner\
-      grocker.app.name={{ app_name }} \
+LABEL grocker.app.name={{ app_name }} \
       grocker.app.extras={{ app_extras }} \
       grocker.app.version={{ app_version }}
 

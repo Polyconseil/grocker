@@ -11,12 +11,12 @@ Command line interface
 .. code-block:: console
 
     usage: grocker [-h] [-c CONFIG] [-r RUNTIME] [-e ENTRYPOINT_NAME]
-                   [--volume VOLUMES] [--port PORTS] [--pip-conf <file>]
-                   [--pip-constraint <file>] [--docker-image-prefix <url>]
-                   [--image-base-name <name>] [-n <name>]
-                   [--result-file <filename>]
-                   [--purge {all,builders,dangling,runners}] [--version] [-v]
-                   <action> [<action> ...] <release>
+               [--volume VOLUMES] [--port PORTS] [--pip-conf <file>]
+               [--pip-constraint <file>] [--docker-image-prefix <url>]
+               [--image-base-name <name>] [-n <name>]
+               [--result-file <filename>]
+               [--purge {old,old:runner,all,all:runner}] [--version] [-v]
+               <action> [<action> ...] <release>
 
     positional arguments:
       <action>              should be one of dep, img, push, build
@@ -40,13 +40,13 @@ Command line interface
                             docker registry or account on Docker official registry
                             to use
       --image-base-name <name>
-                            base name for the image (eg '<docker-image-prefix
-                            >/<image-base-name>:<image-version>')
+                            base name for the image (eg '<docker-image-
+                            prefix>/<image-base-name>:<image-version>')
       -n <name>, --image-name <name>
                             name used to tag the build image
       --result-file <filename>
                             yaml file where results (image name, ...) are written
-      --purge {all,builders,dangling,runners}
+      --purge {old,old:runner,all,all:runner}
       --version             show program's version number and exit
       -v, --verbose         verbose mode
 
@@ -70,13 +70,13 @@ and after your tests passed push the image.
 Purge
 ~~~~~
 
-The ``--purge`` flag is here to clean image list of your Docker daemon. It takes
+The ``--purge`` flag is here to clean Grocker created stuff of your Docker daemon. It takes
 one argument which can be:
 
-- ``dangling``, drop dangling images
-- ``builders``, drop Grocker build images
-- ``runners``, drop Grocker run images
-- ``all``, ``dangling`` + ``build`` + ``run``
+- ``old``, drop previous Grocker version created volumes, containers and images excluding final images
+- ``old:runner``, same as ``old`` but including final images
+- ``all``, same as ``old`` but including current Grocker version stuff
+- ``all:runner``, drop all Grocker created volumes, containers and images.
 
 Pip config
 ~~~~~~~~~~

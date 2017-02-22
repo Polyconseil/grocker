@@ -11,7 +11,7 @@ def read(filename):
 
 setup(
     name='grocker',
-    version='4.7.dev0',
+    version='5.0.dev2',
     description="Docker image builder",
     long_description=read('Readme.rst'),
     keywords='docker build packaging',
@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
     install_requires=[
-        'docker-py!=1.10.*',
+        'docker>=2.0.2',
         'Jinja2',
         'setuptools>=18.0.1',
         'pip>=7.1.2',
