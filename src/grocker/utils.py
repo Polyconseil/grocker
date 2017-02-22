@@ -63,6 +63,18 @@ def default_image_name(config, release):
     return '/'.join((docker_image_prefix, img_name)) if docker_image_prefix else img_name
 
 
+def docker_get_client(min_version=None):
+    client = docker.from_env()
+    if min_version and client.version()['ApiVersion'].split('.') <= min_version.split('.'):
+        raise RuntimeError(
+            'Docker API version should be at least {expected} ({current})'.format(
+                current=client.version()['ApiVersion'],
+                expected=min_version,
+            )
+        )
+    return client
+
+
 def get_run_dependencies(dependency_list):
     """
     Parse list of dependencies to only get run dependencies.

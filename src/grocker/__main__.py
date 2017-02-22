@@ -17,6 +17,7 @@ import yaml
 
 from . import __version__
 from . import builders
+from . import cleanners
 from . import helpers
 from . import loggers
 from . import utils
@@ -91,7 +92,7 @@ def arg_parser():
     )
     parser.add_argument('release', metavar='<release>', help="application to build (you can use version specifier)")
 
-    parser.add_argument('--purge', action=PurgeAction, help="purge docker images")
+    parser.add_argument('--purge', action=PurgeAction, help="purge Grocker containers, images and volumes")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
 
@@ -105,13 +106,18 @@ class PurgeAction(argparse.Action):
         super(PurgeAction, self).__init__(
             option_strings=option_strings,
             dest=argparse.SUPPRESS,
-            choices=('all', 'builders', 'dangling', 'runners'),
+            choices=('old', 'old:runner', 'all', 'all:runner'),
         )
 
     def __call__(self, parser, namespace, values, *args, **kwargs):
-        filters = [values] if values != 'all' else [x for x in self.choices if x != 'all']
-        builders.docker_purge_images(builders.docker_get_client(), filters)
-        builders.docker_purge_volumes(builders.docker_get_client(), filters)
+        current_version = 'all' in values
+        runner = 'runner' in values
+
+        loggers.setup()
+        docker_client = utils.docker_get_client()
+        cleanners.docker_purge_container(docker_client, current_version=current_version)
+        cleanners.docker_purge_volumes(docker_client, current_version=current_version)
+        cleanners.docker_purge_images(docker_client, current_version=current_version, runner=runner)
         parser.exit()
 
 
@@ -152,47 +158,40 @@ def main():
     if config['runtime'] not in config['system']['runtime']:
         raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
-    docker_client = builders.docker_get_client()
+    docker_client = utils.docker_get_client()
     image_name = args.image_name or utils.default_image_name(config, args.release)
     results = {
         'release': args.release,
         'image': image_name,
     }
 
-    wheels_volume_name = 'grocker-wheels-cache-{version}-{hash}'.format(
-        version=__version__,
-        hash=helpers.config_identifier(config),
-    )
-
     if GrockerActions.build_dep in args.actions:
         logger.info('Compiling dependencies...')
-        compiler_tag = builders.get_compiler_image(docker_client, config)
-        results['compiler_image'] = compiler_tag
+        builders.get_or_build_root_image(docker_client, config)
+        compiler = builders.get_or_build_compiler_image(docker_client, config)
+        results['compiler_image'] = compiler.tags[0]
+
         with helpers.pip_conf(pip_conf_path=args.pip_conf) as pip_conf:
             builders.compile_wheels(
                 docker_client=docker_client,
-                compiler_tag=compiler_tag,
                 config=config,
                 release=args.release,
-                wheels_volume_name=wheels_volume_name,
                 pip_conf=pip_conf,
             )
 
     if GrockerActions.build_img in args.actions:
         logger.info('Building image...')
-        root_image_tag = builders.get_root_image(docker_client, config)
-        results['root_image'] = root_image_tag
+        root_image = builders.get_or_build_root_image(docker_client, config)
+        results['root_image'] = root_image.tags[0]
         builders.build_runner_image(
             docker_client=docker_client,
-            root_image_tag=root_image_tag,
             config=config,
+            name=image_name,
             release=args.release,
-            wheels_volume_name=wheels_volume_name,
-            tag=image_name,
         )
 
     if GrockerActions.push_img in args.actions:
-        if '/' not in image_name:
+        if builders.is_prefixed_image(image_name):
             logger.warning('Not pushing any image since the registry is unclear in %s', image_name)
         else:
             logger.info('Pushing image...')

@@ -6,6 +6,7 @@ ChangeLog
 
 - Add support for Python 3.6
 - Drop obsolete .grocker file
+- Switch to docker(-py) 2
 
 4.6 (2016-12-22)
 ----------------

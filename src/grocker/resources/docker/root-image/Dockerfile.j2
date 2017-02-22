@@ -1,7 +1,5 @@
 FROM {{ base_image }}
-LABEL grocker.image.kind=builder \
-      grocker.app.runtime={{ runtime }} \
-      grocker.version={{ version }}
+LABEL grocker.runtime={{ runtime }}
 
 ENV LANG=C.UTF-8 \
     GROCKER_VERSION={{ grocker_version }} \
