@@ -88,7 +88,7 @@ def build_compiler_image(docker_client, root_image_tag, config, tag=None):
 def build_pypi_image(docker_client, tag):
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
-        helpers.copy_resource('resources/docker/nginx-pypi', build_dir)
+        helpers.copy_resource('resources/docker/wheel-server', build_dir)
         return docker_build_image(docker_client, build_dir, tag=tag)
 
 
