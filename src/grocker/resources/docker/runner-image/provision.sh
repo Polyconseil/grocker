@@ -15,7 +15,7 @@ setup_venv() {  # venv runtime *dependencies
     else
         constraint_arg=""
     fi
-    wheelhouse=http://${GROCKER_WHEEL_SERVER_IP:=127.0.0.1}/
+    wheelhouse=http://${GROCKER_WHEEL_SERVER_IP:=should-be-defined}/
 
     pip=${venv}/bin/pip
 
@@ -51,7 +51,9 @@ only_run_as_root() {  # script_or_function
 
 
 provision() {
-    setup_venv ~/app.venv ${GROCKER_RUNTIME:=python3} "${GROCKER_APP:=}[${GROCKER_APP_EXTRAS:=}]==${GROCKER_APP_VERSION:=}"
+    setup_venv ~/app.venv \
+        ${GROCKER_RUNTIME:=should-be-defined} \
+        "${GROCKER_APP:=should-be-defined}[${GROCKER_APP_EXTRAS:=should-be-defined}]==${GROCKER_APP_VERSION:=should-be-defined}"
 }
 
 
