@@ -1,6 +1,5 @@
-FROM {{ root_image_tag }}
-LABEL grocker.image.kind=runner\
-      grocker.app.name={{ app_name }} \
+FROM {{ base_image }}
+LABEL grocker.app.name={{ app_name }} \
       grocker.app.extras={{ app_extras }} \
       grocker.app.version={{ app_version }}
 
@@ -10,10 +9,9 @@ ENV GROCKER_APP={{ app_name }} \
     PATH=/home/grocker/app.venv/bin/:${PATH}
 
 # Provisioning
-ARG GROCKER_PYPI_IP
+ARG GROCKER_WHEEL_SERVER_IP
 COPY . /tmp/grocker
-# always sync before running script to avoid "unable to execute /tmp/grocker/provision.sh: Text file busy"
-RUN sync; /bin/sh /tmp/grocker/provision.sh
+RUN /bin/sh /tmp/grocker/provision.sh
 
 # Ports and Volumes
 {% if ports %}EXPOSE{% for port in ports %} {{ port }}{% endfor %}{% endif %}

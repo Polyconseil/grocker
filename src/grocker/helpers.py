@@ -4,9 +4,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import contextlib
 import functools
-import hashlib
 import io
-import itertools
 import json
 import os.path
 import shutil
@@ -17,12 +15,6 @@ import jinja2
 import pip.baseparser
 import pkg_resources
 import yaml
-
-from . import __version__
-
-GROUP_SEPARATOR = b'\x1D'
-RECORD_SEPARATOR = b'\x1E'
-UNIT_SEPARATOR = b'\x1F'
 
 
 def copy_resource(resource, destination, package='grocker'):
@@ -43,92 +35,6 @@ def load_yaml_resource(resource, package='grocker'):
     return load_yaml(resource_path)
 
 
-def get_run_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get run dependencies.
-
-    Dependency list is a list of string or dict, which match the following
-    format:
-
-     [
-        'run_dependency_1',
-        {'run_dependency_2': 'build_dependency_2'},
-        {'run_dependency_3': ['build_dependency_3.1', 'build_dependency_3.2']},
-    ]
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for key in dependency:
-                yield key
-        else:
-            yield dependency
-
-
-def get_build_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get build dependencies
-
-    see get_run_dependencies() for dependency list format
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for value_or_list in dependency.values():
-                if isinstance(value_or_list, list):
-                    for value in value_or_list:
-                        yield value
-                else:
-                    yield value_or_list
-        else:
-            yield dependency
-
-
-def get_dependencies(config, with_build_dependencies=False):
-    runtime_dependencies = config['system']['runtime'][config['runtime']]
-
-    dependencies = itertools.chain(
-        config['system']['base'],
-        get_run_dependencies(runtime_dependencies),
-        get_run_dependencies(config['dependencies'])
-    )
-
-    if with_build_dependencies:
-        build_dependencies = itertools.chain(
-            config['system']['build'],
-            get_build_dependencies(runtime_dependencies),
-            get_build_dependencies(config['dependencies'])
-        )
-
-        dependencies = itertools.chain(dependencies, build_dependencies)
-
-    return list(dependencies)
-
-
-def config_identifier(config):
-    """
-    Hash config to get an unique identifier
-
-    Args:
-        config (dict): Grocker config
-
-    Returns:
-        str: Config identifier (SHA 256)
-    """
-    def unit_list(l):
-        return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in l))
-
-    dependencies = unit_list(get_dependencies(config, with_build_dependencies=True))
-    repositories = RECORD_SEPARATOR.join(
-        unit_list([name] + [cfg[x] for x in sorted(cfg)])
-        for name, cfg in config['repositories'].items()
-    )
-    data = GROUP_SEPARATOR.join([
-        dependencies,
-        repositories,
-    ])
-    digest = hashlib.sha256(data)
-    return digest.hexdigest()
-
-
 def render_template(template_path, output_path, context):
     env = jinja2.Environment()
     env.filters['jsonify'] = json.dumps
@@ -140,26 +46,6 @@ def render_template(template_path, output_path, context):
 
     with io.open(output_path, mode='w', encoding='utf-8') as output_file:
         output_file.write(output)
-
-
-def default_image_name(config, release):
-    req = pkg_resources.Requirement.parse(release)
-    assert str(req.specifier).startswith('=='), "Only fixed version can use default image name."
-    docker_image_prefix = config['docker_image_prefix']
-    if config['image_base_name']:
-        img_name = config['image_base_name']
-    elif req.extras:
-        img_name = "{project}-{extra_requirements}".format(
-            project=req.project_name,
-            extra_requirements='-'.join(req.extras),
-        )
-    else:
-        img_name = req.project_name
-    img_name += ":{project_version}-{grocker_version}".format(
-        project_version=str(req.specifier)[2:],
-        grocker_version=__version__,
-    )
-    return '/'.join((docker_image_prefix, img_name)) if docker_image_prefix else img_name
 
 
 @contextlib.contextmanager

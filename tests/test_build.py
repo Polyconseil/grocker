@@ -13,40 +13,37 @@ import uuid
 import docker.errors
 import yaml
 
-import grocker.builders as grocker_builders
-import grocker.six as grocker_six
+import grocker.utils
+import grocker.six
 
 
 def docker_rmi(image):
-    client = grocker_builders.docker_get_client()
+    client = grocker.utils.docker_get_client()
     try:
-        client.remove_image(image)
+        client.images.remove(image)
     except docker.errors.APIError:
         pass  # do not fail when image does not exist
 
 
 def docker_run(image, command):
-    client = grocker_builders.docker_get_client()
+    client = grocker.utils.docker_get_client()
 
-    container = client.create_container(
+    container = client.containers.run(
         image=image,
         command=command,
-        host_config=client.create_host_config(),
+        detach=True
     )
 
-    container_id = container.get('Id')
-    client.start(container_id)
-    return_code = client.wait(container_id)
-    logs = client.logs(container_id)
-
-    client.remove_container(container_id)
+    return_code = container.wait()
+    logs = container.logs()
+    container.remove()
 
     return return_code, logs
 
 
 def docker_inspect(image):
-    client = grocker_builders.docker_get_client()
-    return client.inspect_image(image)
+    client = grocker.utils.docker_get_client()
+    return client.images.get(image).attrs
 
 
 class BuildTestCase(unittest.TestCase):
@@ -97,7 +94,7 @@ class BuildTestCase(unittest.TestCase):
             docker_rmi(image_name)
 
     def check(self, config, release, cmd, expected, docker_prefix=None):
-        with grocker_six.TemporaryDirectory() as tmp_dir:
+        with grocker.six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 yaml.dump(config, fp)
 
