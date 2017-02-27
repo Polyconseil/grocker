@@ -30,11 +30,6 @@ setup(
         'pyyaml>=3.11',
         'packaging',
     ],
-    extras_require={
-        ":python_version == '2.7'": [
-            'enum34',
-        ],
-    },
     license='BSD',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
