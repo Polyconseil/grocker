@@ -30,6 +30,15 @@ def load_yaml(file_path):
         return yaml.load(fp.read())
 
 
+def dump_yaml(file_path, data):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with io.open(file_path, 'w') as fp:
+        return yaml.dump(data, stream=fp, indent=True)
+
+
 def load_yaml_resource(resource, package='grocker'):
     resource_path = pkg_resources.resource_filename(package, resource)
     return load_yaml(resource_path)

@@ -23,6 +23,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
     install_requires=[
+        'click',
         'docker>=2.0.2',
         'Jinja2',
         'setuptools>=18.0.1',

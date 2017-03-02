@@ -4,6 +4,7 @@ ChangeLog
 5.0 (unreleased)
 ----------------
 
+- Switch cli to click (**breaking change**)
 - Add support for Python 3.6
 - Drop obsolete .grocker file
 - Switch to docker(-py) 2

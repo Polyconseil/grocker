@@ -5,78 +5,66 @@ Grocker build chain can be customized using the command line interface or the
 ``.grocker.yml`` file (or the one defined through the ``--config`` parameter). When both
 are used, command line arguments take precedence.
 
-Command line interface
-----------------------
+The build command line interface
+--------------------------------
 
 .. code-block:: console
 
-    usage: grocker [-h] [-c CONFIG] [-r RUNTIME] [-e ENTRYPOINT_NAME]
-               [--volume VOLUMES] [--port PORTS] [--pip-conf <file>]
-               [--pip-constraint <file>] [--docker-image-prefix <url>]
-               [--image-base-name <name>] [-n <name>]
-               [--result-file <filename>]
-               [--purge {old,old:runner,all,all:runner}] [--version] [-v]
-               <action> [<action> ...] <release>
+    Usage: grocker [OPTIONS] COMMAND [ARGS]...
 
-    positional arguments:
-      <action>              should be one of dep, img, push, build
-      <release>             application to build (you can use version specifier)
+    Options:
+      --version      Show the version and exit.
+      -v, --verbose
+      --help         Show this message and exit.
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -c CONFIG, --config CONFIG
-                            Grocker config file
-      -r RUNTIME, --runtime RUNTIME
-                            runtime used to build and run this image
-      -e ENTRYPOINT_NAME, --entrypoint-name ENTRYPOINT_NAME
-                            Docker entrypoint to use to run this image
-      --volume VOLUMES      Container storage and configuration area
-      --port PORTS          Port on which a container will listen for connections
-      --pip-conf <file>     pip configuration file used to download dependencies
-                            (by default use pip config getter)
-      --pip-constraint <file>
-                            pip constraint file used to download dependencies
-      --docker-image-prefix <url>
-                            docker registry or account on Docker official registry
-                            to use
-      --image-base-name <name>
-                            base name for the image (eg '<docker-image-
-                            prefix>/<image-base-name>:<image-version>')
-      -n <name>, --image-name <name>
-                            name used to tag the build image
-      --result-file <filename>
-                            yaml file where results (image name, ...) are written
-      --purge {old,old:runner,all,all:runner}
-      --version             show program's version number and exit
-      -v, --verbose         verbose mode
+    Commands:
+      build  Build docker image for <release> (version...
+      purge  Purge Grocker created Docker stuff
+
+.. code-block:: console
+
+    Usage: grocker build [OPTIONS] RELEASE
+
+      Build docker image for <release> (version specifiers can be used).
+
+    Options:
+      -c, --config <filename>         Grocker config file
+      -r, --runtime <runtime>         runtime used to build and run this image
+      --pip-conf <filename>           pip configuration file used to download
+                                      dependencies (by default use pip config
+                                      getter)
+      --pip-constraint <filename>     pip constraint file used to download
+                                      dependencies
+      -e, --entrypoint <entrypoint>   Docker entrypoint to use to run this image
+      --volume <volume>               Container storage and configuration area
+      --port <port>                   Port on which a container will listen for
+                                      connections
+      --image-prefix <uri>            docker registry or account on Docker
+                                      official registry to use
+      --image-base-name <name>        base name for the image (eg '<image-
+                                      prefix>/<image-base-name>:<image-version>')
+      -n, --image-name <name>         name used to tag the build image
+      --result-file <filename>        yaml file where results (image name, ...)
+                                      are written
+      --dependencies / --no-dependencies
+                                      build the dependencies
+      --build-image / --no-build-image
+                                      build the docker image
+      --push / --no-push              push the image
+      --help                          Show this message and exit.
 
 Actions
 ~~~~~~~
 
 Grocker splits the build chain into three steps:
 
-1. ``dep``, compiles wheels and stores them in a data volume.
-2. ``img``, builds the **runner** image using stored wheels.
+1. ``dependencies``, compiles wheels and stores them in a data volume.
+2. ``image``, builds the **runner** image using stored wheels.
 3. ``push``, pushes the **runner** image on the configured Docker registry (
    only if a docker image prefix is given)
 
-The command line accepts multiple steps and runs all that were specified. The order in
-which they are provided does not matter, Grocker runs them like so: ``dep``, ``img``
-and ``push``. ``build`` is a shortcut for the whole sequence.
-
 This allows you, for example, to build an image without pushing it, then do some tests,
 and after your tests passed push the image.
-
-Purge
-~~~~~
-
-The ``--purge`` flag is here to clean Grocker created stuff of your Docker daemon. It takes
-one argument which can be:
-
-- ``old``, drop previous Grocker version created volumes, containers and images excluding final images
-- ``old:runner``, same as ``old`` but including final images
-- ``all``, same as ``old`` but including current Grocker version stuff
-- ``all:runner``, drop all Grocker created volumes, containers and images.
 
 Pip config
 ~~~~~~~~~~
@@ -177,3 +165,20 @@ An example with all options customised:
         - nginx
     docker_image_prefix: docker.example.com
     entrypoint_name: my-runner
+
+
+Purging Grocker stuffs
+----------------------
+
+The ``purge`` command is here to clean Grocker created stuff of your Docker daemon.
+
+.. code-block:: console
+
+    Usage: grocker purge [OPTIONS]
+
+      Purge Grocker created Docker stuff
+
+    Options:
+      -a, --all-versions / --only-old-versions
+      -f, --including-final-images / --excluding-final-images
+      --help                          Show this message and exit.

@@ -64,14 +64,14 @@ class BuildTestCase(unittest.TestCase):
         )
         try:
             call_args = [
-                'python', '-m', 'grocker',
+                'python', '-m', 'grocker', 'build',
                 '--image-name', image_name,
                 '--result-file', result_file_path,
-                'dep', 'img',
+                '--no-push',
                 release,
             ]
             if docker_prefix:
-                call_args += ['--docker-image-prefix', docker_prefix]
+                call_args += ['--image-prefix', docker_prefix]
             if self.runtime:
                 call_args += ['--runtime', self.runtime]
             subprocess.check_call(call_args, cwd=cwd)
