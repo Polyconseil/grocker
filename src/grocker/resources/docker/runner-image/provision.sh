@@ -58,9 +58,6 @@ provision() {
 
 
 system_provision() {
-    local sys_config_dir
-    sys_config_dir=/home/grocker/sys.cfg
-
     # Security updates
     apt update
     apt upgrade -qy
