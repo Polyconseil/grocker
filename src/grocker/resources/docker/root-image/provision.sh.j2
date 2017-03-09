@@ -37,9 +37,6 @@ EOF
 
     # Create grocker user (Debian does not support short options)
     adduser --shell /bin/bash --disabled-password --gecos ",,,," grocker
-
-    # Configure system
-    echo "LANG=C.UTF-8" > /etc/default/locale
 }
 
 alpine_setup() {
@@ -53,8 +50,6 @@ alpine_setup() {
 
     # Create grocker user (alpine does not support long options)
     adduser -s /bin/sh -D -g ",,,," grocker
-
-    # No need to configure system's locale
 }
 
 # Configure the package manager for a lighter & quieter use.
