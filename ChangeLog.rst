@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-5.0 (unreleased)
+5.0 (2017-03-10)
 ----------------
 
 - Switch cli to click (**breaking change**)
