@@ -4,7 +4,7 @@ ChangeLog
 5.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Also extract pip's timeout configuration from local pip configuration file
 
 
 5.0 (2017-03-10)

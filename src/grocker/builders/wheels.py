@@ -32,6 +32,7 @@ def get_pip_env(pip_conf):
     env = {
         'PIP_INDEX_URL': get(config, 'global', 'index-url'),
         'PIP_EXTRA_INDEX_URL': get(config, 'global', 'extra-index-url'),
+        'PIP_TIMEOUT': get(config, 'global', 'timeout'),
     }
     env = {k: v for k, v in env.items() if v}
     logger.debug('pip using env: %s', env)
