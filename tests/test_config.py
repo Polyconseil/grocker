@@ -6,11 +6,13 @@ import contextlib
 import io
 import os
 import os.path
+import tempfile
 import textwrap
 import unittest
 import itertools
 
 from grocker import __version__
+from grocker.builders import wheels
 from grocker.utils import parse_config
 from grocker.utils import default_image_name
 import grocker.six as grocker_six
@@ -115,3 +117,23 @@ class DefaultImageNameTC(unittest.TestCase):
             }
             got = default_image_name(config, release)
             self.assertEqual(got, expected.format(__version__))
+
+
+class PipConfigTestCase(unittest.TestCase):
+
+    def test_get_pip_env(self):
+        with tempfile.NamedTemporaryFile(prefix="grocker") as f:
+            f.write(textwrap.dedent("""\
+                [global]
+                timeout=99
+                index-url=http://example.com/simple
+            """).encode())
+            f.flush()
+            env = wheels.get_pip_env(f.name)
+        self.assertEqual(
+            env,
+            {
+                'PIP_TIMEOUT': '99',
+                'PIP_INDEX_URL': 'http://example.com/simple',
+            },
+        )
