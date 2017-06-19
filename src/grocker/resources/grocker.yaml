@@ -23,14 +23,14 @@ system:  # grocker internal configuration
       - python: python-dev
       - libpython2.7
       - python-virtualenv
-    python3.4:
+    python3.5:
       - python3: python3-dev
-      - libpython3.4
+      - libpython3.5
       - python3-virtualenv
 
 # There begin the project configuration (so all values below are use as default)
 
-runtime: python3.4
+runtime: python3.5
 pip_constraint: # pip_constraint is optional
 volumes: []
 ports: []
