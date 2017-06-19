@@ -6,7 +6,7 @@
 # - runtime_dependency: [build_dependency_1, build_dependency_2]
 
 system:  # grocker internal configuration
-  image: debian:jessie  # base image to use to build root image
+  image: debian:stretch-slim  # base image to use to build root image
 
   base:  # dependencies installed on root image
     - less
