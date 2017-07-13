@@ -18,7 +18,7 @@ EOF
 
 {% if repositories %}
     apt update
-    apt install -qy apt-transport-https
+    apt install -qy apt-transport-https gnupg2
 
 {% for name, desc in repositories.items() %}
     apt-key add - <<EOF
