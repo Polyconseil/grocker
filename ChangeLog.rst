@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-5.2 (unreleased)
+5.2 (2017-07-18)
 ----------------
 
 - Adds gnupg2 to allow grocker to build stretch images.
