@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-5.3 (unreleased)
+5.3 (2017-08-21)
 ----------------
 
 - Support of pip trusted host config in wheel builder.
