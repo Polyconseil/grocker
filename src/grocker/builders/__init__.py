@@ -7,7 +7,7 @@ from . import build
 from .build import build_runner_image
 from . import naming
 from . import op
-from .op import docker_push_image, is_prefixed_image
+from .op import docker_push_image, get_manifest_digest, is_prefixed_image
 from .wheels import compile_wheels
 
 
@@ -16,6 +16,7 @@ __all__ = [
     'docker_push_image',
     'is_prefixed_image',
     'compile_wheels',
+    'get_manifest_digest',
     'get_or_build_root_image',
     'get_or_build_compiler_image',
 ]

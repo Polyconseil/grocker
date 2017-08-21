@@ -134,7 +134,10 @@ def build(release, build_dependencies, build_image, push, **kwargs):
         else:
             logger.info('Pushing image...')
             image = builders.docker_push_image(docker_client, image_name)
-            collect['hash'] = [x.split('@')[1] for x in image.attrs['RepoDigests']][0]
+            collect['hash'] = (
+                builders.get_manifest_digest(image_name)
+                or [x.split('@')[1] for x in image.attrs['RepoDigests']][0]
+            )
 
     if kwargs['result_file']:
         helpers.dump_yaml(kwargs['result_file'], collect)

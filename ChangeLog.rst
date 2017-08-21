@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Support of pip trusted host config in wheel builder.
+- Retrieve image manifest digest from registry.
 
 
 5.2 (2017-07-18)

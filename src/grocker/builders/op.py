@@ -11,6 +11,8 @@ import docker
 import docker.errors
 import docker.utils.json_stream
 
+import requests
+
 from .. import __version__
 from .. import helpers
 from .. import six
@@ -86,6 +88,16 @@ def docker_push_image(docker_client, name):
     logger.info('Pushing image %s...', name)
     docker_client.images.push(name)
     return docker_client.images.get(name)
+
+
+def get_manifest_digest(name):
+    registry_repository, tag = name.split(':', 1)
+    if '.' not in registry_repository:  # Docker Hub
+        return None  # Docker HUB API is not documented
+
+    registry, repository = registry_repository.split('/', 1)
+    response = requests.head('https://{}/v2/{}/manifests/{}'.format(registry, repository, tag))
+    return response.headers['Docker-Content-Digest']
 
 
 def docker_run_container(docker_client, name, command, volumes=None, environment=None):
