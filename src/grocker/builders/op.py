@@ -67,7 +67,7 @@ def docker_get_or_build_image(docker_client, name, builder):
 
 
 def get_or_create_data_volume(docker_client, name, role, labels=None):
-    logger.info('Creating volume %s...')
+    logger.info('Creating volume %s...', name)
     computed_labels = {
         'grocker.version': __version__,
         'grocker.image.role': role,
