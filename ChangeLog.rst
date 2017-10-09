@@ -4,7 +4,7 @@ ChangeLog
 5.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Use python venv instead of virtualenv in compile image
 
 
 5.3 (2017-08-21)
