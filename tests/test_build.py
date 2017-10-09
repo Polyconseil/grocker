@@ -166,7 +166,7 @@ class BuildTestCase(AbstractBuildTestCase):
             'entrypoint_name': 'python',
             'repositories': {
                 'nginx': {
-                    'uri': 'deb http://nginx.org/packages/debian/ jessie nginx',
+                    'uri': 'deb http://nginx.org/packages/debian/ stretch nginx',
                     'key': """
                         -----BEGIN PGP PUBLIC KEY BLOCK-----
                         Version: GnuPG v2.0.22 (GNU/Linux)
