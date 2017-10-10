@@ -72,7 +72,7 @@ def setup_venv(python):
     venv = tempfile.mkdtemp(suffix='.venv')
     try:
         # python 3
-        subprocess.check_call([python, '-m', 'venv', '-p', python, venv])
+        subprocess.check_call([python, '-m', 'venv', venv])
     except subprocess.CalledProcessError:
         subprocess.check_call([python, '-m', 'virtualenv', venv])
     subprocess.check_call([os.path.join(venv, 'bin', 'pip'), 'install', '-U', 'pip', 'setuptools', 'wheel'])
