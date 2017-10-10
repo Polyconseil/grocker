@@ -19,7 +19,7 @@ setup_venv() {  # venv runtime *dependencies
 
     pip=${venv}/bin/pip
 
-    ${runtime} -m virtualenv -p ${runtime} ${venv}
+    ${runtime} -m venv ${venv} || ${runtime} -m virtualenv -p ${runtime} ${venv}
     # Old pip can not deal with constraint file
     ${pip} install --upgrade pip
     ${pip} install --no-cache-dir --upgrade pip setuptools ${constraint_arg}
