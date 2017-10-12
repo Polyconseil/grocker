@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-5.4 (unreleased)
+5.4 (2017-10-12)
 ----------------
 
 - Use python venv instead of virtualenv in compile image
