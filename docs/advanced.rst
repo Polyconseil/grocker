@@ -88,7 +88,9 @@ It is written in YAML. By default, Grocker looks for this file in the current di
     volumes: []
     ports: []
     repositories: {}
-    dependencies: []
+    dependencies:
+        run: []
+        build: []
     docker_image_prefix: # optional
     image_base_name: # optional
     entrypoint_name: grocker-runner
@@ -96,12 +98,10 @@ It is written in YAML. By default, Grocker looks for this file in the current di
 Dependencies
 ~~~~~~~~~~~~
 
-Each entry of the  ``dependencies`` list follow one of this syntax:
+Two kind of dependencies can be declared those used on the final image (``run``) and
+those which will be installed only on the build image (``build``).
 
-- ``my-dependency``, for runtime only dependencies (no build dependency)
-- ``my-dependency: my-dependency-dev``, for runtime dependencies with one build dependency
-- ``my-dependency: [my-dependency-dev, my-dependency-dev2]``, for runtime dependencies
-  with more than one build dependencies
+Each package declared on those lists will be installed using the system package manager.
 
 Repositories
 ~~~~~~~~~~~~
@@ -158,11 +158,18 @@ An example with all options customised:
                 =A015
                 -----END PGP PUBLIC KEY BLOCK-----
     dependencies:
-        - libzbar0: libzbar-dev
-        - libjpeg62-turbo: libjpeg62-turbo-dev
-        - libffi6: libffi-dev
-        - libtiff5: libtiff5-dev
-        - nginx
+        run:
+            - libzbar0
+            - libjpeg62-turbo
+            - libffi6
+            - libtiff5
+            - nginx
+        build:
+            - libzbar-dev
+            - libjpeg62-turbo-dev
+            - libffi-dev
+            - libtiff5-dev
+
     docker_image_prefix: docker.example.com
     entrypoint_name: my-runner
 

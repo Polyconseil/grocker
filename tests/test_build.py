@@ -47,12 +47,7 @@ def docker_inspect(image):
 
 
 class AbstractBuildTestCase(unittest.TestCase):
-    dependencies = yaml.safe_load("""
-        - libzbar0: libzbar-dev
-        - libjpeg62-turbo: libjpeg62-turbo-dev
-        - libffi6: libffi-dev
-        - libtiff5: libtiff5-dev
-    """)
+    dependencies = {}
     runtime = None
 
     def run_grocker(self, release, command, cwd, docker_prefix):
@@ -110,6 +105,10 @@ class AbstractBuildTestCase(unittest.TestCase):
 
 
 class BuildTestCase(AbstractBuildTestCase):
+    dependencies = {
+        'build': ['libzbar-dev', 'libjpeg62-turbo-dev', 'libffi-dev', 'libtiff5-dev'],
+        'run': ['libzbar0', 'libjpeg62-turbo', 'libffi6', 'libtiff5'],
+    }
 
     def test_dependencies(self):
         config = {
@@ -215,20 +214,19 @@ class BuildCustomRuntimeTestCase(BuildTestCase):
 
 class AlpineTestCase(AbstractBuildTestCase):
     runtime = 'python2.7'
-    dependencies = []
 
     def test_with_alpine(self):
         config = {
             'system': {
                 'image': 'alpine',
-                'base': [],
-                'build': [],
                 'runtime': {
-                    'python2.7': [
-                        'python2',
-                        'py2-pip',
-                        'py-virtualenv',
-                    ],
+                    'python2.7': {
+                        'run': [
+                            'python2',
+                            'py2-pip',
+                            'py-virtualenv',
+                        ],
+                    },
                 },
             },
             'entrypoint_name': '/bin/sh'

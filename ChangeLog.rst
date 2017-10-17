@@ -4,7 +4,7 @@ ChangeLog
 5.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Simplify dependency declaration (**breaking change**)
 
 
 5.4 (2017-10-12)

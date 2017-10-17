@@ -3,7 +3,6 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import hashlib
-import itertools
 import os.path
 
 import docker
@@ -75,64 +74,22 @@ def docker_get_client(min_version=None):
     return client
 
 
-def get_run_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get run dependencies.
-
-    Dependency list is a list of string or dict, which match the following
-    format:
-
-     [
-        'run_dependency_1',
-        {'run_dependency_2': 'build_dependency_2'},
-        {'run_dependency_3': ['build_dependency_3.1', 'build_dependency_3.2']},
-    ]
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for key in dependency:
-                yield key
-        else:
-            yield dependency
-
-
-def get_build_dependencies(dependency_list):
-    """
-    Parse list of dependencies to only get build dependencies
-
-    see get_run_dependencies() for dependency list format
-    """
-    for dependency in dependency_list:
-        if isinstance(dependency, dict):
-            for value_or_list in dependency.values():
-                if isinstance(value_or_list, list):
-                    for value in value_or_list:
-                        yield value
-                else:
-                    yield value_or_list
-        else:
-            yield dependency
-
-
 def get_dependencies(config, with_build_dependencies=False):
-    runtime_dependencies = config['system']['runtime'][config['runtime']]
+    runtime = config['runtime']
+    runtime_dependencies = config['system']['runtime'][runtime]
 
-    dependencies = itertools.chain(
-        config['system']['base'],
-        get_run_dependencies(runtime_dependencies),
-        get_run_dependencies(config['dependencies'])
+    dependencies = (
+        runtime_dependencies.get('run', [])
+        + config['dependencies'].get('run', [])
     )
 
     if with_build_dependencies:
-        build_dependencies = itertools.chain(
-            config['system']['build'],
-            get_build_dependencies(runtime_dependencies),
-            get_build_dependencies(config['dependencies'])
+        dependencies += (
+            runtime_dependencies.get('build', [])
+            + config['dependencies'].get('build', [])
         )
 
-        dependencies = itertools.chain(dependencies, build_dependencies)
-
-    return list(dependencies)
+    return dependencies
 
 
 def parse_config(config_paths, **kwargs):
