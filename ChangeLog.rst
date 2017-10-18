@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Simplify dependency declaration (**breaking change**)
+- Manage HTTPError when using get or build image
 
 
 5.4 (2017-10-12)

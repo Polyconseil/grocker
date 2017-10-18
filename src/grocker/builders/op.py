@@ -12,6 +12,7 @@ import docker.errors
 import docker.utils.json_stream
 
 import requests
+import requests.exceptions
 
 from .. import __version__
 from .. import helpers
@@ -56,10 +57,10 @@ def docker_build_image(docker_client, path, name, role=None, labels=None, **kwar
 def docker_get_or_build_image(docker_client, name, builder):
     try:
         return docker_client.images.get(name)
-    except docker.errors.ImageNotFound:
+    except (requests.exceptions.HTTPError, docker.errors.ImageNotFound):
         try:
             return docker_pull_image(docker_client, name)
-        except docker.errors.NotFound:
+        except (requests.exceptions.HTTPError, docker.errors.NotFound):
             image = builder(docker_client)
             if is_prefixed_image(name):
                 image = docker_push_image(docker_client, name)
