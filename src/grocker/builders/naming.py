@@ -17,7 +17,7 @@ def image_name(config, role):
 
     return image_name_template.format(
         prefix=config['docker_image_prefix'],
-        runtime=config['runtime'],
+        runtime=config['runtime'].replace('/', '-'),
         role=role,
         version=__version__,
         hash=utils.config_identifier(config),
@@ -27,6 +27,6 @@ def image_name(config, role):
 def wheel_volume_name(config):
     return 'grocker-wheel-cache-{version}-{runtime}-{hash}'.format(
         version=__version__,
-        runtime=config['runtime'],
+        runtime=config['runtime'].replace('/', '-'),
         hash=utils.config_identifier(config),
     )

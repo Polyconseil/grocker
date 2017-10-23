@@ -46,7 +46,7 @@ def compile_wheels(docker_client, config, release, pip_conf):
         naming.wheel_volume_name(config),
         role='wheel',
         labels={
-            'grocker.runtime': config['runtime'],
+            'grocker.runtime': config['runtimes'][config['runtime']]['runtime'],
             'grocker.config.hash': utils.config_identifier(config),
         },
     )
@@ -56,7 +56,7 @@ def compile_wheels(docker_client, config, release, pip_conf):
             'mode': 'rw',
         },
     }
-    command = ['--python', config['runtime'], release]
+    command = ['--python', config['runtimes'][config['runtime']]['runtime'], release]
     environment = get_pip_env(pip_conf)
 
     if config['pip_constraint']:

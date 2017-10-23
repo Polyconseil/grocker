@@ -100,7 +100,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
     collect['image'] = image_name
 
     # Raise if grocker do not known the runtime
-    if config['runtime'] not in config['system']['runtime']:
+    if config['runtime'] not in config['runtimes']:
         raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
     if build_dependencies:

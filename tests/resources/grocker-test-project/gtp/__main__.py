@@ -1,32 +1,39 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+import os.path
 import sys
+import tempfile
 
 import qrcode
-import zbarlight
+from PIL import Image
 
 
-def scan(image):
-    return zbarlight.scan_codes('qrcode', image)
+def scan(file_path):
+    with open(file_path, 'rb') as image_file:
+        image = Image.open(image_file)
+        image.load()
+    return image
 
 
 def make(content):
     return qrcode.make(content)
 
 
-def decoded(text):
-    return text.decode('utf-8') if isinstance(text, bytes) else text
-
-
 def identity(content):
-    result = scan(make(content))
-    if result and len(result) == 1:
-        return decoded(result[0])
+    filename = os.path.join(tempfile.mkdtemp(), 'grocker.png')
+
+    image = make(content)
+    image.save(filename)
+
+    raw_image = image.get_image()
+    read_image = scan(filename)
+
+    if raw_image.tobitmap() == read_image.tobitmap():
+        return content
     else:
-        raise RuntimeError('Identity fonction fail !')
+        raise RuntimeError('Identity function fail !')
 
 
 def main():

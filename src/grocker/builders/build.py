@@ -26,10 +26,11 @@ def should_pull(config):
 
 def build_root_image(docker_client, config):
     with op.docker_build_context('resources/docker/root-image') as build_dir:
+        cfg = config['runtimes'][config['runtime']]
         context = {
-            'base_image': config['system']['image'],
+            'base_image': cfg['image'],
             'repositories': config['repositories'],
-            'runtime': config['runtime'],
+            'runtime': cfg['runtime'],
             'grocker_version': __version__,
         }
 
@@ -63,7 +64,7 @@ def build_compiler_image(docker_client, config):
     with op.docker_build_context('resources/docker/compiler-image') as build_dir:
         context = {
             'base_image': naming.image_name(config, 'root'),
-            'runtime': config['runtime'],
+            'runtime': config['runtimes'][config['runtime']]['runtime'],
         }
 
         helpers.render_template(

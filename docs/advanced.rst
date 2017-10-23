@@ -83,7 +83,7 @@ It is written in YAML. By default, Grocker looks for this file in the current di
 .. code-block:: yaml
 
     # .grocker.yml (defaults)
-    runtime: python3.4
+    runtime: alpine/3.6
     pip_constraint: # optional
     volumes: []
     ports: []
@@ -121,7 +121,7 @@ An example with all options customised:
 .. code-block:: yaml
 
     # .grocker.yml (full example)
-    runtime: python2.7
+    runtime: jessie/2.7
     pip_constraint: constraints.txt
     volumes: ['/data', '/cache']
     ports: [8080, 8081]

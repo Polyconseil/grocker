@@ -46,9 +46,11 @@ def docker_inspect(image):
     return client.images.get(image).attrs
 
 
-class AbstractBuildTestCase(unittest.TestCase):
+class AbstractBuildTestCase:
     dependencies = {}
     runtime = None
+    tp_name = 'grocker-test-project'
+    tp_version = '3.0.1'
 
     def run_grocker(self, release, command, cwd, docker_prefix):
         image_name = 'grocker.test/{}'.format(uuid.uuid4())
@@ -103,20 +105,14 @@ class AbstractBuildTestCase(unittest.TestCase):
         self.assertEqual(len(matches), 1, msg=logs)
         return logs, inspect_data
 
-
-class BuildTestCase(AbstractBuildTestCase):
-    dependencies = {
-        'build': ['libzbar-dev', 'libjpeg62-turbo-dev', 'libffi-dev', 'libtiff5-dev'],
-        'run': ['libzbar0', 'libjpeg62-turbo', 'libffi6', 'libtiff5'],
-    }
-
     def test_dependencies(self):
         config = {
+            'runtime': self.runtime,
             'dependencies': self.dependencies,
         }
         msg = 'Grocker build this successfully !'
         expected = msg
-        self.check(config, 'grocker-test-project==2.0', msg, expected)
+        self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), msg, expected)
 
     def test_pip_constraints(self):
         with tempfile.NamedTemporaryFile() as fp:
@@ -125,21 +121,24 @@ class BuildTestCase(AbstractBuildTestCase):
 
             config = {
                 'pip_constraint': fp.name,
-                'entrypoint_name': '/bin/bash',
+                'entrypoint_name': '/bin/sh',
+                'runtime': self.runtime,
                 'dependencies': self.dependencies,
             }
-            self.check(config, 'grocker-test-project==2.0', ['-c', 'pip freeze'], 'qrcode==5.2')
+            self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', 'pip freeze'], 'qrcode==5.2')
 
     def test_extras(self):
         config = {
-            'entrypoint_name': '/bin/bash',
+            'entrypoint_name': '/bin/sh',
+            'runtime': self.runtime,
             'dependencies': self.dependencies,
         }
-        self.check(config, 'grocker-test-project[pep8]==2.0', ['-c', 'pip list'], 'pep8')
+        self.check(config, '{}[pep8]=={}'.format(self.tp_name, self.tp_version), ['-c', 'pip list'], 'pep8')
 
     def test_with_docker_prefix(self):
         config = {
-            'entrypoint_name': '/bin/bash'
+            'runtime': self.runtime,
+            'entrypoint_name': '/bin/sh'
         }
         self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
 
@@ -148,19 +147,29 @@ class BuildTestCase(AbstractBuildTestCase):
             'volumes': ['/data', '/config'],
             'ports': [8080, 9090],
             'entrypoint_name': 'my-custom-runner',
+            'runtime': self.runtime,
             'dependencies': self.dependencies,
         }
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
-        _, inspect_data = self.check(config, 'grocker-test-project==2.0', msg, expected)
+        _, inspect_data = self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), msg, expected)
 
         volumes = sorted(inspect_data['Config'].get('Volumes', []))
         ports = sorted(inspect_data['Config'].get('ExposedPorts', []))
         self.assertEqual(volumes, ['/config', '/data'])
         self.assertEqual(ports, ['8080/tcp', '9090/tcp'])
 
+
+class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
+    runtime = 'stretch/3.5'
+    dependencies = {
+        'build': ['libjpeg62-turbo-dev'],
+        'run': ['libjpeg62-turbo'],
+    }
+
     def test_repositories(self):
         config = {
+            'runtime': self.runtime,
             'dependencies': self.dependencies,
             'entrypoint_name': 'python',
             'repositories': {
@@ -205,30 +214,20 @@ class BuildTestCase(AbstractBuildTestCase):
             "output = subprocess.check_output(['apt-cache', 'policy'])",
             "print('nginx' in output.decode())",
         ])
-        self.check(config, 'grocker-test-project==2.0', ['-c', script], 'True')
+        self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', script], 'True')
 
 
-class BuildCustomRuntimeTestCase(BuildTestCase):
-    runtime = 'python2.7'
+class Jessie27BuildTestCase(DebianBuildTestCase, unittest.TestCase):
+    runtime = 'jessie/2.7'
 
 
-class AlpineTestCase(AbstractBuildTestCase):
-    runtime = 'python2.7'
+class Jessie34BuildTestCase(DebianBuildTestCase, unittest.TestCase):
+    runtime = 'jessie/3.4'
 
-    def test_with_alpine(self):
-        config = {
-            'system': {
-                'image': 'alpine',
-                'runtime': {
-                    'python2.7': {
-                        'run': [
-                            'python2',
-                            'py2-pip',
-                            'py-virtualenv',
-                        ],
-                    },
-                },
-            },
-            'entrypoint_name': '/bin/sh'
-        }
-        self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
+
+class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):
+    runtime = 'alpine/3.6'
+    dependencies = {
+        'build': ['libjpeg-turbo-dev', 'zlib-dev'],
+        'run': ['libjpeg-turbo', 'zlib'],
+    }

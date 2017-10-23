@@ -76,7 +76,7 @@ def docker_get_client(min_version=None):
 
 def get_dependencies(config, with_build_dependencies=False):
     runtime = config['runtime']
-    runtime_dependencies = config['system']['runtime'][runtime]
+    runtime_dependencies = config['runtimes'][runtime]['dependencies']
 
     dependencies = (
         runtime_dependencies.get('run', [])

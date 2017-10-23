@@ -88,7 +88,7 @@ def docker_purge_images(docker_client, current_version=False, runner=False):
         for image in docker_client.images.list(filters={'label': 'grocker.version'})
         if (
             (current_version or created_by_older_version(image))
-            and (runner or image.attrs['Labels'].get('grocker.image.role') == 'runner')
+            and (runner or image.attrs.get('Labels', {}).get('grocker.image.role') == 'runner')
         )
     ]
     for image in removable_images:

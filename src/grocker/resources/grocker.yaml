@@ -5,10 +5,11 @@
 # - runtime_dependency: build_dependency
 # - runtime_dependency: [build_dependency_1, build_dependency_2]
 
-system:  # grocker internal configuration
-  image: debian:jessie  # base image to use to build root image
-  runtime:  # dependencies needed for specified runtime
-    python2.7:
+runtimes:  # grocker internal configuration
+  "jessie/2.7":
+    image: debian:jessie  # base image to use to build root image
+    runtime: python2.7  # python executable to use
+    dependencies:  # dependencies needed for specified runtime
       run:
         - python
         - libpython2.7
@@ -17,7 +18,10 @@ system:  # grocker internal configuration
         - build-essential
         - python-dev
 
-    python3.4:
+  "jessie/3.4":
+    image: debian:jessie
+    runtime: python3.4
+    dependencies:
       run:
         - python3
         - libpython3.4
@@ -26,9 +30,31 @@ system:  # grocker internal configuration
         - build-essential
         - python3-dev
 
+  "alpine/3.6":
+    image: alpine:latest
+    runtime: python3
+    dependencies:
+      run:
+        - python3
+      build:
+        - alpine-sdk
+        - python3-dev
+
+  "stretch/3.5":
+    image: debian:stretch
+    runtime: python3.5
+    dependencies:
+      run:
+        - python3
+        - libpython3.5
+        - python3-venv
+      build:
+        - build-essential
+        - python3-dev
+
 # There begin the project configuration (so all values below are use as default)
 
-runtime: python3.4
+runtime: alpine/3.6
 pip_constraint: # pip_constraint is optional
 volumes: []
 ports: []
