@@ -7,6 +7,7 @@
 
 runtimes:  # grocker internal configuration
   "jessie/2.7":
+    deprecated: yes
     image: debian:jessie  # base image to use to build root image
     runtime: python2.7  # python executable to use
     dependencies:  # dependencies needed for specified runtime
@@ -19,6 +20,7 @@ runtimes:  # grocker internal configuration
         - python-dev
 
   "jessie/3.4":
+    deprecated: yes
     image: debian:jessie
     runtime: python3.4
     dependencies:

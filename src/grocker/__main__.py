@@ -103,6 +103,12 @@ def build(release, build_dependencies, build_image, push, **kwargs):
     if config['runtime'] not in config['runtimes']:
         raise RuntimeError('Unknown runtime: %s', config['runtime'])
 
+    if config['runtimes'][config['runtime']].get('deprecated'):
+        logging.warning(
+            "Runtime %s is deprecated, please update to more recent runtime",
+            config['runtime'],
+        )
+
     if build_dependencies:
         logger.info('Compiling dependencies...')
         builders.get_or_build_root_image(docker_client, config)

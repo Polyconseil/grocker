@@ -217,14 +217,6 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
         self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', script], 'True')
 
 
-class Jessie27BuildTestCase(DebianBuildTestCase, unittest.TestCase):
-    runtime = 'jessie/2.7'
-
-
-class Jessie34BuildTestCase(DebianBuildTestCase, unittest.TestCase):
-    runtime = 'jessie/3.4'
-
-
 class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):
     runtime = 'alpine/3.6'
     dependencies = {
