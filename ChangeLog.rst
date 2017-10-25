@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-5.5 (unreleased)
+6.0 (2017-10-25)
 ----------------
 
 - Allow to set environment variables on the final image
