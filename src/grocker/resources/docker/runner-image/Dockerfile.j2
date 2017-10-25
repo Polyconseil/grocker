@@ -16,6 +16,7 @@ RUN /bin/sh /tmp/grocker/provision.sh
 # Ports and Volumes
 {% if ports %}EXPOSE{% for port in ports %} {{ port }}{% endfor %}{% endif %}
 {% if volumes %}VOLUME {{volumes | jsonify }}{% endif %}
+{% if envs %}ENV {% for key, value in envs.items()%}{{ key }}="{{ value }}" {% endfor %}{% endif %}
 
 # Make the entry point run the compile script
 USER grocker

@@ -112,6 +112,7 @@ def build_runner_image(docker_client, config, name, release):
             'app_version': helpers.get_version_from_requirement(requirement),
             'volumes': config['volumes'],
             'ports': config['ports'],
+            'envs': config['envs'],
         }
 
         helpers.render_template(

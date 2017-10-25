@@ -52,6 +52,7 @@ def purge(all_versions, including_final_images):
 @click.option('-e', '--entrypoint', metavar='<entrypoint>', help="Docker entrypoint to use to run this image")
 @click.option('--volume', multiple=True, metavar='<volume>', help="Container storage and configuration area")
 @click.option('--port', multiple=True, metavar='<port>', help="Port on which a container will listen for connections")
+@click.option('--env', multiple=True, metavar='<env=value>', help="Additional environment variable for final image")
 @click.option(
     '--image-prefix', metavar='<uri>',
     help='docker registry or account on Docker official registry to use',
@@ -95,6 +96,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
         image_base_name=kwargs['image_base_name'],
         volumes=kwargs['volume'],
         ports=kwargs['port'],
+        envs=dict(item.split('=', 1) for item in kwargs['env']),
     )
     image_name = kwargs['image_name'] or utils.default_image_name(config, release)
     collect['image'] = image_name

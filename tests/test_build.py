@@ -142,6 +142,22 @@ class AbstractBuildTestCase:
         }
         self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
 
+    def test_envs(self):
+        config = {
+            'runtime': self.runtime,
+            'envs': {
+                'GROCKER_EXTRA_ENVVAR': 'Grocker!'
+            },
+            'entrypoint_name': '/bin/sh'
+        }
+        self.check(
+            config,
+            'pep8==1.7',
+            ['-c', 'env'],
+            'GROCKER_EXTRA_ENVVAR=Grocker!',
+            docker_prefix='grocker',
+        )
+
     def test_entrypoints(self):
         config = {
             'volumes': ['/data', '/config'],

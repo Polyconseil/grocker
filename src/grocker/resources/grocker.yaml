@@ -60,6 +60,7 @@ runtime: alpine/3.6
 pip_constraint: # pip_constraint is optional
 volumes: []
 ports: []
+envs: []
 repositories: {}  # {<repository name>: {uri: '<deb line>', key: '<PGP key for this repository>'}}
 dependencies:
   run: []

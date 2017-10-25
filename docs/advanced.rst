@@ -39,6 +39,7 @@ The build command line interface
       --volume <volume>               Container storage and configuration area
       --port <port>                   Port on which a container will listen for
                                       connections
+      --env <env=value>               Additional environment variable for final image
       --image-prefix <uri>            docker registry or account on Docker
                                       official registry to use
       --image-base-name <name>        base name for the image (eg '<image-
@@ -46,7 +47,7 @@ The build command line interface
       -n, --image-name <name>         name used to tag the build image
       --result-file <filename>        yaml file where results (image name, ...)
                                       are written
-      --dependencies / --no-dependencies
+      --build-dependencies / --no-build-dependencies
                                       build the dependencies
       --build-image / --no-build-image
                                       build the docker image
@@ -87,6 +88,7 @@ It is written in YAML. By default, Grocker looks for this file in the current di
     pip_constraint: # optional
     volumes: []
     ports: []
+    env: {}
     repositories: {}
     dependencies:
         run: []
@@ -125,6 +127,10 @@ An example with all options customised:
     pip_constraint: constraints.txt
     volumes: ['/data', '/cache']
     ports: [8080, 8081]
+    env:
+        SOME_ENV_VAR: value of the envvars
+        ANOTHER_ENV_VAR: 45
+        http_proxy: http://127.0.0.1:8080
     repositories:
         nginx:
             uri: deb http://nginx.org/packages/debian/ jessie nginx

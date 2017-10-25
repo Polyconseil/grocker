@@ -4,6 +4,7 @@ ChangeLog
 5.5 (unreleased)
 ----------------
 
+- Allow to set environment variables on the final image
 - Deprecate Jessie runtimes
 - Allow to use Debian Stretch (Python 2.7 et 3.4), Debian Jessie (Python 3.5) and Alpine (Python 3.6) as base distribution (**breaking change**)
 - Simplify dependency declaration (**breaking change**)
