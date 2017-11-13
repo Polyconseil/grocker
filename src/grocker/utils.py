@@ -8,7 +8,6 @@ import os.path
 import docker
 import pkg_resources
 
-from . import __version__
 from . import helpers
 
 GROUP_SEPARATOR = b'\x1D'
@@ -55,9 +54,8 @@ def default_image_name(config, release):
         )
     else:
         img_name = req.project_name
-    img_name += ":{project_version}-{grocker_version}".format(
+    img_name += ":{project_version}".format(
         project_version=str(req.specifier)[2:],
-        grocker_version=__version__,
     )
     return '/'.join((docker_image_prefix, img_name)) if docker_image_prefix else img_name
 

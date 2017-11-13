@@ -11,7 +11,6 @@ import textwrap
 import unittest
 import itertools
 
-from grocker import __version__
 from grocker.builders import wheels
 from grocker.utils import parse_config
 from grocker.utils import default_image_name
@@ -100,14 +99,14 @@ class DefaultImageNameTC(unittest.TestCase):
         docker_prefixes = (None, 'registry.local')
         product = itertools.product(releases, image_names, docker_prefixes)
         expected_names = [
-            'grocker-test-project:2.0.0-{}',
-            'registry.local/grocker-test-project:2.0.0-{}',
-            'demo-app:2.0.0-{}',
-            'registry.local/demo-app:2.0.0-{}',
-            'grocker-test-project-pep8:2.0.0-{}',
-            'registry.local/grocker-test-project-pep8:2.0.0-{}',
-            'demo-app:2.0.0-{}',
-            'registry.local/demo-app:2.0.0-{}',
+            'grocker-test-project:2.0.0',
+            'registry.local/grocker-test-project:2.0.0',
+            'demo-app:2.0.0',
+            'registry.local/demo-app:2.0.0',
+            'grocker-test-project-pep8:2.0.0',
+            'registry.local/grocker-test-project-pep8:2.0.0',
+            'demo-app:2.0.0',
+            'registry.local/demo-app:2.0.0',
         ]
 
         for (release, image_base_name, docker_image_prefix), expected in zip(product, expected_names):
@@ -116,7 +115,7 @@ class DefaultImageNameTC(unittest.TestCase):
                 'docker_image_prefix': docker_image_prefix,
             }
             got = default_image_name(config, release)
-            self.assertEqual(got, expected.format(__version__))
+            self.assertEqual(got, expected)
 
 
 class PipConfigTestCase(unittest.TestCase):
