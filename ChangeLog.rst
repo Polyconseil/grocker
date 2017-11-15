@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.1 (unreleased)
+6.1 (2017-11-15)
 ----------------
 
 - Remove grocker version from the image default tag
