@@ -8,6 +8,7 @@ sphinx_rtd_theme
 check-manifest
 flake8
 flake8-bandit
+flake8-commas
 flake8-docstrings
 pytest
 readme-renderer

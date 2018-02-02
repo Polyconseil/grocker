@@ -26,7 +26,7 @@ def get_or_build_root_image(docker_client, config):
     return op.docker_get_or_build_image(
         docker_client,
         naming.image_name(config, 'root'),
-        lambda client: build.build_root_image(client, config)
+        lambda client: build.build_root_image(client, config),
     )
 
 
@@ -34,5 +34,5 @@ def get_or_build_compiler_image(docker_client, config):
     return op.docker_get_or_build_image(
         docker_client,
         naming.image_name(config, 'compiler'),
-        lambda client: build.build_compiler_image(client, config)
+        lambda client: build.build_compiler_image(client, config),
     )

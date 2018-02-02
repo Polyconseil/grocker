@@ -70,7 +70,7 @@ def docker_get_client(min_version=None):
             'Docker API version should be at least {expected} ({current})'.format(
                 current=client.version()['ApiVersion'],
                 expected=min_version,
-            )
+            ),
         )
     return client
 

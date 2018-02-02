@@ -31,7 +31,7 @@ def docker_run(image, command):
     container = client.containers.run(
         image=image,
         command=command,
-        detach=True
+        detach=True,
     )
 
     return_code = container.wait()
@@ -138,7 +138,7 @@ class AbstractBuildTestCase:
     def test_with_docker_prefix(self):
         config = {
             'runtime': self.runtime,
-            'entrypoint_name': '/bin/sh'
+            'entrypoint_name': '/bin/sh',
         }
         self.check(config, 'pep8==1.7', ['-c', 'pep8 --version'], '1.7.0', docker_prefix='grocker')
 
@@ -146,9 +146,9 @@ class AbstractBuildTestCase:
         config = {
             'runtime': self.runtime,
             'envs': {
-                'GROCKER_EXTRA_ENVVAR': 'Grocker!'
+                'GROCKER_EXTRA_ENVVAR': 'Grocker!',
             },
-            'entrypoint_name': '/bin/sh'
+            'entrypoint_name': '/bin/sh',
         }
         self.check(
             config,
