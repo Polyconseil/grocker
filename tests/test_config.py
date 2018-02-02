@@ -92,7 +92,7 @@ class ConfigTestCase(unittest.TestCase):
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
 
 
-class DefaultImageNameTC(unittest.TestCase):
+class DefaultImageNameTestCase(unittest.TestCase):
     def test_default_image_name(self):
         releases = ('grocker-test-project==2.0.0', 'grocker-test-project[pep8]==2.0.0')
         image_names = (None, 'demo-app')
