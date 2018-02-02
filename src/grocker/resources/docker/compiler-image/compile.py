@@ -67,7 +67,7 @@ def setup_pip(venv, package_dir):
 
 
 def setup_venv(python):
-    """Setup venv and return python interpreter."""
+    """Return python interpreter after setup the venv."""
     info('Setup venv using %s...', python)
     venv = tempfile.mkdtemp(suffix='.venv')
     try:

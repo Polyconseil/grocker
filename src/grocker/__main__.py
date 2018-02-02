@@ -28,7 +28,7 @@ def main(verbose):
 @click.option('-a', '--all-versions/--only-old-versions', default=False)
 @click.option('-f', '--including-final-images/--excluding-final-images', default=False)
 def purge(all_versions, including_final_images):
-    """Purge Grocker created Docker stuff"""
+    """Purge Grocker created Docker stuff."""
     docker_client = utils.docker_get_client()
     cleanners.docker_purge_container(docker_client, current_version=all_versions)
     cleanners.docker_purge_volumes(docker_client, current_version=all_versions)
@@ -80,9 +80,7 @@ def purge(all_versions, including_final_images):
 )
 @click.argument('release')
 def build(release, build_dependencies, build_image, push, **kwargs):
-    """
-    Build docker image for <release> (version specifiers can be used).
-    """
+    """Build docker image for <release> (version specifiers can be used)."""
     collect = {}  # will contain all collected information
     docker_client = utils.docker_get_client()
     collect['release'] = release

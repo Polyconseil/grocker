@@ -60,7 +60,7 @@ def render_template(template_path, output_path, context):
 @contextlib.contextmanager
 def pip_conf(pip_conf_path=None):
     """
-    Use or fake (when it does not exist) a pip config file
+    Use or fake (when it does not exist) a pip config file.
 
     Args:
         pip_conf_path: str, pip configuration file to use if it exists

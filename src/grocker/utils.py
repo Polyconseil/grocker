@@ -17,13 +17,14 @@ UNIT_SEPARATOR = b'\x1F'
 
 def config_identifier(config):
     """
-    Hash config to get an unique identifier
+    Hash config to get an unique identifier.
 
     Args:
         config (dict): Grocker config
 
     Returns:
         str: Config identifier (SHA 256)
+
     """
     def unit_list(l):
         return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in l))
@@ -92,7 +93,7 @@ def get_dependencies(config, with_build_dependencies=False):
 
 def parse_config(config_paths, **kwargs):
     """
-    Generate config regarding precedence order
+    Generate config regarding precedence order.
 
     Precedence order is defined as :
 

@@ -23,7 +23,7 @@ def created_by_older_version(obj):
 
 def docker_purge_container(docker_client, current_version=False):
     """
-    Purge Grocker internal containers
+    Purge Grocker internal containers.
 
     Args:
         docker_client (docker.DockerClient): a docker client
@@ -51,11 +51,11 @@ def docker_purge_container(docker_client, current_version=False):
 
 def docker_purge_volumes(docker_client, current_version=False):
     """
-        Purge Grocker volumes
+    Purge Grocker volumes.
 
-        Args:
-            docker_client (docker.DockerClient): a docker client
-            current_version (bool): whether the volumes for current version will be deleted
+    Args:
+        docker_client (docker.DockerClient): a docker client
+        current_version (bool): whether the volumes for current version will be deleted
     """
     removable_volumes = [
         volume
@@ -76,7 +76,7 @@ def docker_purge_volumes(docker_client, current_version=False):
 
 def docker_purge_images(docker_client, current_version=False, runner=False):
     """
-    Purge Grocker images
+    Purge Grocker images.
 
     Args:
         docker_client (docker.DockerClient): a docker client
