@@ -44,7 +44,9 @@ def config_identifier(config):
 
 def default_image_name(config, release):
     req = pkg_resources.Requirement.parse(release)
-    assert str(req.specifier).startswith('=='), "Only fixed version can use default image name."
+    if not str(req.specifier).startswith('=='):
+        raise RuntimeError("Only fixed version can use default image name.")
+
     docker_image_prefix = config['docker_image_prefix']
     if config['image_base_name']:
         img_name = config['image_base_name']

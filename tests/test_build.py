@@ -71,10 +71,10 @@ class AbstractBuildTestCase:
                 call_args += ['--image-prefix', docker_prefix]
             if self.runtime:
                 call_args += ['--runtime', self.runtime]
-            subprocess.check_call(call_args, cwd=cwd)
+            subprocess.check_call(call_args, cwd=cwd)  # noqa: B603
 
             with open(result_file_path) as fp:
-                results = yaml.load(fp)
+                results = yaml.safe_load(fp)
 
             self.assertNotIn('hash', results)
             self.assertIn('image', results)
@@ -93,7 +93,7 @@ class AbstractBuildTestCase:
     def check(self, config, release, cmd, expected, docker_prefix=None):
         with grocker.six.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
-                yaml.dump(config, fp)
+                yaml.safe_dump(config, fp)
 
             logs, inspect_data = self.run_grocker(
                 release,

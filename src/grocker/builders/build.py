@@ -96,8 +96,8 @@ def build_runner_image(docker_client, config, name, release):
     requirement = requirements.Requirement(release)
 
     # Markers would not make much sense here and url are unsupported.
-    assert requirement.marker is None, requirement
-    assert requirement.url is None, requirement
+    if requirement.marker or requirement.url:
+        raise RuntimeError("Unsupported release specifier: %s" % release)
 
     with op.docker_build_context('resources/docker/runner-image') as build_dir:
         context = {

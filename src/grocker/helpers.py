@@ -27,7 +27,7 @@ def copy_resource(resource, destination, package='grocker'):
 
 def load_yaml(file_path):
     with io.open(file_path, encoding='utf-8') as fp:
-        return yaml.load(fp.read())
+        return yaml.safe_load(fp.read())
 
 
 def dump_yaml(file_path, data):
@@ -36,7 +36,7 @@ def dump_yaml(file_path, data):
         os.makedirs(directory)
 
     with io.open(file_path, 'w') as fp:
-        return yaml.dump(data, stream=fp, indent=True)
+        return yaml.safe_dump(data, stream=fp, indent=True)
 
 
 def load_yaml_resource(resource, package='grocker'):
@@ -45,7 +45,7 @@ def load_yaml_resource(resource, package='grocker'):
 
 
 def render_template(template_path, output_path, context):
-    env = jinja2.Environment()
+    env = jinja2.Environment()  # noqa: B701
     env.filters['jsonify'] = json.dumps
 
     with io.open(template_path, encoding='utf-8') as template_file:

@@ -72,10 +72,12 @@ def setup_venv(python):
     venv = tempfile.mkdtemp(suffix='.venv')
     try:
         # python 3
-        subprocess.check_call([python, '-m', 'venv', venv])
+        subprocess.check_call([python, '-m', 'venv', venv])  # noqa: B603
     except subprocess.CalledProcessError:
-        subprocess.check_call([python, '-m', 'virtualenv', venv])
-    subprocess.check_call([os.path.join(venv, 'bin', 'pip'), 'install', '-U', 'pip', 'setuptools', 'wheel'])
+        subprocess.check_call([python, '-m', 'virtualenv', venv])  # noqa: B603
+    subprocess.check_call(  # noqa: B603
+        [os.path.join(venv, 'bin', 'pip'), 'install', '-U', 'pip', 'setuptools', 'wheel'],
+    )
     return venv
 
 
@@ -84,7 +86,11 @@ def build_wheels(venv, package, package_dir, constraint=None):
     pip = os.path.join(venv, 'bin', 'pip')
     constraint_args = ['--constraint', constraint] if constraint else []
     try:
-        subprocess.check_call([pip, 'wheel', '--wheel-dir', package_dir] + constraint_args + [package])
+        subprocess.check_call(  # noqa: B603
+            [pip, 'wheel', '--wheel-dir', package_dir]
+            + constraint_args
+            + [package],
+        )
         return True
     except subprocess.CalledProcessError as exc:
         info(str(exc))
