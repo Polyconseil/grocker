@@ -20,10 +20,6 @@ from . import naming
 logger = logging.getLogger(__name__)
 
 
-def should_pull(config):
-    return bool(config['docker_image_prefix'])
-
-
 def build_root_image(docker_client, config):
     with op.docker_build_context('resources/docker/root-image') as build_dir:
         cfg = config['runtimes'][config['runtime']]

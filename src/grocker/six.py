@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import shutil
 import tempfile
-import types
 
 # pylint: disable=unused-import,import-error
 try:
@@ -14,17 +13,6 @@ try:
 except ImportError:
     import ConfigParser as configparser  # noqa
 # pylint: enable=unused-import,import-error
-
-
-def super6(cls, self, method, *args, **kwargs):
-    """
-    A kind of super() working on both old style and new style classes.
-    """
-    classobj = getattr(types, 'ClassType', type(None))
-    if isinstance(cls, classobj):
-        getattr(cls.__bases__[-1], method)(self, *args, **kwargs)
-    else:
-        getattr(super(cls, self), method)(*args, **kwargs)
 
 
 class TemporaryDirectory(object):
@@ -50,7 +38,3 @@ class TemporaryDirectory(object):
 
     def __exit__(self, exc, value, tb):
         shutil.rmtree(self.name)
-
-
-def smart_text(text, encoding='utf-8'):
-    return text.decode(encoding) if isinstance(text, bytes) else text
