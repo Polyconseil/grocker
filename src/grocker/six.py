@@ -36,5 +36,5 @@ class TemporaryDirectory(object):
     def __enter__(self):
         return self.name
 
-    def __exit__(self, exc, value, tb):
+    def __exit__(self, exc, _value, _tb):
         shutil.rmtree(self.name)
