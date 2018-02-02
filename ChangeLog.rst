@@ -4,7 +4,7 @@ ChangeLog
 6.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Switch to Docker(-py) 3.0
 
 
 6.1 (2017-11-15)

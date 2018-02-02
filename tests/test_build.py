@@ -80,12 +80,12 @@ class AbstractBuildTestCase:
             self.assertIn('image', results)
             self.assertEqual(image_name, results['image'])
 
-            return_code, logs = docker_run(
+            result, logs = docker_run(
                 image_name,
                 command,
             )
 
-            self.assertEqual(return_code, 0, msg=logs)
+            self.assertEqual(result['StatusCode'], 0, msg=(result, logs))
             return logs.decode('utf-8'), docker_inspect(image_name)
         finally:
             docker_rmi(image_name)

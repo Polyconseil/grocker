@@ -117,10 +117,10 @@ def docker_run_container(docker_client, name, command, volumes=None, environment
     stream = container.attach(stream=True, logs=True)
     for line in stream:
         print(line.decode('utf-8'), end='')
-    return_code = container.wait()
+    result = container.wait()
     container.remove()
-    if return_code != 0:
-        raise RuntimeError('Container exit with a non-zero return code (%d).', return_code)
+    if result['StatusCode'] != 0:
+        raise RuntimeError('Container exit with a non-zero return code (%s).' % result)
 
 
 def _inspect_stream(stream):
