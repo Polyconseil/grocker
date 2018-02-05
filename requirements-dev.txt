@@ -1,3 +1,6 @@
+# Installation
+setuptools>=30.3
+
 # Documentation
 docutils
 pygments
