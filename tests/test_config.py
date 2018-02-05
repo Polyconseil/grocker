@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import contextlib
 import io
+import itertools
 import os
 import os.path
 import tempfile
 import textwrap
 import unittest
-import itertools
 
-from grocker.builders import wheels
-from grocker.utils import parse_config
-from grocker.utils import default_image_name
+import grocker.builders as grocker_builders
 import grocker.six as grocker_six
+import grocker.utils as grocker_utils
 
 
 @contextlib.contextmanager
@@ -56,7 +59,7 @@ class ConfigTestCase(unittest.TestCase):
             write_file(tmp_dir, 'first.yml', self.first_config_content)
             write_file(tmp_dir, 'second.yml', self.second_config_content)
 
-            config = parse_config(['first.yml', 'second.yml'])
+            config = grocker_utils.parse_config(['first.yml', 'second.yml'])
             self.assertNotIn('not_used_key', config)  # .grocker.yml is not read
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
             self.assertEqual(config.get('dependencies'), 'first.yml')  # from first.yml
@@ -71,23 +74,23 @@ class ConfigTestCase(unittest.TestCase):
 
         with mkchtmpdir() as tmp_dir:
             write_file(tmp_dir, '.grocker.yml', self.grocker_yml_content)
-            self.assertRaises(raised_error, parse_config, ['not_existing_config_file.yml'])
+            self.assertRaises(raised_error, grocker_utils.parse_config, ['not_existing_config_file.yml'])
 
     def test_empty_config(self):
         with mkchtmpdir() as tmp_dir:
             write_file(tmp_dir, 'empty.yml', '')
-            config = parse_config(['empty.yml'])
+            config = grocker_utils.parse_config(['empty.yml'])
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
 
     def test_not_grocker_yml(self):
         with mkchtmpdir():
-            config = parse_config([])
+            config = grocker_utils.parse_config([])
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
 
     def test_grocker_yml(self):
         with mkchtmpdir() as tmp_dir:
             write_file(tmp_dir, '.grocker.yml', self.grocker_yml_content)
-            config = parse_config([])
+            config = grocker_utils.parse_config([])
             self.assertIn('not_used_key', config)  # .grocker.yml is read
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
 
@@ -114,7 +117,7 @@ class DefaultImageNameTestCase(unittest.TestCase):
                 'image_base_name': image_base_name,
                 'docker_image_prefix': docker_image_prefix,
             }
-            got = default_image_name(config, release)
+            got = grocker_utils.default_image_name(config, release)
             self.assertEqual(got, expected)
 
 
@@ -128,7 +131,7 @@ class PipConfigTestCase(unittest.TestCase):
                 index-url=http://example.com/simple
             """).encode())
             f.flush()
-            env = wheels.get_pip_env(f.name)
+            env = grocker_builders.wheels.get_pip_env(f.name)
         self.assertEqual(
             env,
             {

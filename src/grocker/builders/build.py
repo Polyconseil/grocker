@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import contextlib
 import logging
@@ -11,11 +12,11 @@ import shutil
 import docker.errors
 from packaging import requirements
 
+from . import naming
+from . import op
 from .. import __version__
 from .. import helpers
 from .. import utils
-from . import op
-from . import naming
 
 logger = logging.getLogger(__name__)
 
