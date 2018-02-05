@@ -18,6 +18,7 @@ pep8-naming
 pytest
 readme-renderer
 tox
+vulture
 
 # Release
 zest.releaser[recommended]

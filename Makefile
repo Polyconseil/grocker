@@ -1,4 +1,4 @@
-.PHONY: update docs quality tests clean
+.PHONY: update docs quality Quality tests clean
 
 update:
 	pip install -r requirements-dev.txt
@@ -11,6 +11,9 @@ quality:
 	python setup.py check --strict --metadata --restructuredtext
 	check-manifest
 	flake8 src tests setup.py
+
+Quality:  # not used in tests
+	vulture --exclude=build/ src tests setup.py
 
 tests:
 	py.test tests
