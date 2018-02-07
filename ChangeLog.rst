@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.2 (unreleased)
+6.2 (2018-02-07)
 ----------------
 
 - Switch to Docker(-py) 3.0
