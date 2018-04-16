@@ -4,7 +4,7 @@ ChangeLog
 6.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Use latest pip version (10.0)
 
 
 6.2 (2018-02-07)

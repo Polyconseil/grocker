@@ -10,13 +10,15 @@ import io
 import json
 import os.path
 import shutil
+import subprocess
 import tempfile
 import time
 
 import jinja2
-import pip.baseparser
 import pkg_resources
 import yaml
+
+from .six import configparser
 
 
 def copy_resource(resource, destination, package='grocker'):
@@ -72,7 +74,17 @@ def pip_conf(pip_conf_path=None):
     """
     if pip_conf_path is None or not os.path.exists(pip_conf_path):
         with tempfile.NamedTemporaryFile('w', dir=os.path.expanduser('~/.cache')) as f:
-            config = pip.baseparser.ConfigOptionParser(name='global').config
+            config = configparser.RawConfigParser()
+            config.add_section('global')
+            for key in ['index-url', 'timeout', 'extra-index']:
+                try:
+                    output = subprocess.check_output(  # noqa: B603,B607
+                        ['pip', 'config', 'get', 'global.{}'.format(key)],
+                    )
+                    value = output.decode().strip()
+                    config.set('global', key, value)
+                except subprocess.CalledProcessError:
+                    pass
             config.write(f)
             f.flush()
             yield f.name
