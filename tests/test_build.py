@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 
 import os
 import re
-import subprocess
+import subprocess  # noqa: S404
 import tempfile
 import unittest
 import uuid
@@ -73,7 +73,7 @@ class AbstractBuildTestCase:
                 call_args += ['--image-prefix', docker_prefix]
             if self.runtime:
                 call_args += ['--runtime', self.runtime]
-            subprocess.check_call(call_args, cwd=cwd)  # noqa: B603
+            subprocess.check_call(call_args, cwd=cwd)  # noqa: S603
 
             with open(result_file_path) as fp:
                 results = yaml.safe_load(fp)

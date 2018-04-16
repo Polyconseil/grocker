@@ -10,7 +10,7 @@ import logging
 import logging.config
 import os
 import os.path
-import subprocess
+import subprocess  # noqa: S404
 import tempfile
 import zlib
 
@@ -75,10 +75,10 @@ def setup_venv(python):
     venv = tempfile.mkdtemp(suffix='.venv')
     try:
         # python 3
-        subprocess.check_call([python, '-m', 'venv', venv])  # noqa: B603
+        subprocess.check_call([python, '-m', 'venv', venv])  # noqa: S603
     except subprocess.CalledProcessError:
-        subprocess.check_call([python, '-m', 'virtualenv', venv])  # noqa: B603
-    subprocess.check_call(  # noqa: B603
+        subprocess.check_call([python, '-m', 'virtualenv', venv])  # noqa: S603
+    subprocess.check_call(  # noqa: S603
         [os.path.join(venv, 'bin', 'pip'), 'install', '-U', 'pip', 'setuptools', 'wheel'],
     )
     return venv
@@ -89,7 +89,7 @@ def build_wheels(venv, package, package_dir, constraint=None):
     pip = os.path.join(venv, 'bin', 'pip')
     constraint_args = ['--constraint', constraint] if constraint else []
     try:
-        subprocess.check_call(  # noqa: B603
+        subprocess.check_call(  # noqa: S603
             [pip, 'wheel', '--wheel-dir', package_dir]
             + constraint_args
             + [package],

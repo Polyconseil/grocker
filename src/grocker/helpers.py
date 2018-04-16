@@ -10,7 +10,7 @@ import io
 import json
 import os.path
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 import tempfile
 import time
 
@@ -49,7 +49,7 @@ def load_yaml_resource(resource, package='grocker'):
 
 
 def render_template(template_path, output_path, context):
-    env = jinja2.Environment()  # noqa: B701
+    env = jinja2.Environment()  # noqa: S701
     env.filters['jsonify'] = json.dumps
 
     with io.open(template_path, encoding='utf-8') as template_file:
@@ -78,7 +78,7 @@ def pip_conf(pip_conf_path=None):
             config.add_section('global')
             for key in ['index-url', 'timeout', 'extra-index']:
                 try:
-                    output = subprocess.check_output(  # noqa: B603,B607
+                    output = subprocess.check_output(  # noqa: S603,S607
                         ['pip', 'config', 'get', 'global.{}'.format(key)],
                     )
                     value = output.decode().strip()

@@ -10,7 +10,7 @@ sphinx_rtd_theme
 # Tests and Quality
 check-manifest
 flake8
-flake8-bandit
+flake8-bandit>=1.0.2
 flake8-bugbear
 flake8-builtins-unleashed
 flake8-commas
