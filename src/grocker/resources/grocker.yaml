@@ -54,6 +54,15 @@ runtimes:  # grocker internal configuration
         - build-essential
         - python3-dev
 
+  "stretch/3.6":
+    # TODO: this is a rolling-release tag, so the root image needs to be updated to
+    # grab the latest upstream image.
+    image: python:3.6-slim-stretch
+    runtime: python3
+    dependencies:
+      build:
+        - build-essential
+
 # There begin the project configuration (so all values below are use as default)
 
 runtime: alpine/3.6

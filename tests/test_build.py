@@ -235,6 +235,10 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
         self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', script], 'True')
 
 
+class DebianPython36BuildTestCase(DebianBuildTestCase):
+    runtime = 'stretch/3.6'
+
+
 class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):
     runtime = 'alpine/3.6'
     dependencies = {

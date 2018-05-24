@@ -4,7 +4,7 @@ ChangeLog
 6.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add support for Python's stretch+3.6 docker image.
 
 
 6.2.1 (2018-04-16)
