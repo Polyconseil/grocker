@@ -179,7 +179,7 @@ class AbstractBuildTestCase:
 
 
 class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
-    runtime = 'stretch/3.5'
+    runtime = 'stretch/3.6'
     dependencies = {
         'build': ['libjpeg62-turbo-dev'],
         'run': ['libjpeg62-turbo'],
@@ -233,10 +233,6 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
             "print('nginx' in output.decode())",
         ])
         self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', script], 'True')
-
-
-class DebianPython36BuildTestCase(DebianBuildTestCase):
-    runtime = 'stretch/3.6'
 
 
 class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):

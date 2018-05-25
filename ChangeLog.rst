@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Add support for Python's stretch+3.6 docker image.
+- Deprecate stretch/3.5 runtime
 
 
 6.2.1 (2018-04-16)

@@ -43,6 +43,7 @@ runtimes:  # grocker internal configuration
         - python3-dev
 
   "stretch/3.5":
+    deprecated: yes
     image: debian:stretch
     runtime: python3.5
     dependencies:
