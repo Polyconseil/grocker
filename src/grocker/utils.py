@@ -105,7 +105,7 @@ def parse_config(config_paths, **kwargs):
     2. project ``.grocker.yml`` file (or the one specified on the command line)
     3. the grocker ``resources/grocker.yaml`` file
     """
-    config = helpers.load_yaml_resource('resources/grocker.yaml')
+    config = helpers.load_yaml_resource('grocker.resources', 'grocker.yaml')
 
     if not config_paths and os.path.exists('.grocker.yml'):
         config_paths = ['.grocker.yml']

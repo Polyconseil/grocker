@@ -14,19 +14,23 @@ import subprocess  # noqa: S404
 import tempfile
 import time
 
+import importlib_resources as resources
 import jinja2
-import pkg_resources
 import yaml
 
 from .six import configparser
+from .six import makedirs
 
 
-def copy_resource(resource, destination, package='grocker'):
-    resource_path = pkg_resources.resource_filename(package, resource)
-    if pkg_resources.isdir(resource_path):
-        shutil.copytree(resource_path, destination)
-    else:
-        shutil.copy2(resource_path, destination)
+def copy_resources(package, destination):
+    makedirs(destination, exist_ok=True)
+
+    for entry in resources.contents(package):
+        if not resources.is_resource(package, entry):
+            continue
+
+        with resources.path(package, entry) as resource_path:
+            shutil.copy2(str(resource_path), destination)
 
 
 def load_yaml(file_path):
@@ -36,16 +40,15 @@ def load_yaml(file_path):
 
 def dump_yaml(file_path, data):
     directory = os.path.dirname(file_path)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    makedirs(directory, exist_ok=True)
 
     with io.open(file_path, 'w') as fp:
         return yaml.safe_dump(data, stream=fp, indent=True)
 
 
-def load_yaml_resource(resource, package='grocker'):
-    resource_path = pkg_resources.resource_filename(package, resource)
-    return load_yaml(resource_path)
+def load_yaml_resource(package, name):
+    with resources.path(package, name) as resource_path:
+        return load_yaml(str(resource_path))
 
 
 def render_template(template_path, output_path, context):

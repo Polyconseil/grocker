@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_root_image(docker_client, config):
-    with op.docker_build_context('resources/docker/root-image') as build_dir:
+    with op.docker_build_context('grocker.resources.docker.root-image') as build_dir:
         cfg = config['runtimes'][config['runtime']]
         context = {
             'base_image': cfg['image'],
@@ -58,7 +58,7 @@ def build_root_image(docker_client, config):
 
 
 def build_compiler_image(docker_client, config):
-    with op.docker_build_context('resources/docker/compiler-image') as build_dir:
+    with op.docker_build_context('grocker.resources.docker.compiler-image') as build_dir:
         context = {
             'base_image': naming.image_name(config, 'root'),
             'runtime': config['runtimes'][config['runtime']]['runtime'],
@@ -84,7 +84,7 @@ def build_compiler_image(docker_client, config):
 
 
 def build_wheel_server_image(docker_client, config):
-    with op.docker_build_context('resources/docker/wheel-server') as build_dir:
+    with op.docker_build_context('grocker.resources.docker.wheel-server') as build_dir:
         return op.docker_build_image(
             docker_client,
             build_dir,
@@ -100,7 +100,7 @@ def build_runner_image(docker_client, config, name, release):
     if requirement.marker or requirement.url:
         raise RuntimeError("Unsupported release specifier: %s" % release)
 
-    with op.docker_build_context('resources/docker/runner-image') as build_dir:
+    with op.docker_build_context('grocker.resources.docker.runner-image') as build_dir:
         context = {
             'base_image': naming.image_name(config, 'root'),
             'entrypoint_name': config['entrypoint_name'],

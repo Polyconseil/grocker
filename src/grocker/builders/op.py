@@ -27,10 +27,10 @@ def is_prefixed_image(name):
 
 
 @contextlib.contextmanager
-def docker_build_context(context_path):
+def docker_build_context(context_module):
     with six.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
-        helpers.copy_resource(context_path, build_dir)
+        helpers.copy_resources(context_module, build_dir)
         yield build_dir
 
 

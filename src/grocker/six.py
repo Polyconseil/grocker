@@ -5,6 +5,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import os
+import os.path
 import shutil
 import tempfile
 
@@ -40,3 +42,9 @@ class TemporaryDirectory(object):
 
     def __exit__(self, exc, _value, _tb):
         shutil.rmtree(self.name)
+
+
+def makedirs(name, mode=0o777, exist_ok=False):
+    if exist_ok and os.path.exists(name):
+        return
+    os.makedirs(name, mode=mode)
