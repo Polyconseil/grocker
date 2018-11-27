@@ -108,12 +108,3 @@ def retry(exception, tries=3, delay=1):
                     time.sleep(delay)
         return inner
     return decorator
-
-
-def get_version_from_requirement(requirement):
-    if len(requirement.specifier) != 1:
-        raise ValueError("Only exact specifier are accepted: %s" % requirement)
-    spec = list(requirement.specifier)[0]
-    if spec.operator not in ('==', '==='):
-        raise ValueError("Only exact specifier are accepted: %s" % requirement)
-    return spec.version

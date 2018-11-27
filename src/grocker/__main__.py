@@ -83,6 +83,7 @@ def purge(all_versions, including_final_images):
 @click.argument('release')
 def build(release, build_dependencies, build_image, push, **kwargs):
     """Build docker image for <release> (version specifiers can be used)."""
+    requirement = utils.GrockerRequirement.parse(release)
     collect = {}  # will contain all collected information
     docker_client = utils.docker_get_client()
     collect['release'] = release
@@ -98,7 +99,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
         ports=kwargs['port'],
         envs=dict(item.split('=', 1) for item in kwargs['env']),
     )
-    image_name = kwargs['image_name'] or utils.default_image_name(config, release)
+    image_name = kwargs['image_name'] or utils.default_image_name(config, requirement)
     collect['image'] = image_name
 
     # Raise if grocker do not known the runtime
@@ -121,7 +122,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
             builders.compile_wheels(
                 docker_client=docker_client,
                 config=config,
-                release=release,
+                requirement=requirement,
                 pip_conf=pip_conf,
             )
 
@@ -133,7 +134,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
             docker_client=docker_client,
             config=config,
             name=image_name,
-            release=release,
+            requirement=requirement,
         )
 
     if push:

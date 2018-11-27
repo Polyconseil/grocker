@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import base64
 import logging
+import os.path
 import zlib
 
 from . import naming
@@ -41,7 +42,7 @@ def get_pip_env(pip_conf):
     return env
 
 
-def compile_wheels(docker_client, config, release, pip_conf):
+def compile_wheels(docker_client, config, requirement, pip_conf):
     wheels_destination_volume = op.get_or_create_data_volume(
         docker_client,
         naming.wheel_volume_name(config),
@@ -57,7 +58,14 @@ def compile_wheels(docker_client, config, release, pip_conf):
             'mode': 'rw',
         },
     }
-    command = ['--python', config['runtimes'][config['runtime']]['runtime'], release]
+    if requirement.filepath:
+        filename = os.path.basename(requirement.filepath)
+        to_install = '/tmp/src/{}'.format(filename)  # noqa: S108
+        volumes[requirement.filepath] = {'bind': to_install, 'mode': 'ro'}
+    else:
+        to_install = requirement.to_install
+
+    command = ['--python', config['runtimes'][config['runtime']]['runtime'], to_install]
     environment = get_pip_env(pip_conf)
 
     if config['pip_constraint']:

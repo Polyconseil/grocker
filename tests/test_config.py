@@ -95,30 +95,90 @@ class ConfigTestCase(unittest.TestCase):
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
 
 
-class DefaultImageNameTestCase(unittest.TestCase):
-    def test_default_image_name(self):
-        releases = ('grocker-test-project==2.0.0', 'grocker-test-project[pep8]==2.0.0')
-        image_names = (None, 'demo-app')
-        docker_prefixes = (None, 'registry.local')
-        product = itertools.product(releases, image_names, docker_prefixes)
-        expected_names = [
-            'grocker-test-project:2.0.0',
-            'registry.local/grocker-test-project:2.0.0',
-            'demo-app:2.0.0',
-            'registry.local/demo-app:2.0.0',
-            'grocker-test-project-pep8:2.0.0',
-            'registry.local/grocker-test-project-pep8:2.0.0',
-            'demo-app:2.0.0',
-            'registry.local/demo-app:2.0.0',
-        ]
+class GrockerRequirementTestCase(unittest.TestCase):
 
-        for (release, image_base_name, docker_image_prefix), expected in zip(product, expected_names):
-            config = {
-                'image_base_name': image_base_name,
-                'docker_image_prefix': docker_image_prefix,
-            }
-            got = grocker_utils.default_image_name(config, release)
-            self.assertEqual(got, expected)
+    def test_existing_filepath(self):
+        with grocker_six.TemporaryDirectory() as tmpdir:
+            filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
+            filepath = os.path.join(tmpdir, filename)
+            with open(filepath, 'w'):
+                pass
+            grocker_req = grocker_utils.GrockerRequirement.parse(filepath)
+            self.assertEqual('1.2.3', grocker_req.version)
+            self.assertEqual('grocker-test-project', grocker_req.project_name)
+            self.assertEqual([], grocker_req.extras)
+            self.assertEqual(filepath, grocker_req.filepath)
+
+    def test_existing_filepath_with_extras(self):
+        with grocker_six.TemporaryDirectory() as tmpdir:
+            filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
+            filepath = os.path.join(tmpdir, filename)
+            with open(filepath, 'w'):
+                pass
+            grocker_req = grocker_utils.GrockerRequirement.parse(filepath + '[extra2,extra1]')
+            self.assertEqual('1.2.3', grocker_req.version)
+            self.assertEqual('grocker-test-project', grocker_req.project_name)
+            self.assertEqual(['extra1', 'extra2'], grocker_req.extras)
+            self.assertEqual(filepath, grocker_req.filepath)
+
+    def test_valid_req(self):
+        grocker_req = grocker_utils.GrockerRequirement.parse('grocker-test-project[extra2, extra1]==2.0')
+        self.assertEqual('2.0', grocker_req.version)
+        self.assertEqual('grocker-test-project', grocker_req.project_name)
+        self.assertEqual(['extra1', 'extra2'], grocker_req.extras)
+        self.assertIsNone(grocker_req.filepath)
+
+    def test_invalid_reqs(self):
+        for invalid_req in (
+            './grocker_test_project-1.2.3-py2.py3-none-any.whl',  # Unexistent file
+            'grocker-test-project == 2.0 @ file://toto',
+        ):
+            with self.assertRaises(ValueError):
+                grocker_utils.GrockerRequirement.parse(invalid_req)
+
+
+class DefaultImageNameTestCase(unittest.TestCase):
+
+    def test_default_image_name(self):
+        with grocker_six.TemporaryDirectory() as tmpdir:
+            filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
+            filepath = os.path.join(tmpdir, filename)
+            with open(filepath, 'w'):
+                pass
+            releases = (
+                'grocker-test-project==2.0.0',
+                'grocker-test-project[pep8]==2.0.0',
+                filepath,
+            )
+            image_names = (None, 'demo-app')
+            docker_prefixes = (None, 'registry.local')
+            product = itertools.product(releases, image_names, docker_prefixes)
+            expected_names = [
+                # classic
+                'grocker-test-project:2.0.0',
+                'registry.local/grocker-test-project:2.0.0',
+                'demo-app:2.0.0',
+                'registry.local/demo-app:2.0.0',
+                # with extra
+                'grocker-test-project-pep8:2.0.0',
+                'registry.local/grocker-test-project-pep8:2.0.0',
+                'demo-app:2.0.0',
+                'registry.local/demo-app:2.0.0',
+                # from path
+                'grocker-test-project:1.2.3',
+                'registry.local/grocker-test-project:1.2.3',
+                'demo-app:1.2.3',
+                'registry.local/demo-app:1.2.3',
+            ]
+
+            for (release, image_base_name, docker_image_prefix), expected in zip(product, expected_names):
+                config = {
+                    'image_base_name': image_base_name,
+                    'docker_image_prefix': docker_image_prefix,
+                }
+                grocker_req = grocker_utils.GrockerRequirement.parse(release)
+                got = grocker_utils.default_image_name(config, grocker_req)
+                self.assertEqual(got, expected)
 
 
 class PipConfigTestCase(unittest.TestCase):

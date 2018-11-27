@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import os
 import re
 import subprocess  # noqa: S404
+import sys
 import tempfile
 import unittest
 import uuid
@@ -115,6 +116,27 @@ class AbstractBuildTestCase:
         msg = 'Grocker build this successfully !'
         expected = msg
         self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), msg, expected)
+
+    def test_from_path(self):
+        test_project_path = os.path.abspath(os.path.join(__file__, '..', 'resources', 'grocker-test-project'))
+        subprocess.check_call([  # noqa: S603
+                sys.executable,
+                'setup.py',
+                'bdist_wheel',
+                '--universal',
+            ],
+            cwd=test_project_path,
+        )
+        wheel_filepath = os.path.join(
+            test_project_path, 'dist', 'grocker_test_project-3.0.1-py2.py3-none-any.whl',
+        )
+        config = {
+            'runtime': self.runtime,
+            'dependencies': self.dependencies,
+        }
+        msg = 'Grocker build this successfully !'
+        expected = msg
+        self.check(config, wheel_filepath, msg, expected)
 
     def test_pip_constraints(self):
         with tempfile.NamedTemporaryFile() as fp:
