@@ -8,7 +8,8 @@ import hashlib
 import os.path
 
 import docker
-import pkg_resources
+import packaging.utils
+from packaging import requirements
 
 from . import helpers
 
@@ -44,11 +45,7 @@ def config_identifier(config):
     return digest.hexdigest()
 
 
-def default_image_name(config, release):
-    req = pkg_resources.Requirement.parse(release)
-    if not str(req.specifier).startswith('=='):
-        raise RuntimeError("Only fixed version can use default image name.")
-
+def default_image_name(config, req):
     docker_image_prefix = config['docker_image_prefix']
     if config['image_base_name']:
         img_name = config['image_base_name']
@@ -60,7 +57,7 @@ def default_image_name(config, release):
     else:
         img_name = req.project_name
     img_name += ":{project_version}".format(
-        project_version=str(req.specifier)[2:],
+        project_version=req.version,
     )
     return '/'.join((docker_image_prefix, img_name)) if docker_image_prefix else img_name
 
@@ -117,3 +114,68 @@ def parse_config(config_paths, **kwargs):
     config.update({k: v for k, v in kwargs.items() if v})
 
     return config
+
+
+class GrockerRequirement(object):
+
+    def __init__(self, project_name, operator, version, extras, filepath):
+        self.project_name = packaging.utils.canonicalize_name(project_name)
+        self.operator = operator
+        self.version = version
+        self.extras = extras
+        self.filepath = filepath
+
+    @classmethod
+    def parse(cls, release):
+        if os.path.sep in release:
+            return cls.parse_from_filepath(release)
+        else:
+            return cls.parse_from_req(release)
+
+    @classmethod
+    def parse_from_req(cls, release):
+        requirement = requirements.Requirement(release)
+        if len(requirement.specifier) != 1:
+            raise ValueError("A single exact specifier is mandatory: %s" % requirement)
+        if requirement.url or requirement.marker:
+            raise ValueError("Invalid requirement: %s: marker and url are ignored" % requirement)
+        spec = list(requirement.specifier)[0]
+        if spec.operator not in ('==', '==='):
+            raise ValueError("Only exact specifier are accepted: %s" % requirement)
+        version = spec.version
+        return cls(
+            project_name=requirement.name,
+            operator=spec.operator,
+            version=version,
+            extras=sorted(requirement.extras),
+            filepath=None,
+        )
+
+    @classmethod
+    def parse_from_filepath(cls, release):
+        if release.endswith(']'):
+            filepath, _, extras = release[:-1].rpartition('[')
+            extras = sorted(extra.strip() for extra in extras.split(','))
+        else:
+            filepath = release
+            extras = []
+        if not os.path.exists(filepath):
+            raise ValueError("Invalid filepath %s" % release)
+        if not filepath.endswith('.whl'):
+            raise ValueError("Invalid filepath %s: only .whl are accepted" % release)
+        wheel_file_parts = os.path.basename(filepath).split('-')
+        return cls(
+            project_name=wheel_file_parts[0],
+            operator='==',
+            version=wheel_file_parts[1],
+            extras=extras,
+            filepath=os.path.abspath(filepath),
+        )
+
+    @property
+    def to_install(self):
+        parts = [self.project_name]
+        if self.extras:
+            parts.append("[{}]".format(",".join(sorted(self.extras))))
+        parts.extend([self.operator, self.version])
+        return "".join(parts)

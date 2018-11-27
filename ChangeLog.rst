@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Python 2.7 support (for Grocker command) will be dropped in next major version (**deprecation warning**)
+- Accept wheel path as release argument
 
 
 6.3 (2018-05-25)

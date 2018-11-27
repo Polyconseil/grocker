@@ -10,7 +10,6 @@ import os.path
 import shutil
 
 import docker.errors
-from packaging import requirements
 
 from . import naming
 from . import op
@@ -93,20 +92,15 @@ def build_wheel_server_image(docker_client, config):
         )
 
 
-def build_runner_image(docker_client, config, name, release):
-    requirement = requirements.Requirement(release)
-
+def build_runner_image(docker_client, config, name, requirement):
     # Markers would not make much sense here and url are unsupported.
-    if requirement.marker or requirement.url:
-        raise RuntimeError("Unsupported release specifier: %s" % release)
-
     with op.docker_build_context('grocker.resources.docker.runner-image') as build_dir:
         context = {
             'base_image': naming.image_name(config, 'root'),
             'entrypoint_name': config['entrypoint_name'],
-            'app_name': requirement.name,
+            'app_name': requirement.project_name,
             'app_extras': ','.join(sorted(requirement.extras)),
-            'app_version': helpers.get_version_from_requirement(requirement),
+            'app_version': requirement.version,
             'volumes': config['volumes'],
             'ports': config['ports'],
             'envs': config['envs'],
