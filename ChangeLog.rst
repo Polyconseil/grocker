@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.4 (unreleased)
+6.4 (2018-11-28)
 ----------------
 
 - Python 2.7 support (for Grocker command) will be dropped in next major version (**deprecation warning**)
