@@ -4,7 +4,7 @@ ChangeLog
 6.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Replace "+" signs in python versions by "-" in default image name
 
 
 6.4 (2018-11-28)
