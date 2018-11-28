@@ -148,6 +148,7 @@ class DefaultImageNameTestCase(unittest.TestCase):
             releases = (
                 'grocker-test-project==2.0.0',
                 'grocker-test-project[pep8]==2.0.0',
+                'grocker-test-project[pep8, other_extra]==2.0.0+git1234',
                 filepath,
             )
             image_names = (None, 'demo-app')
@@ -164,6 +165,11 @@ class DefaultImageNameTestCase(unittest.TestCase):
                 'registry.local/grocker-test-project-pep8:2.0.0',
                 'demo-app:2.0.0',
                 'registry.local/demo-app:2.0.0',
+                # with several extras and + sign
+                'grocker-test-project-other_extra-pep8:2.0.0-git1234',
+                'registry.local/grocker-test-project-other_extra-pep8:2.0.0-git1234',
+                'demo-app:2.0.0-git1234',
+                'registry.local/demo-app:2.0.0-git1234',
                 # from path
                 'grocker-test-project:1.2.3',
                 'registry.local/grocker-test-project:1.2.3',

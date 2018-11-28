@@ -57,7 +57,10 @@ def default_image_name(config, req):
     else:
         img_name = req.project_name
     img_name += ":{project_version}".format(
-        project_version=req.version,
+        # Python versions might contain "+"
+        # but a docker tag name must be valid ASCII and may contain lowercase and uppercase
+        # letters, digits, underscores, periods and dashes
+        project_version=req.version.replace('+', '-'),
     )
     return '/'.join((docker_image_prefix, img_name)) if docker_image_prefix else img_name
 
