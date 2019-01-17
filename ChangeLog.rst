@@ -4,6 +4,7 @@ ChangeLog
 6.6 (unreleased)
 ----------------
 
+- Python 3.4 & 3.5 support (for Grocker command) will be dropped in next major version (**deprecation warning**)
 - Add support for Python's stretch/3.7 docker image.
 
 
