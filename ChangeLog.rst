@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.6 (unreleased)
+6.6 (2019-01-18)
 ----------------
 
 - Python 3.4 & 3.5 support (for Grocker command) will be dropped in next major version (**deprecation warning**)
