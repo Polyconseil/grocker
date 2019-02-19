@@ -176,9 +176,11 @@ class GrockerRequirement(object):
         )
 
     @property
+    def pip_extras(self):
+        if not self.extras:
+            return ''
+        return "[{}]".format(",".join(sorted(self.extras)))
+
+    @property
     def to_install(self):
-        parts = [self.project_name]
-        if self.extras:
-            parts.append("[{}]".format(",".join(sorted(self.extras))))
-        parts.extend([self.operator, self.version])
-        return "".join(parts)
+        return "".join([self.project_name, self.pip_extras, self.operator, self.version])

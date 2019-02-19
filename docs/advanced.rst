@@ -25,7 +25,15 @@ The build command line interface
 
     Usage: grocker build [OPTIONS] RELEASE
 
-      Build docker image for <release> (version specifiers can be used).
+      Build docker image for RELEASE (version specifiers can be used).
+
+      RELEASE can either be the name of a project, or the path to a wheel to
+      use. In both cases, extra requirements can be applied:
+
+      grocker build your_project[with_extra]==1.2.3
+
+      grocker build /path/to/your_project-1.2.3.whl[with_extra]
+
 
     Options:
       -c, --config <filename>         Grocker config file

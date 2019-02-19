@@ -4,7 +4,7 @@ ChangeLog
 6.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix pip install error when building an image from a wheel with extra requirements passed from a filepath
 
 
 6.6 (2019-01-18)

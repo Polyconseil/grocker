@@ -30,9 +30,10 @@ Direct wheel path
 A wheel can also be directly passed to grocker to avoid the need to upload an artefact to
 build an image.
 
-Grocker will switch to this mode if a ``/`` is present in the argument.
+Grocker will switch to this mode if a ``/`` is present in the argument. Pip ``extra``
+requirements can be used in this mode.
 
 .. code-block:: console
 
-    $ grocker build ./path/to/ipython-7.1.1-py3-none-any.whl --entrypoint ipython
-    $ docker run --rm -ti ipython:7.1.1-<grocker-version>
+    $ grocker build ./path/to/ipython-7.1.1-py3-none-any.whl[doc] --entrypoint ipython
+    $ docker run --rm -ti ipython-doc:7.1.1-<grocker-version>

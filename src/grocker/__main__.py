@@ -82,7 +82,15 @@ def purge(all_versions, including_final_images):
 )
 @click.argument('release')
 def build(release, build_dependencies, build_image, push, **kwargs):
-    """Build docker image for <release> (version specifiers can be used)."""
+    """Build docker image for RELEASE (version specifiers can be used).
+
+    RELEASE can either be the name of a project, or the path to a wheel to use. In both cases, extra requirements can be
+    applied:
+
+        grocker build your_project[with_extra]==1.2.3
+
+        grocker build /path/to/your_project-1.2.3.whl[with_extra]
+    """
     requirement = utils.GrockerRequirement.parse(release)
     collect = {}  # will contain all collected information
     docker_client = utils.docker_get_client()

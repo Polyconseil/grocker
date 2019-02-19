@@ -58,10 +58,12 @@ def compile_wheels(docker_client, config, requirement, pip_conf):
             'mode': 'rw',
         },
     }
+
     if requirement.filepath:
         filename = os.path.basename(requirement.filepath)
-        to_install = '/tmp/src/{}'.format(filename)  # noqa: S108
-        volumes[requirement.filepath] = {'bind': to_install, 'mode': 'ro'}
+        wheel_path = '/tmp/src/{}'.format(filename)  # noqa: S108
+        volumes[requirement.filepath] = {'bind': wheel_path, 'mode': 'ro'}
+        to_install = wheel_path + requirement.pip_extras
     else:
         to_install = requirement.to_install
 

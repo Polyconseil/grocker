@@ -138,6 +138,28 @@ class AbstractBuildTestCase:
         expected = msg
         self.check(config, wheel_filepath, msg, expected)
 
+    def test_from_path_with_extra(self):
+        test_project_path = os.path.abspath(os.path.join(__file__, '..', 'resources', 'grocker-test-project'))
+        subprocess.check_call([  # noqa: S603
+                sys.executable,
+                'setup.py',
+                'bdist_wheel',
+                '--universal',
+            ],
+            cwd=test_project_path,
+        )
+        # Specificy [pep8] extra requirement
+        wheel_filepath = os.path.join(
+            test_project_path, 'dist', 'grocker_test_project-3.0.1-py2.py3-none-any.whl[pep8]',
+        )
+        config = {
+            'runtime': self.runtime,
+            'dependencies': self.dependencies,
+        }
+        msg = 'Grocker build this successfully !'
+        expected = msg
+        self.check(config, wheel_filepath, msg, expected)
+
     def test_pip_constraints(self):
         with tempfile.NamedTemporaryFile() as fp:
             fp.write(b'qrcode==5.2')
