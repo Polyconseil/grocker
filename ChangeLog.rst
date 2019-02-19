@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.7 (unreleased)
+6.7 (2019-02-19)
 ----------------
 
 - Fix pip install error when building an image from a wheel with extra requirements passed from a filepath
