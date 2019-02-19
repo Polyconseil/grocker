@@ -17,7 +17,7 @@ import zlib
 try:  # Python 3+
     import configparser
 except ImportError:  # Python 2.7
-    import ConfigParser as configparser
+    import ConfigParser as configparser  # noqa: N813
 
 
 WHEELS_DIRECTORY = os.path.expanduser('~/packages')
