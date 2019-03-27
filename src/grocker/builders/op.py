@@ -99,6 +99,7 @@ def get_manifest_digest(name):
 
     registry, repository = registry_repository.split('/', 1)
     response = requests.head('https://{}/v2/{}/manifests/{}'.format(registry, repository, tag))
+    response.raise_for_status()
     return response.headers['Docker-Content-Digest']
 
 
