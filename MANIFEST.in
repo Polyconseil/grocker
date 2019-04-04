@@ -1,6 +1,6 @@
-include Readme.rst LICENSE.txt
+include README.rst LICENSE.txt
 graft src/grocker
 prune docs
 prune tests
-exclude ChangeLog.rst requirements-dev.txt Makefile tox.ini
+exclude CHANGELOG.rst requirements-dev.txt Makefile tox.ini
 global-exclude *.py[cod] __pycache__ *.so
