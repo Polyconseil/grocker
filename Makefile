@@ -8,7 +8,8 @@ docs:
 	sphinx-build -W -n -b html docs ./build/sphinx/html
 
 quality:
-	python setup.py check --strict --metadata --restructuredtext
+	python setup.py check --strict --metadata
+	python setup.py --quiet sdist && twine check dist/*
 	check-manifest
 	flake8 src tests setup.py
 
