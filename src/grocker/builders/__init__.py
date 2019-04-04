@@ -5,12 +5,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from . import build
-from .build import build_runner_image
 from . import naming
 from . import op
-from .op import docker_push_image, get_manifest_digest, is_prefixed_image
+from .build import build_runner_image
+from .op import docker_push_image
+from .op import get_manifest_digest
+from .op import is_prefixed_image
 from .wheels import compile_wheels
-
 
 __all__ = [
     'build_runner_image',

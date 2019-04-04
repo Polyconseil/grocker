@@ -9,10 +9,10 @@ import logging
 import os.path
 import zlib
 
-from . import naming
-from . import op
 from .. import six
 from .. import utils
+from . import naming
+from . import op
 
 logger = logging.getLogger(__name__)
 

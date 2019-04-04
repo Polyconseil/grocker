@@ -11,11 +11,11 @@ import shutil
 
 import docker.errors
 
-from . import naming
-from . import op
 from .. import __version__
 from .. import helpers
 from .. import utils
+from . import naming
+from . import op
 
 logger = logging.getLogger(__name__)
 
