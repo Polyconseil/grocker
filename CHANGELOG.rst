@@ -4,7 +4,7 @@ ChangeLog
 6.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Drop Python 3.4 support since it is not supported anymore (**breaking change**).
 
 
 6.7 (2019-02-19)
