@@ -56,7 +56,7 @@ runtimes:  # grocker internal configuration
         - python3-dev
 
   "stretch/3.6":
-    # TODO: this is a rolling-release tag, so the root image needs to be updated to
+    # XXX: this is a rolling-release tag, so the root image needs to be updated to
     # grab the latest upstream image.
     image: python:3.6-slim-stretch
     runtime: python3
@@ -65,7 +65,7 @@ runtimes:  # grocker internal configuration
         - build-essential
 
   "stretch/3.7":
-    # TODO: this is a rolling-release tag, so the root image needs to be updated to
+    # XXX: this is a rolling-release tag, so the root image needs to be updated to
     # grab the latest upstream image.
     image: python:3.7-slim-stretch
     runtime: python3
