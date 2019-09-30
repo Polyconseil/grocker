@@ -29,6 +29,7 @@ def docker_purge_container(docker_client, current_version=False):
     Args:
         docker_client (docker.DockerClient): a docker client
         current_version (bool): whether the images for current version will be deleted
+
     """
     removable_containers = [
         container
@@ -57,6 +58,7 @@ def docker_purge_volumes(docker_client, current_version=False):
     Args:
         docker_client (docker.DockerClient): a docker client
         current_version (bool): whether the volumes for current version will be deleted
+
     """
     removable_volumes = [
         volume
@@ -83,6 +85,7 @@ def docker_purge_images(docker_client, current_version=False, runner=False):
         docker_client (docker.DockerClient): a docker client
         current_version (bool): whether the images for current version will be deleted
         runner (bool): whether the runner images will be deleted
+
     """
     removable_images = [
         image
