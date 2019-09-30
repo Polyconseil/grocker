@@ -74,6 +74,7 @@ def pip_conf(pip_conf_path=None):
 
     Yield:
         str, the path to the pip configuration file (or the faked one)
+
     """
     if pip_conf_path is None or not os.path.exists(pip_conf_path):
         with tempfile.NamedTemporaryFile('w', dir=os.path.expanduser('~/.cache')) as f:
