@@ -4,6 +4,7 @@ ChangeLog
 6.8 (unreleased)
 ----------------
 
+- Add support for buster/3.7 runtime.
 - Drop Python 3.4 support since it is not supported anymore (**breaking change**).
 
 
