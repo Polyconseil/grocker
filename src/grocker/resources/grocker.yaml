@@ -33,6 +33,7 @@ runtimes:  # grocker internal configuration
         - python3-dev
 
   "alpine/3.6":
+    deprecated: yes
     image: alpine:latest
     runtime: python3
     dependencies:
@@ -82,9 +83,19 @@ runtimes:  # grocker internal configuration
       build:
         - build-essential
 
+  "alpine/3":
+    image: alpine:latest
+    runtime: python3
+    dependencies:
+      run:
+        - python3
+      build:
+        - alpine-sdk
+        - python3-dev
+
 # There begin the project configuration (so all values below are use as default)
 
-runtime: alpine/3.6
+runtime: alpine/3
 pip_constraint: # pip_constraint is optional
 volumes: []
 ports: []

@@ -280,7 +280,7 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
 
 
 class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):
-    runtime = 'alpine/3.6'
+    runtime = 'alpine/3'
     dependencies = {
         'build': ['libjpeg-turbo-dev', 'zlib-dev'],
         'run': ['libjpeg-turbo', 'zlib'],

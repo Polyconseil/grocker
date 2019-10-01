@@ -92,7 +92,7 @@ It is written in YAML. By default, Grocker looks for this file in the current di
 .. code-block:: yaml
 
     # .grocker.yml (defaults)
-    runtime: alpine/3.6
+    runtime: alpine/3
     pip_constraint: # optional
     volumes: []
     ports: []
