@@ -69,6 +69,7 @@ runtimes:  # grocker internal configuration
   "stretch/3.7":
     # XXX: this is a rolling-release tag, so the root image needs to be updated to
     # grab the latest upstream image.
+    deprecated: yes
     image: python:3.7-slim-stretch
     runtime: python3
     dependencies:

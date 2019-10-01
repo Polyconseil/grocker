@@ -6,6 +6,7 @@ ChangeLog
 
 - Add support for buster/3.7 runtime.
 - Add support for alpine/3 runtime and use it by default.
+- Deprecate stretch/3.7 runtime (**deprecation warning**).
 - Deprecate alpine/3.6 runtime (**deprecation warning**)
 - Drop Python 3.4 support since it is not supported anymore (**breaking change**).
 
