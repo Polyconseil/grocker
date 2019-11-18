@@ -4,6 +4,7 @@ ChangeLog
 6.8 (unreleased)
 ----------------
 
+- Add support for buster/3.8 runtime.
 - Add support for buster/3.7 runtime.
 - Add support for alpine/3 runtime and use it by default.
 - Deprecate stretch/3.7 runtime (**deprecation warning**).
