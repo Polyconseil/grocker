@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.8 (unreleased)
+6.8 (2019-11-18)
 ----------------
 
 - Add Python 3.8 support (for Grocker command).
