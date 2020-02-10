@@ -5,7 +5,9 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import base64
 import contextlib
+import json
 import logging
 import os.path
 
@@ -98,6 +100,20 @@ def get_manifest_digest(name):
         return None  # Docker HUB API is not documented
 
     registry, repository = registry_repository.split('/', 1)
+
+    docker_config_path = os.path.expanduser('~/.docker/config.json')
+    if os.path.exists(docker_config_path):
+        with open(docker_config_path, 'r') as f:
+            docker_conf = json.load(f)
+        auth_basic_token = (
+            docker_conf.get('auths', {})
+            .get(registry, {})
+            .get('auth', None)
+        )
+        if auth_basic_token:
+            credentials = base64.b64decode(auth_basic_token).decode('utf-8')
+            registry = f'{credentials}@{registry}'
+
     response = requests.head('https://{}/v2/{}/manifests/{}'.format(registry, repository, tag))
     response.raise_for_status()
     return response.headers['Docker-Content-Digest']
