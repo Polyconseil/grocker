@@ -17,8 +17,8 @@ class GrockerDeprecationWarning(Warning):
     pass
 
 
-if tuple(sys.version_info[:2]) in ((2, 7), (3, 4), (3, 5)):
+if tuple(sys.version_info[:2]) in ((3, 5)):
     warnings.warn(
-        "Support for 2.7, 3.4 and 3.5 will be dropped in next major version",
+        "Support for 3.5 will be dropped in next major version",
         category=GrockerDeprecationWarning,
     )

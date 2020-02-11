@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import argparse
 import base64
+import configparser
 import logging
 import logging.config
 import os
@@ -13,12 +14,6 @@ import os.path
 import subprocess  # noqa: S404
 import tempfile
 import zlib
-
-try:  # Python 3+
-    import configparser
-except ImportError:  # Python 2.7
-    import ConfigParser as configparser  # noqa: N813
-
 
 WHEELS_DIRECTORY = os.path.expanduser('~/packages')
 

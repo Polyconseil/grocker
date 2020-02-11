@@ -4,7 +4,7 @@ ChangeLog
 6.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Drop Python 2.7 support (for Grocker command) **breaking change**
 
 
 6.8 (2019-11-18)
