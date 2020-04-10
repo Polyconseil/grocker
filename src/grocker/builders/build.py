@@ -36,7 +36,7 @@ def build_root_image(docker_client, config):
             context,
         )
 
-        # FIXME(fbochu): Replace template by env vars
+        # XXX: We should replace template by env vars
         helpers.render_template(
             os.path.join(build_dir, 'provision.sh.j2'),
             os.path.join(build_dir, 'provision.sh'),
