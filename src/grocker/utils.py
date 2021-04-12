@@ -29,8 +29,8 @@ def config_identifier(config):
         str: Config identifier (SHA 256)
 
     """
-    def unit_list(l):
-        return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in l))
+    def unit_list(list_item):
+        return UNIT_SEPARATOR.join(sorted(x.encode('utf-8') for x in list_item))
 
     dependencies = unit_list(get_dependencies(config, with_build_dependencies=True))
     repositories = RECORD_SEPARATOR.join(

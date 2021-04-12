@@ -119,7 +119,8 @@ class AbstractBuildTestCase:
 
     def test_from_path(self):
         test_project_path = os.path.abspath(os.path.join(__file__, '..', 'resources', 'grocker-test-project'))
-        subprocess.check_call([  # noqa: S603
+        subprocess.check_call(  # noqa: S603
+            [
                 sys.executable,
                 'setup.py',
                 'bdist_wheel',
@@ -140,7 +141,8 @@ class AbstractBuildTestCase:
 
     def test_from_path_with_extra(self):
         test_project_path = os.path.abspath(os.path.join(__file__, '..', 'resources', 'grocker-test-project'))
-        subprocess.check_call([  # noqa: S603
+        subprocess.check_call(  # noqa: S603
+            [
                 sys.executable,
                 'setup.py',
                 'bdist_wheel',
