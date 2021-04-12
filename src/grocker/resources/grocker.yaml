@@ -118,3 +118,4 @@ dependencies:
 docker_image_prefix:
 image_base_name:
 entrypoint_name: grocker-runner
+manifest: False
