@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-6.9 (unreleased)
+6.9 (2021-04-13)
 ----------------
 
 - Drop Python 2.7 support (for Grocker command) **breaking change**
