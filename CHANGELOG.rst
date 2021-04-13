@@ -5,7 +5,7 @@ ChangeLog
 ----------------
 
 - Drop Python 2.7 support (for Grocker command) **breaking change**
-- get image hash from manifest is now optionnal and set by default to False
+- Retrieving the image hash from manifest is now optional and disabled by default
 
 
 6.8 (2019-11-18)
