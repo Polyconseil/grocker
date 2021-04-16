@@ -154,7 +154,7 @@ def build(release, build_dependencies, build_image, push, **kwargs):
             collect['hash'] = (
                 builders.get_manifest_digest(image_name)
                 or [x.split('@')[1] for x in image.attrs['RepoDigests']][0]
-            ) if config['manifest'] else [x.split('@')[1] for x in image.attrs['RepoDigests']][0]
+            ) if config['manifest'] else None
 
     if kwargs['result_file']:
         helpers.dump_yaml(kwargs['result_file'], collect)

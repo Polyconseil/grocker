@@ -4,7 +4,7 @@ ChangeLog
 6.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- optionnal manifest set image hash to None
 
 
 6.9 (2021-04-13)
