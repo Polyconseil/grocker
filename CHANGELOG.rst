@@ -1,8 +1,8 @@
 ChangeLog
 =========
 
-6.10 (unreleased)
------------------
+6.9.1 (2021-04-20)
+------------------
 
 - optionnal manifest set image hash to None
 
