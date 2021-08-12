@@ -5,6 +5,8 @@ ChangeLog
 -----------------
 
 - Drop Python 3.5 support since it is not supported anymore (**breaking change**).
+- Add Python 3.9 support (for Grocker command).
+- Add support for buster/3.9 runtime.
 
 
 6.9.1 (2021-04-20)

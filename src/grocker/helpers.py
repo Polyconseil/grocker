@@ -11,9 +11,14 @@ import subprocess  # noqa: S404
 import tempfile
 import time
 
-import importlib_resources as resources
 import jinja2
 import yaml
+
+try:
+    from importlib import resources
+except ImportError:
+    # Python<3.9: use importlib-resources package
+    import importlib_resources as resources  # type: ignore
 
 
 def copy_resources(package, destination):

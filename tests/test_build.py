@@ -221,7 +221,7 @@ class AbstractBuildTestCase:
 
 
 class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
-    runtime = 'buster/3.8'
+    runtime = 'buster/3.9'
     dependencies = {
         'build': ['libjpeg62-turbo-dev'],
         'run': ['libjpeg62-turbo'],

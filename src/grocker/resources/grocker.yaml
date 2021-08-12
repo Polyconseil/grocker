@@ -94,6 +94,15 @@ runtimes:  # grocker internal configuration
       build:
         - build-essential
 
+  "buster/3.9":
+    # XXX: this is a rolling-release tag, so the root image needs to be updated to
+    # grab the latest upstream image.
+    image: python:3.9-slim-buster
+    runtime: python3
+    dependencies:
+      build:
+        - build-essential
+
   "alpine/3":
     image: alpine:latest
     runtime: python3
