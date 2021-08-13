@@ -3,9 +3,13 @@
 import sys
 import warnings
 
-import pkg_resources
+try:
+    from importlib import metadata
+except ImportError:
+    # Python<3.8: use importlib-metadata package
+    import importlib_metadata as metadata  # type: ignore
 
-__version__ = pkg_resources.get_distribution('grocker').version
+__version__ = metadata.version('grocker')
 __copyright__ = '2015, Polyconseil'
 
 
