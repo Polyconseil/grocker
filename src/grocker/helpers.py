@@ -1,8 +1,10 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
+import configparser
 import contextlib
 import functools
 import json
+import os
 import os.path
 import shutil
 import subprocess  # noqa: S404
@@ -13,12 +15,9 @@ import importlib_resources as resources
 import jinja2
 import yaml
 
-from .six import configparser
-from .six import makedirs
-
 
 def copy_resources(package, destination):
-    makedirs(destination, exist_ok=True)
+    os.makedirs(destination, exist_ok=True)
 
     for entry in resources.contents(package):
         if not resources.is_resource(package, entry):
@@ -35,7 +34,7 @@ def load_yaml(file_path):
 
 def dump_yaml(file_path, data):
     directory = os.path.dirname(file_path)
-    makedirs(directory, exist_ok=True)
+    os.makedirs(directory, exist_ok=True)
 
     with open(file_path, 'w') as fp:
         return yaml.safe_dump(data, stream=fp, indent=True)

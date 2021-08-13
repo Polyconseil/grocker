@@ -9,13 +9,12 @@ import textwrap
 import unittest
 
 import grocker.builders as grocker_builders
-import grocker.six as grocker_six
 import grocker.utils as grocker_utils
 
 
 @contextlib.contextmanager
 def mkchtmpdir():
-    with grocker_six.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory() as tmp_dir:
         old_cwd = os.getcwd()
         try:
             os.chdir(tmp_dir)
@@ -91,7 +90,7 @@ class ConfigTestCase(unittest.TestCase):
 class GrockerRequirementTestCase(unittest.TestCase):
 
     def test_existing_filepath(self):
-        with grocker_six.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
             filepath = os.path.join(tmpdir, filename)
             with open(filepath, 'w'):
@@ -103,7 +102,7 @@ class GrockerRequirementTestCase(unittest.TestCase):
             self.assertEqual(filepath, grocker_req.filepath)
 
     def test_existing_filepath_with_extras(self):
-        with grocker_six.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
             filepath = os.path.join(tmpdir, filename)
             with open(filepath, 'w'):
@@ -133,7 +132,7 @@ class GrockerRequirementTestCase(unittest.TestCase):
 class DefaultImageNameTestCase(unittest.TestCase):
 
     def test_default_image_name(self):
-        with grocker_six.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             filename = 'grocker_test_project-1.2.3-py2.py3-none-any.whl'
             filepath = os.path.join(tmpdir, filename)
             with open(filepath, 'w'):

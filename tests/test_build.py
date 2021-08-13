@@ -13,7 +13,6 @@ import uuid
 import docker.errors
 import yaml
 
-import grocker.six
 import grocker.utils
 
 
@@ -91,7 +90,7 @@ class AbstractBuildTestCase:
             docker_rmi(image_name)
 
     def check(self, config, release, cmd, expected, docker_prefix=None):
-        with grocker.six.TemporaryDirectory() as tmp_dir:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, '.grocker.yml'), 'w') as fp:
                 yaml.safe_dump(config, fp)
 
