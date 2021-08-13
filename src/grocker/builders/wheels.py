@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import base64
 import logging
@@ -61,7 +57,7 @@ def compile_wheels(docker_client, config, requirement, pip_conf):
 
     if requirement.filepath:
         filename = os.path.basename(requirement.filepath)
-        wheel_path = '/tmp/src/{}'.format(filename)  # noqa: S108
+        wheel_path = f'/tmp/src/{filename}'  # noqa: S108
         volumes[requirement.filepath] = {'bind': wheel_path, 'mode': 'ro'}
         to_install = wheel_path + requirement.pip_extras
     else:

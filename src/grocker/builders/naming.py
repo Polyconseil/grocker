@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 from .. import __version__
 from .. import utils

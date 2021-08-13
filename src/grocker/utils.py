@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import hashlib
 import os.path
@@ -119,7 +115,7 @@ def parse_config(config_paths, **kwargs):
     return config
 
 
-class GrockerRequirement(object):
+class GrockerRequirement:
 
     def __init__(self, project_name, operator, version, extras, filepath):
         self.project_name = packaging.utils.canonicalize_name(project_name)

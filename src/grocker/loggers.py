@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import logging
 import logging.config
@@ -18,13 +14,13 @@ class ColoredStreamHandler(logging.StreamHandler):
     }
 
     def format(self, record):
-        msg = super(ColoredStreamHandler, self).format(record)
+        msg = super().format(record)
         color = self._colors.get(record.levelno, None)
 
         if not color or not self.stream.isatty():
             return msg
 
-        return '\x1b[{color}m{msg}\x1b[0m'.format(color=color, msg=msg)
+        return f'\x1b[{color}m{msg}\x1b[0m'
 
 
 def setup(verbose=False):
@@ -36,7 +32,7 @@ def setup(verbose=False):
             'simple': {'format': '%(name)s: %(message)s'},
         },
         'handlers': {
-            'console': {'class': '{}.ColoredStreamHandler'.format(__name__), 'formatter': 'simple'},
+            'console': {'class': f'{__name__}.ColoredStreamHandler', 'formatter': 'simple'},
         },
         'loggers': {
             'grocker': {'handlers': ['console'], 'level': level},

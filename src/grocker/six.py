@@ -1,9 +1,5 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import os
 import os.path
@@ -18,7 +14,7 @@ except ImportError:
 # pylint: enable=unused-import,import-error
 
 
-class TemporaryDirectory(object):
+class TemporaryDirectory:
     """Create and return a temporary directory.
 
     This has the same behavior as mkdtemp but can be used as a context manager.
@@ -35,7 +31,7 @@ class TemporaryDirectory(object):
         self.name = tempfile.mkdtemp(suffix, prefix, directory)
 
     def __repr__(self):
-        return "<{} {!r}>".format(self.__class__.__name__, self.name)
+        return f"<{self.__class__.__name__} {self.name!r}>"
 
     def __enter__(self):
         return self.name
