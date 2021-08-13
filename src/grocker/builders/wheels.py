@@ -1,11 +1,11 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
 import base64
+import configparser
 import logging
 import os.path
 import zlib
 
-from .. import six
 from .. import utils
 from . import naming
 from . import op
@@ -17,14 +17,14 @@ def get_pip_env(pip_conf):
     def get(cfg, section, option, default=None):
         try:
             return cfg.get(section, option)
-        except (six.configparser.NoSectionError, six.configparser.NoOptionError):
+        except (configparser.NoSectionError, configparser.NoOptionError):
             return default
 
     if not pip_conf:
         return {}
 
     logger.info('-> Pip use configuration from %s.', pip_conf)
-    config = six.configparser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(pip_conf)
 
     env = {

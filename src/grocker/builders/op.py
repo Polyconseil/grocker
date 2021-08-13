@@ -3,6 +3,7 @@
 import contextlib
 import logging
 import os.path
+import tempfile
 
 import docker
 import docker.errors
@@ -12,7 +13,6 @@ import requests.exceptions
 
 from .. import __version__
 from .. import helpers
-from .. import six
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ def is_prefixed_image(name):
 
 @contextlib.contextmanager
 def docker_build_context(context_module):
-    with six.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory() as tmp_dir:
         build_dir = os.path.join(tmp_dir, 'build')
         helpers.copy_resources(context_module, build_dir)
         yield build_dir
