@@ -4,7 +4,7 @@ ChangeLog
 6.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Drop Python 3.5 support since it is not supported anymore (**breaking change**).
 
 
 6.9.1 (2021-04-20)

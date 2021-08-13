@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import contextlib
 import logging
@@ -98,7 +93,7 @@ def get_manifest_digest(name):
         return None  # Docker HUB API is not documented
 
     registry, repository = registry_repository.split('/', 1)
-    response = requests.head('https://{}/v2/{}/manifests/{}'.format(registry, repository, tag))
+    response = requests.head(f'https://{registry}/v2/{repository}/manifests/{tag}')
     response.raise_for_status()
     return response.headers['Docker-Content-Digest']
 

@@ -1,9 +1,6 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import os
 import re
@@ -56,7 +53,7 @@ class AbstractBuildTestCase:
     tp_version = '3.0.1'
 
     def run_grocker(self, release, command, cwd, docker_prefix):
-        image_name = 'grocker.test/{}'.format(uuid.uuid4())
+        image_name = f'grocker.test/{uuid.uuid4()}'
         result_file_path = os.path.join(
             cwd,
             'created-by-grocker',
@@ -115,7 +112,7 @@ class AbstractBuildTestCase:
         }
         msg = 'Grocker build this successfully !'
         expected = msg
-        self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), msg, expected)
+        self.check(config, f'{self.tp_name}=={self.tp_version}', msg, expected)
 
     def test_from_path(self):
         test_project_path = os.path.abspath(os.path.join(__file__, '..', 'resources', 'grocker-test-project'))
@@ -173,7 +170,7 @@ class AbstractBuildTestCase:
                 'runtime': self.runtime,
                 'dependencies': self.dependencies,
             }
-            self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', 'pip freeze'], 'qrcode==5.2')
+            self.check(config, f'{self.tp_name}=={self.tp_version}', ['-c', 'pip freeze'], 'qrcode==5.2')
 
     def test_extras(self):
         config = {
@@ -181,7 +178,7 @@ class AbstractBuildTestCase:
             'runtime': self.runtime,
             'dependencies': self.dependencies,
         }
-        self.check(config, '{}[pep8]=={}'.format(self.tp_name, self.tp_version), ['-c', 'pip list'], 'pep8')
+        self.check(config, f'{self.tp_name}[pep8]=={self.tp_version}', ['-c', 'pip list'], 'pep8')
 
     def test_with_docker_prefix(self):
         config = {
@@ -216,7 +213,7 @@ class AbstractBuildTestCase:
         }
         msg = 'Grocker build this successfully !'
         expected = 'custom: %s' % msg
-        _, inspect_data = self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), msg, expected)
+        _, inspect_data = self.check(config, f'{self.tp_name}=={self.tp_version}', msg, expected)
 
         volumes = sorted(inspect_data['Config'].get('Volumes', []))
         ports = sorted(inspect_data['Config'].get('ExposedPorts', []))
@@ -278,7 +275,7 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
             "output = subprocess.check_output(['apt-cache', 'policy'])",
             "print('nginx' in output.decode())",
         ])
-        self.check(config, '{}=={}'.format(self.tp_name, self.tp_version), ['-c', script], 'True')
+        self.check(config, f'{self.tp_name}=={self.tp_version}', ['-c', script], 'True')
 
 
 class AlpineTestCase(AbstractBuildTestCase, unittest.TestCase):

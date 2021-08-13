@@ -1,13 +1,6 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import contextlib
-import io
 import itertools
 import os
 import os.path
@@ -32,7 +25,7 @@ def mkchtmpdir():
 
 
 def write_file(directory, name, content):
-    with io.open(os.path.join(directory, name), 'w') as fp:
+    with open(os.path.join(directory, name), 'w') as fp:
         fp.write(textwrap.dedent(content))
 
 

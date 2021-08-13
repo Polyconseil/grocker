@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Polyconseil SAS. All rights reserved.
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import contextlib
 import functools
-import io
 import json
 import os.path
 import shutil
@@ -34,7 +29,7 @@ def copy_resources(package, destination):
 
 
 def load_yaml(file_path):
-    with io.open(file_path, encoding='utf-8') as fp:
+    with open(file_path, encoding='utf-8') as fp:
         return yaml.safe_load(fp.read())
 
 
@@ -42,7 +37,7 @@ def dump_yaml(file_path, data):
     directory = os.path.dirname(file_path)
     makedirs(directory, exist_ok=True)
 
-    with io.open(file_path, 'w') as fp:
+    with open(file_path, 'w') as fp:
         return yaml.safe_dump(data, stream=fp, indent=True)
 
 
@@ -55,12 +50,12 @@ def render_template(template_path, output_path, context):
     env = jinja2.Environment()  # noqa: S701
     env.filters['jsonify'] = json.dumps
 
-    with io.open(template_path, encoding='utf-8') as template_file:
+    with open(template_path, encoding='utf-8') as template_file:
         template = env.from_string(template_file.read())
 
     output = template.render(**context)
 
-    with io.open(output_path, mode='w', encoding='utf-8') as output_file:
+    with open(output_path, mode='w', encoding='utf-8') as output_file:
         output_file.write(output)
 
 
@@ -83,7 +78,7 @@ def pip_conf(pip_conf_path=None):
             for key in ['index-url', 'timeout', 'extra-index']:
                 try:
                     output = subprocess.check_output(  # noqa: S603,S607
-                        ['pip', 'config', 'get', 'global.{}'.format(key)],
+                        ['pip', 'config', 'get', f'global.{key}'],
                     )
                     value = output.decode().strip()
                     config.set('global', key, value)
