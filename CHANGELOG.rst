@@ -4,7 +4,7 @@ ChangeLog
 7.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Remove docker!=5.0.0 constraint
 
 
 7.0 (2021-08-13)
