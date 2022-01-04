@@ -1,8 +1,8 @@
 ChangeLog
 =========
 
-7.1 (unreleased)
-----------------
+7.0.1 (2022-01-04)
+------------------
 
 - Remove docker!=5.0.0 constraint
 
