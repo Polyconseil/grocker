@@ -4,7 +4,8 @@ ChangeLog
 7.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Drop Python 3.6 support since it is not supported anymore (**breaking change**).
+- Add Python 3.10 support (for Grocker command).
 
 
 7.0.1 (2022-01-04)
