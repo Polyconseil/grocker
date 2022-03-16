@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-7.1 (unreleased)
+8.0 (2022-03-16)
 ----------------
 
 - Drop Python 3.6 support since it is not supported anymore (**breaking change**).
