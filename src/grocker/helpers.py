@@ -76,7 +76,7 @@ def pip_conf(pip_conf_path=None):
 
     """
     if pip_conf_path is None or not os.path.exists(pip_conf_path):
-        with tempfile.NamedTemporaryFile('w', dir=os.path.expanduser('~/.cache')) as f:
+        with tempfile.NamedTemporaryFile('w') as f:
             config = configparser.RawConfigParser()
             config.add_section('global')
             for key in ['index-url', 'timeout', 'extra-index']:
