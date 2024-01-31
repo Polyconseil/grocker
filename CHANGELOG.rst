@@ -4,6 +4,7 @@ ChangeLog
 8.1 (unreleased)
 ----------------
 
+- Add Python 3.11 support (for Grocker command).
 - Drop Python 3.7 support since it is not supported anymore (**breaking change**).
 
 
