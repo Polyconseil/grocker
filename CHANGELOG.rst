@@ -4,7 +4,7 @@ ChangeLog
 8.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add support for bookworm/3.10 runtime.
 
 
 8.0 (2022-03-16)

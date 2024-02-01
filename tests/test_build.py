@@ -221,7 +221,7 @@ class AbstractBuildTestCase:
 
 
 class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
-    runtime = 'buster/3.10'
+    runtime = 'bookworm/3.10'
     dependencies = {
         'build': ['libjpeg62-turbo-dev'],
         'run': ['libjpeg62-turbo'],
@@ -234,7 +234,7 @@ class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
             'entrypoint_name': 'python',
             'repositories': {
                 'nginx': {
-                    'uri': 'deb http://nginx.org/packages/debian/ jessie nginx',
+                    'uri': 'deb http://nginx.org/packages/debian/ bookworm nginx',
                     'key': """
                         -----BEGIN PGP PUBLIC KEY BLOCK-----
                         Version: GnuPG v2.0.22 (GNU/Linux)
