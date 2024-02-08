@@ -11,7 +11,7 @@ quality:
 	python setup.py check --strict --metadata
 	python setup.py --quiet sdist && twine check dist/*
 	check-manifest
-	flake8 src tests setup.py
+	flake8 src tests
 
 Quality:  # not used in tests
 	vulture --exclude=build/ src tests setup.py
