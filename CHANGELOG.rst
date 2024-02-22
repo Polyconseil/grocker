@@ -5,6 +5,7 @@ ChangeLog
 ----------------
 
 - Add support for bookworm/3.10 runtime.
+- Add support for bookworm/3.12 runtime.
 
 
 8.0 (2022-03-16)

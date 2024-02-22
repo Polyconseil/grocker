@@ -121,6 +121,15 @@ runtimes:  # grocker internal configuration
       build:
         - build-essential
 
+  "bookworm/3.12":
+    # XXX: this is a rolling-release tag, so the root image needs to be updated to
+    # grab the latest upstream image.
+    image: python:3.12-slim-bookworm
+    runtime: python3
+    dependencies:
+      build:
+        - build-essential
+
   "alpine/3":
     image: alpine:latest
     runtime: python3

@@ -221,7 +221,7 @@ class AbstractBuildTestCase:
 
 
 class DebianBuildTestCase(AbstractBuildTestCase, unittest.TestCase):
-    runtime = 'bookworm/3.10'
+    runtime = 'bookworm/3.12'
     dependencies = {
         'build': ['libjpeg62-turbo-dev'],
         'run': ['libjpeg62-turbo'],
