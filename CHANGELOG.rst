@@ -4,6 +4,7 @@ ChangeLog
 8.1 (unreleased)
 ----------------
 
+- Add support for Python 3.11
 - Drop support for Python 3.7
 - Drop support for jessie & stretch & buster/3.7 & buster 3.8 runtime.
 - Add support for bookworm/3.10 runtime.
