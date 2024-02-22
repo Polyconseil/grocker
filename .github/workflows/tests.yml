@@ -16,11 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    name: Python ${{ matrix.python-version }} / ${{ matrix.django-version }}
+    name: Python ${{ matrix.python-version }}
     strategy:
       matrix:
         python-version:
-          - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
