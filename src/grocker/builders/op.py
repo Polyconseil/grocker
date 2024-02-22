@@ -93,7 +93,7 @@ def get_manifest_digest(name):
         return None  # Docker HUB API is not documented
 
     registry, repository = registry_repository.split('/', 1)
-    response = requests.head(f'https://{registry}/v2/{repository}/manifests/{tag}')
+    response = requests.head(f'https://{registry}/v2/{repository}/manifests/{tag}', timeout=5)
     response.raise_for_status()
     return response.headers['Docker-Content-Digest']
 
