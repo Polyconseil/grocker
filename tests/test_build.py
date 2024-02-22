@@ -118,9 +118,8 @@ class AbstractBuildTestCase:
         subprocess.check_call(  # noqa: S603
             [
                 sys.executable,
-                'setup.py',
-                'bdist_wheel',
-                '--universal',
+                '-m',
+                'build',
             ],
             cwd=test_project_path,
         )
@@ -140,9 +139,8 @@ class AbstractBuildTestCase:
         subprocess.check_call(  # noqa: S603
             [
                 sys.executable,
-                'setup.py',
-                'bdist_wheel',
-                '--universal',
+                '-m',
+                'build',
             ],
             cwd=test_project_path,
         )
