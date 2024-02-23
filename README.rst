@@ -4,7 +4,7 @@ Grocker - a Docker image builder for Python applications
 *Grocker* allows you to bundle your Python applications as Docker image
 while keeping the image size as minimal as possible.
 
-*Grocker* uses ``debian:jessie``, ``debian:stretch`` or ``alpine:latest`` as its
+*Grocker* uses ``debian:buster``, ``debian:bookworm`` or ``alpine:latest`` as its
 base image.
 
 *Grocker* is hosted on Github at https://github.com/polyconseil/Grocker.
