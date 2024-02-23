@@ -23,4 +23,5 @@ tox
 vulture
 
 # Release
+zest.releaser[recommended]
 build
