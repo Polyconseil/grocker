@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+8.2 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 8.1 (2024-02-23)
 ----------------
 
