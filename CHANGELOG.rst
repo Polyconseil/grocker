@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-8.2 (unreleased)
+8.2 (2024-02-27)
 ----------------
 
 - Use recursive update on grocker config
