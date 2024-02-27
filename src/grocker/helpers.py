@@ -21,6 +21,16 @@ except ImportError:
     import importlib_resources as resources  # type: ignore
 
 
+def deep_update(initial_mapping, updating_mapping):
+    updated_mapping = initial_mapping.copy()
+    for k, v in updating_mapping.items():
+        if k in updated_mapping and isinstance(updated_mapping[k], dict) and isinstance(v, dict):
+            updated_mapping[k] = deep_update(updated_mapping[k], v)
+        else:
+            updated_mapping[k] = v
+    return updated_mapping
+
+
 def copy_resources(package, destination):
     os.makedirs(destination, exist_ok=True)
 

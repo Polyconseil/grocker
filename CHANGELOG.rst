@@ -4,7 +4,7 @@ ChangeLog
 8.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Use recursive update on grocker config
 
 
 8.1 (2024-02-23)

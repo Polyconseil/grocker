@@ -8,6 +8,8 @@ import tempfile
 import textwrap
 import unittest
 
+import yaml
+
 import grocker.builders as grocker_builders
 import grocker.utils as grocker_utils
 
@@ -25,7 +27,7 @@ def mkchtmpdir():
 
 def write_file(directory, name, content):
     with open(os.path.join(directory, name), 'w') as fp:
-        fp.write(textwrap.dedent(content))
+        fp.write(yaml.dump(yaml.safe_load(content)))
 
 
 class ConfigTestCase(unittest.TestCase):
@@ -37,11 +39,14 @@ class ConfigTestCase(unittest.TestCase):
 
     first_config_content = """
         file: first.yml
-        dependencies: first.yml
+        dependencies:
+            run: first.yml
     """[1:-1]
 
     second_config_content = """
         file: second.yml
+        dependencies:
+            build: second.yml
         runtime: second.yml
     """[1:-1]
 
@@ -54,7 +59,8 @@ class ConfigTestCase(unittest.TestCase):
             config = grocker_utils.parse_config(['first.yml', 'second.yml'])
             self.assertNotIn('not_used_key', config)  # .grocker.yml is not read
             self.assertIn('entrypoint_name', config)  # grocker internal config is read
-            self.assertEqual(config.get('dependencies'), 'first.yml')  # from first.yml
+            self.assertEqual(config.get('dependencies').get('run'), 'first.yml')  # from first.yml
+            self.assertEqual(config.get('dependencies').get('build'), 'second.yml')  # from second.yml
             self.assertEqual(config.get('runtime'), 'second.yml')  # from second.yml
             self.assertEqual(config.get('file'), 'second.yml')  # from second.yml
 
