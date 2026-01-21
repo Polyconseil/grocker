@@ -148,8 +148,21 @@ def wheel_server(docker_client, config):
     )
     logger.info('Starting http server in container: %s', container.id)
     container.reload()
-    server_ip = container.attrs['NetworkSettings']['IPAddress']
-    logger.debug('http server running with ip: %s', server_ip)
+    network_settings = container.attrs['NetworkSettings']
+    if 'IPAddress' in network_settings:
+        # older version of dockerd, dunno exactly which
+        server_ip = network_settings['IPAddress']
+        logger.debug('http server running with ip: %s', server_ip)
+    else:
+        # hopefully, there's only one network defined (e.g. 'bridge') so let's try and use that one
+        # if there are more, let's hope that the first one that comes up is the one we care about
+        network_names = list(network_settings['Networks'])
+        first_network_name, *other_network_names = network_names
+        server_ip = network_settings['Networks'][first_network_name]['IPAddress']
+        logger.debug('http server running with ip: %s (on network %s)', server_ip, first_network_name)
+        if other_network_names:
+            logger.debug('(ignored networks: %s)', ', '.join(other_network_names))
+
     try:
         yield server_ip
     finally:

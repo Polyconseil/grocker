@@ -4,6 +4,7 @@ ChangeLog
 8.3 (unreleased)
 ----------------
 
+- Add support for newer dockerd 'container inspect' JSON payloads.
 - Add support for pypi auth using .netrc
 
 
