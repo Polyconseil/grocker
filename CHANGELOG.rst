@@ -4,6 +4,7 @@ ChangeLog
 8.3 (unreleased)
 ----------------
 
+- Drop unmaintained python 3.8/3.9, add newer versions
 - Add support for newer dockerd 'container inspect' JSON payloads.
 - Add support for pypi auth using .netrc
 
