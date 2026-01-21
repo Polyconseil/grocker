@@ -4,7 +4,7 @@ ChangeLog
 8.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add support for pypi auth using .netrc
 
 
 8.2 (2024-02-27)

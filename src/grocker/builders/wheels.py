@@ -4,6 +4,7 @@ import base64
 import configparser
 import logging
 import os.path
+import pathlib
 import zlib
 
 from .. import utils
@@ -54,6 +55,14 @@ def compile_wheels(docker_client, config, requirement, pip_conf):
             'mode': 'rw',
         },
     }
+
+    # may contain passwords/token for pypi auth
+    netrc = pathlib.Path('~/.netrc').expanduser()
+    if netrc.exists():
+        volumes[netrc] = {
+            'bind': '/home/grocker/.netrc',
+            'mode': 'ro',
+        }
 
     if requirement.filepath:
         filename = os.path.basename(requirement.filepath)
