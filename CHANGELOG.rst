@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-8.3 (unreleased)
+8.3 (2026-01-22)
 ----------------
 
 - Drop unmaintained python 3.8/3.9, add newer versions
